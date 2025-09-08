@@ -1,0 +1,54 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      NEXT_PUBLIC_NFT_COLLECTION_ADDRESS: "0xf167ACb33384D998fa3A1C415B680eA7976B1d9C"
+      NEXT_PUBLIC_MARKETPLACE_ADDRESS: "0x97fe79A5DEDB4890795786e8B91f697f9825A358"
+      NEXT_PUBLIC_NFT_OWNER_ADDRESS: "0xA72E7530798195dC09eDD905e129C17776892572"
+      NEXT_PUBLIC_CHAIN_ID: 8453
+      NEXT_PUBLIC_CHAIN_NAME: Base
+      NEXT_PUBLIC_RPC_URL: https://8453.rpc.thirdweb.com
+      NEXT_PUBLIC_THIRDWEB_CLIENT_ID: "0744c820c52c38d4c5017096246a1f60"
+      THIRDWEB_CLIENT_ID: "0744c820c52c38d4c5017096246a1f60"
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 8
+
+    - name: Get pnpm store directory
+      shell: bash
+      run: |
+        echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+    - name: Setup pnpm cache
+      uses: actions/cache@v3
+      with:
+        path: ${{ env.STORE_PATH }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
+
+    - name: Install dependencies
+      run: pnpm install
+
+    - name: Build project
+      run: pnpm build

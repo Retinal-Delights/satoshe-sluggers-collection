@@ -1,0 +1,20 @@
+{
+    "workbench.colorTheme": "Cursor Dark Midnight",
+    "terminal.integrated.enableMultiLinePasteWarning": false,
+    // automatically remove trailing spaces on save
+    "files.trimTrailingWhitespace": true,
+    "editor.guides.indentation": false,
+    "editor.guides.bracketPairs": false,
+    "editor.bracketPairColorization.enabled": false,
+    "editor.guides.highlightActiveIndentation": false,
+    "workbench.tree.renderIndentGuides": "none",
+    "editor.guides.highlightActiveBracketPair": false,
+    "editor.language.colorizedBracketPairs": [],
+    "workbench.colorCustomizations": {
+        "editorIndentGuide.background": "#00000000",
+        "editorIndentGuide.activeBackground": "#00000000"
+    },
+    "cursor.editor.renderIndentGuides": false,
+    "cursor.editor.renderBracketPairGuides": false,
+    "cursor.editor.renderWhitespace": "none"
+}

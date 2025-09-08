@@ -1,0 +1,14 @@
+
+Token ID	Metadata URL Starting Token ID	                                              Metadata URL Ending Token ID
+0-1499	  https://ipfs.io/ipfs/QmNMFNLD6U5xHcgzgBf6kBabwS54JyLTuPbtqcHp7wtUXR/0	        https://ipfs.io/ipfs/QmNMFNLD6U5xHcgzgBf6kBabwS54JyLTuPbtqcHp7wtUXR/1499
+1500-2999	https://ipfs.io/ipfs/QmSWmoFEHyPw59dBNDXpk8Ki23DKrJS4rmHgrBHgzjbE4K/1500	    https://ipfs.io/ipfs/QmSWmoFEHyPw59dBNDXpk8Ki23DKrJS4rmHgrBHgzjbE4K/2999
+3000-4499	https://ipfs.io/ipfs/QmdV4dPMDafHfKymEHh9nZjQK8JqMF3p5nX2MuhMJRVjLL/3000	    https://ipfs.io/ipfs/QmdV4dPMDafHfKymEHh9nZjQK8JqMF3p5nX2MuhMJRVjLL/4499
+4500-5999	https://ipfs.io/ipfs/QmfM4sYFjNBxfh1jCJckhT6dur2hqBQ83heCCSs7nAWuLk/4500	    https://ipfs.io/ipfs/QmfM4sYFjNBxfh1jCJckhT6dur2hqBQ83heCCSs7nAWuLk/5999
+6000-7776	https://ipfs.io/ipfs/QmdnXYmhnJcQbKwAEW5HrFiNZENVGqkcEgAghDVpg4EnZZ/6000	    https://ipfs.io/ipfs/QmdnXYmhnJcQbKwAEW5HrFiNZENVGqkcEgAghDVpg4EnZZ/7776
+
+Token ID	Media Image URL Starting Token ID	                                            Media Image URL Ending Token ID
+0-1499	  https://ipfs.io/ipfs/QmVgSHzcYzUGSZHNTRTQYjSRG3rbMkGBnzpxfxkpRokiTW/0.webp	  https://ipfs.io/ipfs/QmVgSHzcYzUGSZHNTRTQYjSRG3rbMkGBnzpxfxkpRokiTW/1499.webp
+1500-2999	https://ipfs.io/ipfs/QmWQg93rPMxCb1PsXtKwbNyXwLuzFBvVzjVcZa7yyS1tX5/1500.webp	https://ipfs.io/ipfs/QmWQg93rPMxCb1PsXtKwbNyXwLuzFBvVzjVcZa7yyS1tX5/2999.webp
+3000-4499	https://ipfs.io/ipfs/QmU3iXQYtstd4qZaa84C6GZbaJ349Nzia1bw4h9Aq7HYoS/3000.webp	https://ipfs.io/ipfs/QmU3iXQYtstd4qZaa84C6GZbaJ349Nzia1bw4h9Aq7HYoS/44989.webp
+4500-5999	https://ipfs.io/ipfs/QmR5KNgVSTAzpz762fdo6sJVjBMSfTJpQhTM3ofWbSAMxR/4500.webp	https://ipfs.io/ipfs/QmR5KNgVSTAzpz762fdo6sJVjBMSfTJpQhTM3ofWbSAMxR/5999.webp
+6000-7776	https://ipfs.io/ipfs/QmYNkR9Ysi5k5QaKfCvEhLqTkspNDXasYTXYumbaAoQEQc/6000.webp	https://ipfs.io/ipfs/QmYNkR9Ysi5k5QaKfCvEhLqTkspNDXasYTXYumbaAoQEQc/7776.webp
