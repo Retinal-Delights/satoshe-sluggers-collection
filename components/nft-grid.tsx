@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Pagination from "@/components/ui/pagination";
-import { useActiveAccount, useWalletBalance, useSendTransaction } from "thirdweb/react";
+import { useActiveAccount, useWalletBalance, useSendTransaction, TransactionButton } from "thirdweb/react";
 import { format } from "date-fns";
 import { readContract } from "thirdweb";
 import { bidInAuction, buyoutAuction } from "thirdweb/extensions/marketplace";
@@ -859,8 +859,8 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
       nft.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       nft.tokenId.toString().includes(searchTerm);
 
-    // View filter (Live vs Sold)
-    const matchesView = activeView === "forSale" ? nft.isForSale : !nft.isForSale;
+  // View filter (Live vs Sold)
+  const matchesView = activeView === "forSale" ? nft.isForSale : !nft.isForSale;
 
     // Rarity filter
     const matchesRarity =
@@ -1084,7 +1084,7 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
               className={`px-3 py-1 text-sm rounded transition-colors ${
                 activeView === "forSale"
                   ? "bg-brand-pink text-white"
-                  : "text-neutral-300 hover:text-brand-pink-light"
+                  : "text-neutral-300 hover:text-[#ff0099]"
               }`}
               onClick={() => setActiveView("forSale")}
             >
@@ -1094,7 +1094,7 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
               className={`px-3 py-1 text-sm rounded transition-colors ${
                 activeView === "sold"
                   ? "bg-brand-pink text-white"
-                  : "text-neutral-300 hover:text-brand-pink-light"
+                  : "text-neutral-300 hover:text-[#ff0099]"
               }`}
               onClick={() => setActiveView("sold")}
             >
@@ -1163,8 +1163,8 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
           </div>
         </div>
       </div>
-      {/* Only render the grid if there are NFTs, otherwise render nothing */}
-      {paginatedNFTs.length > 0 && (
+      {/* Only render the grid if there are NFTs, otherwise show empty state */}
+      {paginatedNFTs.length > 0 ? (
         <div className="mt-8 mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 justify-between">
           {paginatedNFTs.map((nft) => {
             const bidPriceFormatted = displayPrice(nft.bidPriceWei);
@@ -1230,7 +1230,7 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
                   rank={nft.rank}
                   rarity={nft.rarity}
                   rarityPercent={nft.rarityPercent}
-                  bidPrice={currentBidFormatted}
+                  bidPrice={bidPriceFormatted}
                   currentBid={currentBidFormatted}
                   buyNow={buyNowFormatted}
                   tokenId={nft.tokenId}
@@ -1242,6 +1242,7 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
                   isProcessingBid={isProcessingBid[nft.id]}
                   isProcessingBuyNow={isProcessingBuyNow[nft.id]}
                   isForSale={nft.isForSale}
+                  auctionId={nft.auctionId.toString()}
                   onBidAmountChange={(id, value) => handleBidAmountChange(nft.id, value)}
                   onPlaceBid={() => handlePlaceBid(nft)}
                   onBuyNow={() => handleBuyNow(nft)}
@@ -1250,6 +1251,15 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
               </div>
             );
           })}
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <div className="text-neutral-400 text-lg mb-2">No NFTs found</div>
+          <div className="text-neutral-500 text-sm">
+            {searchTerm
+              ? `No NFTs match "${searchTerm}"`
+              : "Try adjusting your filters or check back later"}
+          </div>
         </div>
       )}
       <Pagination

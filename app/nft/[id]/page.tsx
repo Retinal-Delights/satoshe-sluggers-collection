@@ -16,7 +16,7 @@ import {
 import AttributeRarityChart from "@/components/attribute-rarity-chart";
 import Footer from "@/components/footer";
 import Navigation from "@/components/navigation";
-import { MediaRenderer } from "thirdweb/react";
+import { MediaRenderer, TransactionButton } from "thirdweb/react";
 import {
   useReadContract,
   useSendTransaction,
@@ -34,6 +34,7 @@ import { bidInAuction, buyoutAuction } from "thirdweb/extensions/marketplace";
 import { validateNumericInput } from "@/lib/input-validation";
 import { client } from "@/lib/thirdweb";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useMarketplaceEvents } from "@/hooks/useMarketplaceEvents";
 import { ownerOf } from "thirdweb/extensions/erc721";
 import { formatETHPrice } from "@/lib/utils";
 // import { format } from "date-fns";
@@ -109,20 +110,24 @@ function getTierPricing(rarity: string) {
 function formatAuctionDate(endTimeSeconds: string | number | bigint) {
   if (!endTimeSeconds) return "N/A";
   const endDate = new Date(Number(endTimeSeconds) * 1000);
+  console.log(`[DEBUG] Auction end timestamp: ${endTimeSeconds}, converted date: ${endDate.toISOString()}`);
   return endDate.toLocaleDateString('en-US', {
     month: '2-digit',
     day: '2-digit',
-    year: 'numeric'
+    year: 'numeric',
+    timeZone: 'America/Los_Angeles'
   });
 }
 
 function formatAuctionTime(endTimeSeconds: string | number | bigint) {
   if (!endTimeSeconds) return "N/A";
   const endDate = new Date(Number(endTimeSeconds) * 1000);
+  console.log(`[DEBUG] Auction end time: ${endDate.toISOString()}`);
   return endDate.toLocaleTimeString('en-US', {
     hour: 'numeric',
     minute: '2-digit',
     hour12: true,
+    timeZone: 'America/Los_Angeles',
     timeZoneName: 'short'
   });
 }
@@ -143,6 +148,7 @@ function formatTimeRemaining(endTimeSeconds: string | number | bigint) {
   if (!endTimeSeconds) return "Auction ended";
   
   const timeLeft = Number(endTimeSeconds) - Math.floor(Date.now() / 1000);
+  console.log(`[DEBUG] Time remaining calculation: endTime=${endTimeSeconds}, now=${Math.floor(Date.now() / 1000)}, timeLeft=${timeLeft}`);
   
   if (timeLeft <= 0) return "Auction ended";
   
@@ -184,6 +190,22 @@ export default function NFTDetailPage() {
   const [bidAmount, setBidAmount] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState("");
+  const [bidCount, setBidCount] = useState(0);
+  const [currentBidAmount, setCurrentBidAmount] = useState<string>("0");
+  
+  // Use global marketplace events
+  const { getCurrentBid, getBidCount, getAuctionStatus, refreshAuctionBid } = useMarketplaceEvents();
+
+  // Bid counter management functions
+  const incrementBidCount = () => {
+    setBidCount(prev => prev + 1);
+  };
+
+  const decrementBidCount = () => {
+    setBidCount(prev => Math.max(0, prev - 1));
+  };
+
+  // Fetch current winning bid
 
   const account = useActiveAccount();
   const { isFavorited, toggleFavorite, isConnected } = useFavorites();
@@ -277,6 +299,7 @@ export default function NFTDetailPage() {
               
               if (tokenAuction) {
                 console.log(`[NFT Detail] Found auction for token ${tokenId} in batch ${startId}-${endId}`);
+                console.log(`[DEBUG] Raw auction data:`, tokenAuction);
                 break; // Found it, stop searching
               }
               
@@ -298,7 +321,7 @@ export default function NFTDetailPage() {
 
         if (tokenAuction) {
           console.log(`[NFT Detail] Found auction for token ${tokenId}:`, tokenAuction);
-          setAuctionData({
+          const processedAuctionData = {
             id: tokenAuction.auctionId,
             tokenId: tokenAuction.tokenId,
             auctionId: tokenAuction.auctionId,
@@ -312,7 +335,11 @@ export default function NFTDetailPage() {
             endTimeInSeconds: tokenAuction.endTimestamp,
             startTimeInSeconds: tokenAuction.startTimestamp,
             totalBids: 0 // This would need to be fetched separately if available
-          });
+          };
+          setAuctionData(processedAuctionData);
+          setBidCount(processedAuctionData.totalBids || 0);
+          // Fetch the current winning bid
+          await refreshAuctionBid(processedAuctionData.auctionId.toString());
         } else {
           console.log(`[NFT Detail] No auction found for token ${tokenId}`);
           setAuctionData(null);
@@ -394,6 +421,14 @@ export default function NFTDetailPage() {
     return () => clearInterval(interval);
   }, [auctionData?.endTimeInSeconds]);
 
+  // Fetch winning bid when auction data changes
+  useEffect(() => {
+    if (auctionData?.auctionId) {
+      refreshAuctionBid(auctionData.auctionId.toString());
+    }
+  }, [auctionData?.auctionId, refreshAuctionBid]);
+
+
   const attributes = useMemo(() => {
     if (metadata && Array.isArray(metadata.attributes)) {
       return metadata.attributes.map((attr: any, index: number) => {
@@ -413,15 +448,38 @@ export default function NFTDetailPage() {
   // Get tier pricing for this NFT
   const tierPricing = getTierPricing(metadata?.rarity_tier || "Unknown");
 
+  // Update local state from global event state
+  useEffect(() => {
+    if (!auctionData?.auctionId) return;
+    
+    const auctionId = auctionData.auctionId.toString();
+    const globalCurrentBid = getCurrentBid(auctionId, tierPricing.bid.toString());
+    const globalBidCount = getBidCount(auctionId);
+    const auctionStatus = getAuctionStatus(auctionId);
+    
+    // Update current bid if it changed
+    if (globalCurrentBid !== currentBidAmount) {
+      setCurrentBidAmount(globalCurrentBid);
+    }
+    
+    // Update bid count if it changed
+    if (globalBidCount !== bidCount) {
+      setBidCount(globalBidCount);
+    }
+    
+    // If auction is closed, refresh all data
+    if (auctionStatus === 'closed') {
+      fetchAuctionData();
+    }
+  }, [auctionData?.auctionId, getCurrentBid, getBidCount, getAuctionStatus, currentBidAmount, bidCount, tierPricing.bid]);
+
   // Helper to format auction prices
   const formatAuctionPrice = (priceWei: string | number | bigint) => {
     return formatETHPrice(priceWei);
   };
 
   // Get real auction prices or fallback to tier pricing
-  const currentBidPrice = auctionData?.currentBidAmount 
-    ? formatAuctionPrice(auctionData.currentBidAmount)
-    : tierPricing.bid;
+  const currentBidPrice = currentBidAmount || tierPricing.bid;
   const buyNowPrice = auctionData?.buyoutAmount 
     ? formatAuctionPrice(auctionData.buyoutAmount)
     : tierPricing.buy;
@@ -445,11 +503,14 @@ export default function NFTDetailPage() {
     }
   };
 
-  // Handle place bid
-  const handlePlaceBid = async () => {
+  // Transaction function for placing a bid
+  const createBidTransaction = () => {
     if (!account?.address) {
-      alert("Please connect your wallet first");
-      return;
+      throw new Error("Please connect your wallet first");
+    }
+
+    if (!auctionData) {
+      throw new Error("No auction data available");
     }
 
     const minBid = auctionData?.minimumBidAmount 
@@ -458,50 +519,34 @@ export default function NFTDetailPage() {
     const maxBid = Number(buyNowPrice);
 
     if (!bidAmount || Number(bidAmount) < minBid) {
-      alert(`Bid must be at least ${minBid} ETH`);
-      return;
+      throw new Error(`Bid must be at least ${minBid} ETH`);
     }
 
     if (Number(bidAmount) >= maxBid) {
-      alert(`Bid must be less than buy now price of ${maxBid} ETH`);
-      return;
+      throw new Error(`Bid must be less than buy now price of ${maxBid} ETH`);
     }
 
-    setIsProcessing(true);
-    try {
-      // Find the auction for this token
-      const auction = auctionData;
-      if (!auction) {
-        alert("No active auction found for this NFT");
-        setIsProcessing(false);
-        return;
-      }
+    return bidInAuction({
+      contract: marketplace,
+      auctionId: BigInt(auctionData.auctionId),
+      bidAmount: toWei(bidAmount).toString(),
+    });
+  };
 
-      const tx = bidInAuction({
-        contract: marketplace,
-        auctionId: auction.auctionId,
-        bidAmount: toWei(bidAmount).toString(),
-      });
-
-      await new Promise((resolve, reject) => {
-        sendBid(tx, {
-          onSuccess: () => {
-            // Refresh auction data to get updated bid count and current bid
-            fetchAuctionData();
-            resolve(true);
-          },
-          onError: reject,
-        });
-      });
-
-      alert(`Bid of ${bidAmount} ETH placed successfully!`);
-      setBidAmount(""); // Clear the bid amount
-    } catch (error) {
-      console.error("Error placing bid:", error);
-      alert("Failed to place bid. Please try again.");
-    } finally {
-      setIsProcessing(false);
+  // Transaction function for buy now (buyout auction)
+  const createBuyNowTransaction = () => {
+    if (!account?.address) {
+      throw new Error("Please connect your wallet first");
     }
+
+    if (!auctionData) {
+      throw new Error("No auction data available");
+    }
+
+    return buyoutAuction({
+      contract: marketplace,
+      auctionId: BigInt(auctionData.auctionId),
+    });
   };
 
   // Handle buy now
@@ -594,7 +639,7 @@ export default function NFTDetailPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex-grow pt-24 sm:pt-28">
         <Link
           href="/nfts"
-          className="inline-flex items-center text-neutral-400 hover:text-brand-pink-light mb-4 sm:mb-6 text-sm transition-colors"
+          className="inline-flex items-center text-neutral-400 hover:text-[#ff0099] mb-4 sm:mb-6 text-sm transition-colors"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to collection
@@ -733,36 +778,6 @@ export default function NFTDetailPage() {
               </div>
             </div>
 
-            {/* Artist and Platform Attribution */}
-            <div className="grid grid-cols-2 gap-3 mt-4">
-              <div className="bg-neutral-800 p-3 rounded border border-neutral-700">
-                <p className="text-neutral-400 text-xs mb-2">Artist</p>
-                <div className="flex items-center gap-2">
-                  <Image
-                    src="/icons/artist-logo-kristen-woerdeman-20px.png"
-                    alt="Kristen Woerdeman"
-                    width={20}
-                    height={20}
-                    className="w-5 h-5"
-                  />
-                  <p className="text-neutral-100 text-sm font-medium">Kristen Woerdeman</p>
-                </div>
-              </div>
-              <div className="bg-neutral-800 p-3 rounded border border-neutral-700">
-                <p className="text-neutral-400 text-xs mb-2">Platform</p>
-                <div className="flex items-center gap-2">
-                  <Image
-                    src="/icons/platform-logo-retinal-delights-20px.png"
-                    alt="Retinal Delights"
-                    width={20}
-                    height={20}
-                    className="w-5 h-5"
-                  />
-                  <p className="text-neutral-100 text-sm font-medium">Retinal Delights</p>
-                </div>
-              </div>
-            </div>
-
             {/* Additional Details */}
             <div className="bg-neutral-800 p-4 rounded border border-neutral-700">
               <h3 className="text-lg font-semibold text-neutral-100 mb-3">Details</h3>
@@ -778,7 +793,7 @@ export default function NFTDetailPage() {
                 <div>
                   <p className="text-neutral-400 mb-1">Collection</p>
                   <p className="text-neutral-100 font-medium">
-                    {metadata?.collection_number ? `Retinal Delights - Collection ${metadata.collection_number}` : "Retinal Delights"}
+                    {metadata?.collection_number ?? "—"}
                   </p>
                 </div>
                 <div>
@@ -813,10 +828,12 @@ export default function NFTDetailPage() {
               <div className="bg-neutral-800 p-4 rounded border border-neutral-700">
                 <p className="text-neutral-400 text-sm mb-2">Artist</p>
                 <div className="flex items-center">
-                  <img
-                    src="/icons/retinal-delights-white-icon.svg"
-                    alt="Artist"
-                    className="h-6 w-6 rounded-full mr-2"
+                  <Image
+                    src="/icons/artist-logo-kristen-woerdeman-20px.png"
+                    alt="Kristen Woerdeman"
+                    width={20}
+                    height={20}
+                    className="w-5 h-5 mr-2"
                   />
                   <p className="text-sm text-neutral-100">{metadata?.artist ?? "Kristen Woerdeman"}</p>
                 </div>
@@ -824,10 +841,12 @@ export default function NFTDetailPage() {
               <div className="bg-neutral-800 p-4 rounded border border-neutral-700">
                 <p className="text-neutral-400 text-sm mb-2">Platform</p>
                 <div className="flex items-center">
-                  <img
-                    src="/icons/retinal-delights-white-icon.svg"
-                    alt="Platform"
-                    className="h-6 w-6 rounded-full mr-2"
+                  <Image
+                    src="/icons/platform-logo-retinal-delights-20px.png"
+                    alt="Retinal Delights"
+                    width={20}
+                    height={20}
+                    className="w-5 h-5 mr-2"
                   />
                   <p className="text-sm text-neutral-100">{metadata?.platform ?? "Retinal Delights"}</p>
                 </div>
@@ -867,7 +886,7 @@ export default function NFTDetailPage() {
                     Place Your Bid
                   </label>
                   <div className="text-sm text-neutral-400">
-                    {auctionData?.totalBids ?? 0} bid{(auctionData?.totalBids ?? 0) !== 1 ? 's' : ''} placed
+                    {bidCount} bid{bidCount !== 1 ? 's' : ''} placed
                   </div>
                 </div>
                 <div className="flex gap-3">
@@ -897,20 +916,29 @@ export default function NFTDetailPage() {
                       ETH
                     </div>
                   </div>
-                  <Button
-                    onClick={handlePlaceBid}
-                    disabled={isProcessing}
-                    className="w-32 px-6 py-2 font-semibold text-white transition-all duration-200 hover:scale-105 focus:ring-2 focus:ring-offset-2"
+                  <TransactionButton
+                    transaction={createBidTransaction}
+                    onTransactionConfirmed={async () => {
+                      setBidAmount("");
+                      // Refresh the winning bid to show the new current bid immediately
+                      if (auctionData?.auctionId) {
+                        await refreshAuctionBid(auctionData.auctionId.toString());
+                      }
+                      alert(`Bid of ${bidAmount} ETH placed successfully!`);
+                    }}
+                    onError={(error) => {
+                      console.error("Bid failed:", error);
+                      alert(error.message || "Failed to place bid. Please try again.");
+                    }}
+                    className="w-32 px-6 py-2 font-semibold text-white transition-all duration-200 hover:scale-105 focus:ring-2 focus:ring-offset-2 hover:bg-emerald-600"
                     style={{
                       backgroundColor: COLORS.hair,
                       borderColor: COLORS.hair
                     }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#059669"}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = COLORS.hair}
                     aria-describedby="bid-help"
                   >
-                    {isProcessing ? "PROCESSING..." : "PLACE BID"}
-                  </Button>
+                    PLACE BID
+                  </TransactionButton>
                 </div>
                 <p id="bid-help" className="text-sm text-neutral-400 mt-2">
                   Minimum bid: {tierPricing.start} ETH
@@ -923,22 +951,28 @@ export default function NFTDetailPage() {
                   <div>
                     <p className="text-sm mb-1" style={{ color: COLORS.background }}>Buy Now Price</p>
                     <p className="text-xl font-bold" style={{ color: COLORS.background }}>
-                      {tierPricing.buy} ETH
+                      {isLoadingAuction ? "Loading..." : `${buyNowPrice} ETH`}
                     </p>
                   </div>
-                  <Button
-                    onClick={handleBuyNow}
-                    disabled={isProcessing}
-                    className="w-32 px-6 py-2 font-semibold text-white transition-all duration-200 hover:scale-105 focus:ring-2 focus:ring-offset-2"
+                  <TransactionButton
+                    transaction={createBuyNowTransaction}
+                    onTransactionConfirmed={() => {
+                      alert(`NFT purchased successfully for ${buyNowPrice} ETH!`);
+                      // Refresh auction data to update UI
+                      fetchAuctionData();
+                    }}
+                    onError={(error) => {
+                      console.error("Buy now failed:", error);
+                      alert(error.message || "Failed to buy NFT. Please try again.");
+                    }}
+                    className="w-32 px-6 py-2 font-semibold text-white transition-all duration-200 hover:scale-105 focus:ring-2 focus:ring-offset-2 hover:bg-blue-600"
                     style={{
                       backgroundColor: COLORS.background,
                       borderColor: COLORS.background
                     }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#2563EB"}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = COLORS.background}
                   >
-                    {isProcessing ? "Processing..." : "BUY NOW"}
-                  </Button>
+                    BUY NOW
+                  </TransactionButton>
                 </div>
               </div>
             </div>

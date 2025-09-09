@@ -40,7 +40,7 @@ export default function Footer() {
             />
           </div>
 
-          <div className="flex flex-wrap justify-center gap-3 text-xs text-neutral-400 max-w-3xl">
+          <div className="flex flex-wrap justify-center gap-3 text-[10px] text-neutral-400 max-w-3xl">
             <div className="flex flex-wrap justify-center gap-3 mb-1">
               {legalLinks.slice(0, 3).map((link) => (
                 <Link
@@ -48,7 +48,7 @@ export default function Footer() {
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-brand-pink-light transition-colors"
+                  className="hover:text-[#ff0099] transition-colors"
                 >
                   {link.label}
                 </Link>
@@ -61,7 +61,7 @@ export default function Footer() {
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-brand-pink-light transition-colors"
+                  className="hover:text-[#ff0099] transition-colors"
                 >
                   {link.label}
                 </Link>
@@ -78,7 +78,7 @@ export default function Footer() {
             Created with <Heart className="inline-block h-3 w-3 mx-1 text-brand-pink fill-brand-pink" /> in Los Angeles by{" "}
             <a
               href="https://kristenwoerdeman.com"
-              className="font-medium text-brand-pink hover:text-brand-pink-light transition-colors"
+              className="font-medium text-brand-pink hover:text-[#ff0099] transition-colors"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -90,7 +90,7 @@ export default function Footer() {
             2025 ©{" "}
             <a
               href="https://retinaldelights.io"
-              className="text-brand-pink hover:text-brand-pink-light transition-colors"
+              className="text-brand-pink hover:text-[#ff0099] transition-colors"
               target="_blank"
               rel="noopener noreferrer"
             >

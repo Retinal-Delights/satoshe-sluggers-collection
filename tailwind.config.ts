@@ -70,8 +70,7 @@ const config = {
         // Brand colors - consistent across the site
         brand: {
           pink: "#FF0099",
-          "pink-hover": "#E6008A", 
-          "pink-light": "#FF33B3",
+          "pink-hover": "#E6008A",
         },
         // Legacy pink colors for backward compatibility
         pink: {

@@ -11,7 +11,7 @@ export default function CollectionStats() {
       </div>
       <div className="bg-card p-4 rounded border border-neutral-700 shadow-sm text-center">
         <h3 className="text-neutral-400 text-sm mb-1">Rarity Tiers</h3>
-        <p className="text-xl sm:text-2xl font-bold">10</p>
+        <p className="text-xl sm:text-2xl font-bold">11</p>
       </div>
     </div>
   )
