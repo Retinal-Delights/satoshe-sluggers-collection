@@ -316,7 +316,7 @@ export default function NFTCard({
                   </div>
                   <div className="flex justify-between">
                     <span className="text-neutral-400">{numBids > 0 ? "Current Bid:" : "Starting Bid:"}</span>
-                    <span className="font-medium truncate max-w-[120px]" style={{ color: "#10B981" }}>{currentBidAmount} ETH</span>
+                    <span className="font-medium truncate max-w-[120px]" style={{ color: "#10B981" }}>{currentBidAmount}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-neutral-400">Buy Now:</span>
@@ -394,7 +394,7 @@ export default function NFTCard({
                       console.error("Bid failed:", error);
                       alert(error.message || "Failed to place bid. Please try again.");
                     }}
-                    className="col-span-1 !w-full !min-w-0 !h-9 text-sm font-medium bg-emerald-500 hover:bg-emerald-600"
+                    className="col-span-1 !w-full !min-w-0 !h-9 text-sm font-medium text-white bg-emerald-500 hover:bg-emerald-600"
                     style={{ 
                       backgroundColor: "#10B981",
                       minWidth: 0,
