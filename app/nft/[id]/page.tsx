@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,6 +35,7 @@ import { validateNumericInput } from "@/lib/input-validation";
 import { client } from "@/lib/thirdweb";
 import { useFavorites } from "@/hooks/useFavorites";
 import { ownerOf } from "thirdweb/extensions/erc721";
+import { formatETHPrice } from "@/lib/utils";
 // import { format } from "date-fns";
 // import ResponsiveGrid from "@/components/responsive-grid";
 
@@ -413,13 +415,7 @@ export default function NFTDetailPage() {
 
   // Helper to format auction prices
   const formatAuctionPrice = (priceWei: string | number | bigint) => {
-    if (!priceWei || priceWei === "0") return "0";
-    try {
-      const price = Number(priceWei) / 1e18;
-      return price.toFixed(6);
-    } catch {
-      return "0";
-    }
+    return formatETHPrice(priceWei);
   };
 
   // Get real auction prices or fallback to tier pricing
@@ -734,6 +730,36 @@ export default function NFTDetailPage() {
                 <p className="text-sm sm:text-base font-bold" style={{ color: COLORS.background }}>
                   {isLoadingAuction ? "Loading..." : `${buyNowPrice} ETH`}
                 </p>
+              </div>
+            </div>
+
+            {/* Artist and Platform Attribution */}
+            <div className="grid grid-cols-2 gap-3 mt-4">
+              <div className="bg-neutral-800 p-3 rounded border border-neutral-700">
+                <p className="text-neutral-400 text-xs mb-2">Artist</p>
+                <div className="flex items-center gap-2">
+                  <Image
+                    src="/icons/artist-logo-kristen-woerdeman-20px.png"
+                    alt="Kristen Woerdeman"
+                    width={20}
+                    height={20}
+                    className="w-5 h-5"
+                  />
+                  <p className="text-neutral-100 text-sm font-medium">Kristen Woerdeman</p>
+                </div>
+              </div>
+              <div className="bg-neutral-800 p-3 rounded border border-neutral-700">
+                <p className="text-neutral-400 text-xs mb-2">Platform</p>
+                <div className="flex items-center gap-2">
+                  <Image
+                    src="/icons/platform-logo-retinal-delights-20px.png"
+                    alt="Retinal Delights"
+                    width={20}
+                    height={20}
+                    className="w-5 h-5"
+                  />
+                  <p className="text-neutral-100 text-sm font-medium">Retinal Delights</p>
+                </div>
               </div>
             </div>
 

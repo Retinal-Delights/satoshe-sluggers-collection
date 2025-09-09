@@ -90,6 +90,7 @@ export default function NFTCard({
   const [imgError, setImgError] = useState(false);
   const [imgLoading, setImgLoading] = useState(true);
   const [countdown, setCountdown] = useState("");
+  const [isTilted, setIsTilted] = useState(false);
   const placeholder = "/placeholder-nft.webp";
   const showPlaceholder = !imgLoaded || imgError;
   const endColor = getAuctionEndColor(auctionEnd || 0);
@@ -119,6 +120,12 @@ export default function NFTCard({
   // Favorites functionality
   const { isFavorited, toggleFavorite, isConnected } = useFavorites();
   const isFav = isFavorited(tokenId);
+
+  // Mobile tilt interaction
+  const handleMobileTilt = () => {
+    setIsTilted(true);
+    setTimeout(() => setIsTilted(false), 300);
+  };
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent navigation when clicking heart
@@ -150,7 +157,10 @@ export default function NFTCard({
   };
 
   return (
-    <div className="overflow-visible w-full max-w-sm mx-auto rounded-lg shadow-md flex flex-col h-full bg-neutral-900">
+    <div 
+      className="overflow-visible w-full max-w-sm mx-auto rounded-lg shadow-md flex flex-col h-full bg-neutral-900"
+      onClick={handleMobileTilt}
+    >
       <Link href={`/nft/${tokenId}`} className="block w-full">
         <div className="relative bg-neutral-900 w-full overflow-visible" style={{ aspectRatio: "0.9/1" }}>
           <img
@@ -158,7 +168,7 @@ export default function NFTCard({
             alt={name}
             width="100%"
             height="100%"
-            className={`object-contain p-2 hover:scale-[1.02] hover:rotate-[5deg] hover:-translate-y-1 transition-all duration-300 ease-out relative z-20 ${showPlaceholder ? 'animate-pulse' : ''}`}
+            className={`object-contain p-2 hover:scale-[1.02] hover:rotate-[5deg] hover:-translate-y-1 transition-all duration-300 ease-out relative z-20 ${showPlaceholder ? 'animate-pulse' : ''} ${isTilted ? 'scale-[1.02] rotate-[5deg] -translate-y-1' : ''}`}
             onLoad={() => {
               setImgLoaded(true);
               setImgLoading(false);

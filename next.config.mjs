@@ -19,16 +19,21 @@ const nextConfig = {
         tls: false,
       };
 
-      // Optimize chunk splitting for wallets
+      // Use default chunk splitting but avoid problematic vendor chunks
       config.optimization.splitChunks = {
-        ...config.optimization.splitChunks,
+        chunks: 'all',
         cacheGroups: {
-          ...config.optimization.splitChunks.cacheGroups,
-          thirdweb: {
-            test: /[\\/]node_modules[\\/]thirdweb[\\/]/,
-            name: 'thirdweb',
+          default: {
+            minChunks: 2,
+            priority: -20,
+            reuseExistingChunk: true,
+          },
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            priority: -10,
             chunks: 'all',
-            priority: 10,
+            maxSize: 244000,
           },
         },
       };
