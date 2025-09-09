@@ -14,7 +14,10 @@ export default function ConnectWalletButton() {
   return (
     <ConnectButton
       client={client}
-      connectButton={{ label: "CONNECT" }}
+      connectButton={{ 
+        label: "CONNECT",
+        className: "!rounded"
+      }}
       connectModal={{
         privacyPolicyUrl:
           "https://retinaldelights.io/privacy",

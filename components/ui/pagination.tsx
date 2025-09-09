@@ -47,7 +47,8 @@ function PageJumpInput({
       onChange={handleInputChange}
       onKeyDown={handleKeyDown}
       onBlur={handleBlur}
-      className="w-12 h-8 px-1 text-center bg-neutral-900 border border-brand-pink rounded text-sm text-brand-pink focus:ring-2 focus:ring-brand-pink focus:outline-none"
+            className="w-12 h-8 px-1 text-center bg-neutral-900 border border-brand-pink text-sm text-brand-pink focus:ring-2 focus:ring-brand-pink focus:outline-none"
+            style={{ borderRadius: "4px" }}
       aria-label="Go to page"
     />
   )
@@ -133,6 +134,8 @@ export default function NFTPagination({
             disabled={currentPage === 1}
             aria-label="First page"
             className="bg-neutral-800 border-neutral-700 hover:bg-neutral-700 h-8 w-8 p-0"
+            style={{ borderRadius: "4px" }}
+            style={{ borderRadius: "4px" }}
           >
             <ChevronFirst className="h-4 w-4" />
           </Button>
@@ -143,6 +146,7 @@ export default function NFTPagination({
             disabled={currentPage === 1}
             aria-label="Previous page"
             className="bg-neutral-800 border-neutral-700 hover:bg-neutral-700 h-8 w-8 p-0"
+            style={{ borderRadius: "4px" }}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -167,6 +171,7 @@ export default function NFTPagination({
                       ? "bg-brand-pink hover:bg-brand-pink-hover text-white text-xs h-8 w-8 p-0"
                       : "bg-neutral-800 border-neutral-700 hover:bg-neutral-700 text-white text-xs h-8 w-8 p-0"
                   }
+                  style={{ borderRadius: "4px" }}
                   onClick={() => onPageChange(page as number)}
                 >
                   {page}
@@ -182,6 +187,7 @@ export default function NFTPagination({
             disabled={currentPage === totalPages}
             aria-label="Next page"
             className="bg-neutral-800 border-neutral-700 hover:bg-neutral-700 h-8 w-8 p-0"
+            style={{ borderRadius: "4px" }}
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -192,6 +198,7 @@ export default function NFTPagination({
             disabled={currentPage === totalPages}
             aria-label="Last page"
             className="bg-neutral-800 border-neutral-700 hover:bg-neutral-700 h-8 w-8 p-0"
+            style={{ borderRadius: "4px" }}
           >
             <ChevronLast className="h-4 w-4" />
           </Button>

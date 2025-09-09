@@ -354,12 +354,13 @@ export default function NFTCard({
                           }
                         }
                       }}
-                      className="w-full h-9 text-sm px-3 py-1 rounded-sm bg-neutral-900 border focus:outline-none text-neutral-100 placeholder:text-neutral-500 truncate"
+                      className="w-full h-9 text-sm px-3 py-1 bg-neutral-900 border focus:outline-none text-neutral-100 placeholder:text-neutral-500 truncate"
                       style={{
                         borderColor: "#10B981",
                         color: "#10B981",
                         borderWidth: "1px",
-                        minWidth: 0
+                        minWidth: 0,
+                        borderRadius: "4px"
                       }}
                       onFocus={(e) => e.currentTarget.style.borderColor = "#059669"}
                       onBlur={(e) => e.currentTarget.style.borderColor = "#10B981"}
@@ -393,10 +394,11 @@ export default function NFTCard({
                       console.error("Bid failed:", error);
                       alert(error.message || "Failed to place bid. Please try again.");
                     }}
-                    className="col-span-1 !w-full !min-w-0 !h-9 rounded-sm text-sm font-medium bg-emerald-500 hover:bg-emerald-600"
+                    className="col-span-1 !w-full !min-w-0 !h-9 text-sm font-medium bg-emerald-500 hover:bg-emerald-600"
                     style={{ 
                       backgroundColor: "#10B981",
-                      minWidth: 0
+                      minWidth: 0,
+                      borderRadius: "4px"
                     }}
                   >
                     BID
@@ -420,8 +422,11 @@ export default function NFTCard({
                     console.error("Buy now failed:", error);
                     alert(error.message || "Failed to buy NFT. Please try again.");
                   }}
-                  className="w-full text-sm py-1 h-9 text-white rounded-sm transition-all duration-300 ease-out font-medium hover:scale-[1.02] hover:shadow-lg hover:bg-blue-600"
-                  style={{ backgroundColor: "#3B82F6" }}
+                  className="w-full text-sm py-1 h-9 text-white transition-all duration-300 ease-out font-medium hover:scale-[1.02] hover:shadow-lg hover:bg-blue-600"
+                  style={{ 
+                    backgroundColor: "#3B82F6",
+                    borderRadius: "4px"
+                  }}
                 >
                   BUY NOW
                 </TransactionButton>
