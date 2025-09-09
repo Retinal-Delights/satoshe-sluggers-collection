@@ -636,7 +636,7 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, selectedFilters,
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-500" />
           <Input
             placeholder="Search NFTs..."
-            className="pl-9 py-1.5 text-sm font-normal h-8 rounded text-[#ff0099] border-neutral-600 focus:outline-none focus:ring-0 focus:border-neutral-500"
+            className="pl-9 py-1.5 text-sm font-normal h-8 rounded text-brand-pink border-neutral-600 focus:outline-none focus:ring-0 focus:border-brand-pink transition-colors"
             value={searchTerm}
             onChange={(e: any) => {
               const newValue = (e.target as HTMLInputElement).value;

@@ -194,8 +194,8 @@ export default function NFTCard({
                   <Heart
                     className={`w-5 h-5 transition-colors ${
                       isFav
-                        ? "fill-[#ff0099] text-[#ff0099]"
-                        : "text-neutral-400 hover:text-[#ff0099]"
+                        ? "fill-brand-pink text-brand-pink"
+                        : "text-neutral-400 hover:text-brand-pink"
                     }`}
                   />
                 </button>

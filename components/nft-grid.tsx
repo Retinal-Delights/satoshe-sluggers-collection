@@ -1038,7 +1038,7 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
         <div className="mb-6">
           <div className="mb-4">
             <h2 className="text-lg font-medium">NFT Collection</h2>
-            <div className="text-sm font-medium text-pink-500 mt-1">Loading...</div>
+            <div className="text-sm font-medium text-brand-pink mt-1">Loading...</div>
           </div>
         </div>
         <div className="mt-8 mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 justify-between">
@@ -1070,7 +1070,7 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
             NFT Collection
           </h2>
           {filteredNFTs.length > 0 && (
-            <div className="text-sm font-medium text-pink-500 mt-1">
+            <div className="text-sm font-medium text-brand-pink mt-1">
               {activeView === "forSale" 
                 ? `${filteredNFTs.length} active listing${filteredNFTs.length !== 1 ? 's' : ''} found`
                 : `${filteredNFTs.length} NFT${filteredNFTs.length !== 1 ? 's' : ''} found`
@@ -1083,8 +1083,8 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
             <button
               className={`px-3 py-1 text-sm rounded transition-colors ${
                 activeView === "forSale"
-                  ? "bg-[#ff0099] text-white"
-                  : "text-neutral-300 hover:text-white"
+                  ? "bg-brand-pink text-white"
+                  : "text-neutral-300 hover:text-brand-pink-light"
               }`}
               onClick={() => setActiveView("forSale")}
             >
@@ -1093,8 +1093,8 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
             <button
               className={`px-3 py-1 text-sm rounded transition-colors ${
                 activeView === "sold"
-                  ? "bg-[#ff0099] text-white"
-                  : "text-neutral-300 hover:text-white"
+                  ? "bg-brand-pink text-white"
+                  : "text-neutral-300 hover:text-brand-pink-light"
               }`}
               onClick={() => setActiveView("sold")}
             >

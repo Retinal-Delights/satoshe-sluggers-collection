@@ -47,7 +47,7 @@ function PageJumpInput({
       onChange={handleInputChange}
       onKeyDown={handleKeyDown}
       onBlur={handleBlur}
-      className="w-12 h-8 px-1 text-center bg-neutral-900 border border-[#ff0099] rounded text-sm text-[#ff0099]"
+      className="w-12 h-8 px-1 text-center bg-neutral-900 border border-brand-pink rounded text-sm text-brand-pink focus:ring-2 focus:ring-brand-pink focus:outline-none"
       aria-label="Go to page"
     />
   )
@@ -164,7 +164,7 @@ export default function NFTPagination({
                   size="sm"
                   className={
                     currentPage === page
-                      ? "bg-[#ff0099] hover:bg-[#e6008a] text-white text-xs h-8 w-8 p-0"
+                      ? "bg-brand-pink hover:bg-brand-pink-hover text-white text-xs h-8 w-8 p-0"
                       : "bg-neutral-800 border-neutral-700 hover:bg-neutral-700 text-white text-xs h-8 w-8 p-0"
                   }
                   onClick={() => onPageChange(page as number)}

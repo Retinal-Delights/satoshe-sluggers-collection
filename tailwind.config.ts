@@ -67,8 +67,17 @@ const config = {
           foreground: "hsl(var(--card-foreground))",
         },
         // Keep the bright pink and blue colors
+        // Brand colors - consistent across the site
+        brand: {
+          pink: "#FF0099",
+          "pink-hover": "#E6008A", 
+          "pink-light": "#FF33B3",
+        },
+        // Legacy pink colors for backward compatibility
         pink: {
+          400: "#FF33B3",
           500: "#FF0099",
+          600: "#E6008A",
         },
         blue: {
           500: "#2563EB",

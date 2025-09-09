@@ -45,7 +45,7 @@ export default function SellPage() {
                 </div>
                 <Button
                   onClick={navigateToMyNFTs}
-                  className="relative z-10 text-base px-6 py-3 font-medium text-[#ff0099] border-[#ff0099] border-2 hover:text-neutral-100 hover:border-[#ff0099] hover:bg-[#ff0099] transition-all duration-300 shadow-[0_0_15px_rgba(255,0,153,0.5)] hover:shadow-[0_0_25px_rgba(255,0,153,0.7)] bg-neutral-900/80 rounded"
+                  className="relative z-10 text-base px-6 py-3 font-medium text-brand-pink border-brand-pink border-2 hover:text-white hover:border-brand-pink hover:bg-brand-pink transition-all duration-300 shadow-[0_0_15px_rgba(255,0,153,0.5)] hover:shadow-[0_0_25px_rgba(255,0,153,0.7)] bg-neutral-900/80 rounded"
                 >
                   View My NFTs
                 </Button>
@@ -60,19 +60,19 @@ export default function SellPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-neutral-800 p-4 rounded-lg border border-neutral-700">
-                <div className="text-xl text-[#ff0099] font-bold mb-2">1</div>
+                <div className="text-xl text-brand-pink font-bold mb-2">1</div>
                 <h4 className="text-base font-medium mb-1">Connect</h4>
                 <p className="text-neutral-400 text-xs">Connect your wallet to our platform</p>
               </div>
 
               <div className="bg-neutral-800 p-4 rounded-lg border border-neutral-700">
-                <div className="text-xl text-[#ff0099] font-bold mb-2">2</div>
+                <div className="text-xl text-brand-pink font-bold mb-2">2</div>
                 <h4 className="text-base font-medium mb-1">List</h4>
                 <p className="text-neutral-400 text-xs">Set your price and list your NFTs</p>
               </div>
 
               <div className="bg-neutral-800 p-4 rounded-lg border border-neutral-700">
-                <div className="text-xl text-[#ff0099] font-bold mb-2">3</div>
+                <div className="text-xl text-brand-pink font-bold mb-2">3</div>
                 <h4 className="text-base font-medium mb-1">Sell</h4>
                 <p className="text-neutral-400 text-xs">Get paid when your NFTs sell</p>
               </div>

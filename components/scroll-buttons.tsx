@@ -105,7 +105,7 @@ export default function ScrollButtons() {
         <Button
           onClick={scrollToTop}
           size="icon"
-          className="rounded-full bg-[#ff0099] hover:bg-[#ff0099]/80 shadow-lg transition-all duration-300 hover:scale-105"
+          className="rounded-full bg-brand-pink hover:bg-brand-pink-hover shadow-lg transition-all duration-300 hover:scale-105"
           aria-label="Scroll to top"
         >
           <ArrowUp className="h-5 w-5 text-white" />
@@ -115,7 +115,7 @@ export default function ScrollButtons() {
         <Button
           onClick={scrollToBottom}
           size="icon"
-          className="rounded-full bg-[#ff0099] hover:bg-[#ff0099]/80 shadow-lg transition-all duration-300 hover:scale-105"
+          className="rounded-full bg-brand-pink hover:bg-brand-pink-hover shadow-lg transition-all duration-300 hover:scale-105"
           aria-label="Scroll to bottom"
         >
           <ArrowDown className="h-5 w-5 text-white" />

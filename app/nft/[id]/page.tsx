@@ -598,7 +598,7 @@ export default function NFTDetailPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex-grow pt-24 sm:pt-28">
         <Link
           href="/nfts"
-          className="inline-flex items-center text-neutral-400 hover:text-neutral-100 mb-4 sm:mb-6 text-sm"
+          className="inline-flex items-center text-neutral-400 hover:text-brand-pink-light mb-4 sm:mb-6 text-sm transition-colors"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to collection
@@ -700,8 +700,8 @@ export default function NFTDetailPage() {
                 onClick={handleFavoriteToggle}
                 className={`p-2 rounded-full hover:bg-neutral-800 transition-colors ${
                   isFav
-                    ? "text-[#ff0099] fill-[#ff0099]"
-                    : "text-neutral-400 hover:text-[#ff0099]"
+                    ? "text-brand-pink fill-brand-pink"
+                    : "text-neutral-400 hover:text-brand-pink"
                 }`}
                 aria-label={isFav ? "Remove from favorites" : "Add to favorites"}
               >

@@ -57,35 +57,35 @@ export function MobileMenu({ isWalletConnected = false }: MobileMenuProps) {
           <nav className="flex flex-col space-y-4 items-center w-full max-w-md mx-auto">
             <Link
               href="/"
-              className="text-xl sm:text-2xl font-medium text-muted-foreground hover:text-foreground py-2 w-full text-center transition-colors duration-200"
+              className="text-xl sm:text-2xl font-medium text-muted-foreground hover:text-brand-pink-light py-2 w-full text-center transition-colors duration-200"
               onClick={() => setOpen(false)}
             >
               HOME
             </Link>
             <Link
               href="/about"
-              className="text-xl sm:text-2xl font-medium text-muted-foreground hover:text-foreground py-2 w-full text-center transition-colors duration-200"
+              className="text-xl sm:text-2xl font-medium text-muted-foreground hover:text-brand-pink-light py-2 w-full text-center transition-colors duration-200"
               onClick={() => setOpen(false)}
             >
               ABOUT
             </Link>
             <Link
               href="/nfts"
-              className="text-xl sm:text-2xl font-medium text-muted-foreground hover:text-foreground py-2 w-full text-center transition-colors duration-200"
+              className="text-xl sm:text-2xl font-medium text-muted-foreground hover:text-brand-pink-light py-2 w-full text-center transition-colors duration-200"
               onClick={() => setOpen(false)}
             >
               NFTS
             </Link>
             <Link
               href="/sell"
-              className="text-xl sm:text-2xl font-medium text-muted-foreground hover:text-foreground py-2 w-full text-center transition-colors duration-200"
+              className="text-xl sm:text-2xl font-medium text-muted-foreground hover:text-brand-pink-light py-2 w-full text-center transition-colors duration-200"
               onClick={() => setOpen(false)}
             >
               SELL
             </Link>
             <Link
               href="/contact"
-              className="text-xl sm:text-2xl font-medium text-muted-foreground hover:text-foreground py-2 w-full text-center transition-colors duration-200"
+              className="text-xl sm:text-2xl font-medium text-muted-foreground hover:text-brand-pink-light py-2 w-full text-center transition-colors duration-200"
               onClick={() => setOpen(false)}
             >
               CONTACT
@@ -93,7 +93,7 @@ export function MobileMenu({ isWalletConnected = false }: MobileMenuProps) {
             {walletConnected && (
               <Link
                 href="/my-nfts"
-                className="text-xl sm:text-2xl font-medium text-muted-foreground hover:text-foreground py-2 w-full text-center transition-colors duration-200"
+                className="text-xl sm:text-2xl font-medium text-muted-foreground hover:text-brand-pink-light py-2 w-full text-center transition-colors duration-200"
                 onClick={() => setOpen(false)}
               >
                 MY NFTS

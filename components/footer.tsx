@@ -48,7 +48,7 @@ export default function Footer() {
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-neutral-100 transition-colors"
+                  className="hover:text-brand-pink-light transition-colors"
                 >
                   {link.label}
                 </Link>
@@ -61,7 +61,7 @@ export default function Footer() {
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-neutral-100 transition-colors"
+                  className="hover:text-brand-pink-light transition-colors"
                 >
                   {link.label}
                 </Link>
@@ -71,14 +71,14 @@ export default function Footer() {
 
         </div>
 
-        <Separator className="my-4 max-w-3xl mx-auto opacity-20 border-[#ff0099]" />
+        <Separator className="my-4 max-w-3xl mx-auto opacity-20 border-brand-pink" />
 
         <div className="flex flex-col items-center text-xs text-neutral-400">
           <div className="mb-1">
-            Created with <Heart className="inline-block h-3 w-3 mx-1 text-[#ff0099] fill-[#ff0099]" /> in Los Angeles by{" "}
+            Created with <Heart className="inline-block h-3 w-3 mx-1 text-brand-pink fill-brand-pink" /> in Los Angeles by{" "}
             <a
               href="https://kristenwoerdeman.com"
-              className="font-medium text-[#ff0099] hover:text-[#ff0099]/80"
+              className="font-medium text-brand-pink hover:text-brand-pink-light transition-colors"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -90,7 +90,7 @@ export default function Footer() {
             2025 ©{" "}
             <a
               href="https://retinaldelights.io"
-              className="text-pink-500 hover:text-pink-400"
+              className="text-brand-pink hover:text-brand-pink-light transition-colors"
               target="_blank"
               rel="noopener noreferrer"
             >
