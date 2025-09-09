@@ -1043,8 +1043,8 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
         </div>
         <div className="mt-8 mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 justify-between">
           {Array.from({ length: 12 }).map((_, index) => (
-            <div key={index} className="bg-neutral-800 rounded-lg p-4 animate-pulse">
-              <div className="aspect-square bg-neutral-700 rounded-lg mb-3"></div>
+            <div key={index} className="bg-neutral-800 rounded p-4 animate-pulse">
+              <div className="aspect-square bg-neutral-700 rounded mb-3"></div>
               <div className="h-4 bg-neutral-700 rounded mb-2"></div>
               <div className="h-3 bg-neutral-700 rounded mb-1"></div>
               <div className="h-3 bg-neutral-700 rounded w-2/3"></div>

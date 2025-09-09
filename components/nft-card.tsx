@@ -332,95 +332,99 @@ export default function NFTCard({
             </div>
             {isForSale && (
               <>
-                <div className="relative w-full mb-2">
-                  <input
-                    type="number"
-                    id={`bid-amount-${tokenId}`}
-                    placeholder={currentBid.replace(' ETH', '')}
-                    value={bidAmount || currentBid.replace(' ETH', '')}
-                    onChange={(e) => {
-                      const validation = validateNumericInput(e.target.value, tokenId);
-                      if (validation.isValid) {
-                        onBidAmountChange(tokenId, validation.formattedValue);
-                        // Track bid amount changes
-                        if (validation.formattedValue !== currentBid.replace(' ETH', '')) {
-                          track('Bid Amount Modified', {
-                            tokenId,
-                            newBidAmount: validation.formattedValue,
-                            currentBid: currentBid.replace(' ETH', ''),
-                            rarity
-                          });
+                <div className="grid grid-cols-4 gap-2 mb-2 items-center">
+                  <div className="relative col-span-3 min-w-0">
+                    <input
+                      type="number"
+                      id={`bid-amount-${tokenId}`}
+                      placeholder={currentBid.replace(' ETH', '')}
+                      value={bidAmount || currentBid.replace(' ETH', '')}
+                      onChange={(e) => {
+                        const validation = validateNumericInput(e.target.value, tokenId);
+                        if (validation.isValid) {
+                          onBidAmountChange(tokenId, validation.formattedValue);
+                          // Track bid amount changes
+                          if (validation.formattedValue !== currentBid.replace(' ETH', '')) {
+                            track('Bid Amount Modified', {
+                              tokenId,
+                              newBidAmount: validation.formattedValue,
+                              currentBid: currentBid.replace(' ETH', ''),
+                              rarity
+                            });
+                          }
                         }
-                      }
-                    }}
-                    className="w-full h-9 text-sm px-3 py-1 rounded bg-neutral-900 border focus:outline-none text-neutral-100 placeholder:text-neutral-500 truncate"
-                    style={{
-                      borderColor: "#10B981",
-                      color: "#10B981",
-                      borderWidth: "1px"
-                    }}
-                    onFocus={(e) => e.currentTarget.style.borderColor = "#059669"}
-                    onBlur={(e) => e.currentTarget.style.borderColor = "#10B981"}
-                    step="0.00001"
-                    min={currentBid.replace(' ETH', '')}
-                  />
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 text-xs pointer-events-none">
-                    ETH
+                      }}
+                      className="w-full h-9 text-sm px-3 py-1 rounded bg-neutral-900 border focus:outline-none text-neutral-100 placeholder:text-neutral-500 truncate"
+                      style={{
+                        borderColor: "#10B981",
+                        color: "#10B981",
+                        borderWidth: "1px",
+                        minWidth: 0
+                      }}
+                      onFocus={(e) => e.currentTarget.style.borderColor = "#059669"}
+                      onBlur={(e) => e.currentTarget.style.borderColor = "#10B981"}
+                      step="0.00001"
+                      min={currentBid.replace(' ETH', '')}
+                    />
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 text-xs pointer-events-none">
+                      ETH
+                    </div>
                   </div>
+                  <TransactionButton
+                    transaction={createBidTransaction}
+                    onTransactionConfirmed={async () => {
+                      // Track bid placement
+                      track('NFT Bid Placed', {
+                        tokenId,
+                        bidAmount: bidAmount || currentBid.replace(' ETH', ''),
+                        currentBid: currentBid.replace(' ETH', ''),
+                        buyNow: buyNow.replace(' ETH', ''),
+                        rarity,
+                        rank: String(rank),
+                        numBids: String(numBids)
+                      });
+                      // Refresh the winning bid to show the new current bid
+                      if (auctionId) {
+                        await fetchWinningBid(auctionId);
+                      }
+                      onPlaceBid();
+                    }}
+                    onError={(error) => {
+                      console.error("Bid failed:", error);
+                      alert(error.message || "Failed to place bid. Please try again.");
+                    }}
+                    className="col-span-1 !w-full !min-w-0 !h-9 rounded text-sm font-medium bg-emerald-500 hover:bg-emerald-600"
+                    style={{ 
+                      backgroundColor: "#10B981",
+                      minWidth: 0
+                    }}
+                  >
+                    BID
+                  </TransactionButton>
                 </div>
-                <div className="flex flex-col gap-2">
-              <TransactionButton
-                transaction={createBidTransaction}
-                onTransactionConfirmed={async () => {
-                  // Track bid placement
-                  track('NFT Bid Placed', {
-                    tokenId,
-                    bidAmount: bidAmount || currentBid.replace(' ETH', ''),
-                    currentBid: currentBid.replace(' ETH', ''),
-                    buyNow: buyNow.replace(' ETH', ''),
-                    rarity,
-                    rank: String(rank),
-                    numBids: String(numBids)
-                  });
-                  // Refresh the winning bid to show the new current bid
-                  if (auctionId) {
-                    await fetchWinningBid(auctionId);
-                  }
-                  onPlaceBid();
-                }}
-                onError={(error) => {
-                  console.error("Bid failed:", error);
-                  alert(error.message || "Failed to place bid. Please try again.");
-                }}
-                className="w-full text-sm py-1 h-9 text-white rounded transition-all duration-300 ease-out font-medium hover:scale-[1.02] hover:shadow-lg hover:bg-emerald-600"
-                style={{ backgroundColor: "#10B981" }}
-              >
-                PLACE BID
-              </TransactionButton>
-              <TransactionButton
-                transaction={createBuyNowTransaction}
-                onTransactionConfirmed={() => {
-                  // Track buy now action
-                  track('NFT Buy Now Clicked', {
-                    tokenId,
-                    buyNowPrice: buyNow.replace(' ETH', ''),
-                    currentBid: currentBid.replace(' ETH', ''),
-                    rarity,
-                    rank: String(rank),
-                    numBids: String(numBids)
-                  });
-                  onBuyNow();
-                }}
-                onError={(error) => {
-                  console.error("Buy now failed:", error);
-                  alert(error.message || "Failed to buy NFT. Please try again.");
-                }}
-                className="w-full text-sm py-1 h-9 text-white rounded transition-all duration-300 ease-out font-medium hover:scale-[1.02] hover:shadow-lg hover:bg-blue-600"
-                style={{ backgroundColor: "#3B82F6" }}
-              >
-                BUY NOW
-              </TransactionButton>
-                </div>
+                <TransactionButton
+                  transaction={createBuyNowTransaction}
+                  onTransactionConfirmed={() => {
+                    // Track buy now action
+                    track('NFT Buy Now Clicked', {
+                      tokenId,
+                      buyNowPrice: buyNow.replace(' ETH', ''),
+                      currentBid: currentBid.replace(' ETH', ''),
+                      rarity,
+                      rank: String(rank),
+                      numBids: String(numBids)
+                    });
+                    onBuyNow();
+                  }}
+                  onError={(error) => {
+                    console.error("Buy now failed:", error);
+                    alert(error.message || "Failed to buy NFT. Please try again.");
+                  }}
+                  className="w-full text-sm py-1 h-9 text-white rounded transition-all duration-300 ease-out font-medium hover:scale-[1.02] hover:shadow-lg hover:bg-blue-600"
+                  style={{ backgroundColor: "#3B82F6" }}
+                >
+                  BUY NOW
+                </TransactionButton>
               </>
             )}
           </div>
