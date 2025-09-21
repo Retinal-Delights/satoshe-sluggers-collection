@@ -933,7 +933,7 @@ export default function NFTDetailPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm mb-1" style={{ color: COLORS.background }}>Buy Now Price</p>
-                    <p className="text-lg font-semibold" style={{ color: COLORS.background }}>
+                    <p className="text-sm sm:text-base font-semibold" style={{ color: COLORS.background }}>
                       {isLoadingAuction ? "Loading..." : `${buyNowPrice} ETH`}
                     </p>
                   </div>
