@@ -661,7 +661,7 @@ export default function NFTDetailPage() {
                             {attr.name}
                           </p>
                         </div>
-                        <p className="font-medium text-base text-neutral-100">{attr.value}</p>
+                        <p className="font-normal text-base text-neutral-100">{attr.value}</p>
                         <div className="text-sm text-neutral-400 mt-1">
                           <p>{attr.percentage}% have this trait</p>
                           {occurrence && <p>{occurrence} of 7777</p>}
@@ -688,7 +688,7 @@ export default function NFTDetailPage() {
                             {attr.name}
                           </p>
                         </div>
-                        <p className="font-medium text-base text-neutral-100">{attr.value}</p>
+                        <p className="font-normal text-base text-neutral-100">{attr.value}</p>
                         <div className="text-sm text-neutral-400 mt-1">
                           <p>{attr.percentage}% have this trait</p>
                           {occurrence && <p>{occurrence} of 7777</p>}
@@ -715,7 +715,7 @@ export default function NFTDetailPage() {
           <div className="space-y-6">
             {/* NFT Name with Heart Icon */}
             <div className="flex items-start justify-between gap-4">
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-neutral-100 leading-tight">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-neutral-100 leading-tight">
                 {metadata?.name || `Satoshe Slugger #${parseInt(tokenId) + 1}`}
               </h1>
               <button
@@ -738,22 +738,22 @@ export default function NFTDetailPage() {
             </div>
 
             {/* Price Information */}
-            <div className="grid grid-cols-3 gap-2 sm:gap-3">
+            <div className="grid grid-cols-3 gap-3 sm:gap-4">
               <div className="bg-neutral-800 p-3 sm:p-4 rounded border border-neutral-700">
                 <p className="text-neutral-400 text-xs sm:text-sm mb-1">Starting Price</p>
-                <p className="text-sm sm:text-base font-bold text-neutral-100">
+                <p className="text-sm sm:text-base font-semibold text-neutral-100">
                   {tierPricing.start} ETH
                 </p>
               </div>
               <div className="bg-neutral-800 p-3 sm:p-4 rounded border border-neutral-700">
                 <p className="text-neutral-400 text-xs sm:text-sm mb-1">Current Bid</p>
-                <p className="text-sm sm:text-base font-bold" style={{ color: COLORS.hair }}>
+                <p className="text-sm sm:text-base font-semibold" style={{ color: COLORS.hair }}>
                   {isLoadingAuction ? "Loading..." : `${currentBidPrice} ETH`}
                 </p>
               </div>
               <div className="bg-neutral-800 p-3 sm:p-4 rounded border border-neutral-700">
                 <p className="text-neutral-400 text-xs sm:text-sm mb-1">Buy Now Price</p>
-                <p className="text-sm sm:text-base font-bold" style={{ color: COLORS.background }}>
+                <p className="text-sm sm:text-base font-semibold" style={{ color: COLORS.background }}>
                   {isLoadingAuction ? "Loading..." : `${buyNowPrice} ETH`}
                 </p>
               </div>
@@ -761,45 +761,45 @@ export default function NFTDetailPage() {
 
             {/* Additional Details */}
             <div className="bg-neutral-800 p-4 rounded border border-neutral-700">
-              <h3 className="text-lg font-semibold text-neutral-100 mb-3">Details</h3>
+              <h3 className="text-lg font-semibold text-neutral-100 mb-4">Details</h3>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="text-neutral-400 mb-1">NFT Number</p>
-                  <p className="text-neutral-100 font-medium">{metadata?.card_number ?? parseInt(tokenId) + 1}</p>
+                  <p className="text-neutral-100 font-normal">{metadata?.card_number ?? parseInt(tokenId) + 1}</p>
                 </div>
                 <div>
                   <p className="text-neutral-400 mb-1">Token ID</p>
-                  <p className="text-neutral-100 font-medium">{metadata?.token_id ?? tokenId}</p>
+                  <p className="text-neutral-100 font-normal">{metadata?.token_id ?? tokenId}</p>
                 </div>
                 <div>
                   <p className="text-neutral-400 mb-1">Collection</p>
-                  <p className="text-neutral-100 font-medium">
+                  <p className="text-neutral-100 font-normal">
                     {metadata?.collection_number ?? "—"}
                   </p>
                 </div>
                 <div>
                   <p className="text-neutral-400 mb-1">Edition</p>
-                  <p className="text-neutral-100 font-medium">{metadata?.edition ?? "—"}</p>
+                  <p className="text-neutral-100 font-normal">{metadata?.edition ?? "—"}</p>
                 </div>
                 <div>
                   <p className="text-neutral-400 mb-1">Series</p>
-                  <p className="text-neutral-100 font-medium">{metadata?.series ?? "—"}</p>
+                  <p className="text-neutral-100 font-normal">{metadata?.series ?? "—"}</p>
                 </div>
                 <div>
                   <p className="text-neutral-400 mb-1">Rarity Tier</p>
-                  <p className="text-neutral-100 font-medium">{metadata?.rarity_tier ?? "Unknown"}</p>
+                  <p className="text-neutral-100 font-normal">{metadata?.rarity_tier ?? "Unknown"}</p>
                 </div>
                 <div>
                   <p className="text-neutral-400 mb-1">Rarity Score</p>
-                  <p className="text-neutral-100 font-medium">{metadata?.rarity_score ?? "—"}</p>
+                  <p className="text-neutral-100 font-normal">{metadata?.rarity_score ?? "—"}</p>
                 </div>
                 <div>
                   <p className="text-neutral-400 mb-1">Rank</p>
-                  <p className="text-neutral-100 font-medium">{metadata?.rank ?? "—"} of 7777</p>
+                  <p className="text-neutral-100 font-normal">{metadata?.rank ?? "—"} of 7777</p>
                 </div>
                 <div>
                   <p className="text-neutral-400 mb-1">Rarity Percentage</p>
-                  <p className="text-neutral-100 font-medium">{metadata?.rarity_percent ?? "—"}%</p>
+                  <p className="text-neutral-100 font-normal">{metadata?.rarity_percent ?? "—"}%</p>
                 </div>
               </div>
             </div>
@@ -835,11 +835,11 @@ export default function NFTDetailPage() {
             </div>
 
             {/* Auction End Time */}
-            <div className="text-sm bg-neutral-800 p-3 rounded border border-neutral-700">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="text-sm bg-neutral-800 p-4 rounded border border-neutral-700">
+              <div className="grid grid-cols-2 gap-6">
                 <div>
                   <span className="text-neutral-400">Auction Ends:</span>
-                  <p className="text-neutral-100 font-medium">
+                  <p className="text-neutral-100 font-normal">
                     {isLoadingAuction ? (
                       "Loading..."
                     ) : auctionData ? (
@@ -851,7 +851,7 @@ export default function NFTDetailPage() {
                 </div>
                 <div>
                   <span className="text-neutral-400">Time Remaining:</span>
-                  <p className="font-medium text-white">
+                  <p className="font-semibold text-white">
                     {isLoadingAuction ? "Loading..." : timeRemaining || "No active auction"}
                   </p>
                 </div>
@@ -859,7 +859,7 @@ export default function NFTDetailPage() {
             </div>
 
             {/* Bidding Section */}
-            <div className="space-y-4">
+            <div className="space-y-6">
               {/* Place Bid */}
               <div className="bg-neutral-800 p-4 rounded border border-neutral-700">
                 <div className="flex items-center justify-between mb-3">
@@ -870,7 +870,7 @@ export default function NFTDetailPage() {
                     {bidCount} bid{bidCount !== 1 ? 's' : ''} placed
                   </div>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex gap-4">
                   <div className="relative flex-1">
                     <Input
                       id="bid-amount"
@@ -883,11 +883,12 @@ export default function NFTDetailPage() {
                           setBidAmount(validation.formattedValue);
                         }
                       }}
-                      className="pr-12 border-2 focus:ring-2 focus:ring-offset-2 text-base font-semibold placeholder:text-green-400 h-10"
+                      className="pr-12 border-2 focus:ring-2 focus:ring-offset-2 text-base font-semibold placeholder:text-green-400 h-10 rounded"
                       style={{
                         borderColor: COLORS.hair + '80',
                         color: '#10B981',
-                        backgroundColor: 'transparent'
+                        backgroundColor: 'transparent',
+                        borderRadius: "4px"
                       }}
                       step="0.001"
                       min={tierPricing.start}
@@ -932,7 +933,7 @@ export default function NFTDetailPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm mb-1" style={{ color: COLORS.background }}>Buy Now Price</p>
-                    <p className="text-xl font-bold" style={{ color: COLORS.background }}>
+                    <p className="text-lg font-semibold" style={{ color: COLORS.background }}>
                       {isLoadingAuction ? "Loading..." : `${buyNowPrice} ETH`}
                     </p>
                   </div>
@@ -1078,7 +1079,7 @@ export default function NFTDetailPage() {
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="description" className="mt-4">
-                <div className="bg-neutral-800 p-4 rounded-lg border border-neutral-700">
+                <div className="bg-neutral-800 p-4 rounded border border-neutral-700">
                   <p className="text-neutral-300 text-sm mb-4">
                     {metadata?.description || "Women's Baseball Card from the Satoshe Sluggers collection."}
                   </p>
@@ -1110,7 +1111,7 @@ export default function NFTDetailPage() {
                 </div>
               </TabsContent>
               <TabsContent value="sales" className="mt-4">
-                <div className="bg-neutral-800 p-4 rounded-lg border border-neutral-700">
+                <div className="bg-neutral-800 p-4 rounded border border-neutral-700">
                   <div className="space-y-3">
                     {salesHistory.map((sale, index) => (
                       <div key={index} className="flex justify-between items-center py-3 border-b border-neutral-700 last:border-b-0">
