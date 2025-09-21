@@ -661,7 +661,7 @@ export default function NFTDetailPage() {
                             {attr.name}
                           </p>
                         </div>
-                        <p className="font-semibold text-base text-neutral-100">{attr.value}</p>
+                        <p className="font-medium text-base text-neutral-100">{attr.value}</p>
                         <div className="text-sm text-neutral-400 mt-1">
                           <p>{attr.percentage}% have this trait</p>
                           {occurrence && <p>{occurrence} of 7777</p>}
@@ -688,7 +688,7 @@ export default function NFTDetailPage() {
                             {attr.name}
                           </p>
                         </div>
-                        <p className="font-semibold text-base text-neutral-100">{attr.value}</p>
+                        <p className="font-medium text-base text-neutral-100">{attr.value}</p>
                         <div className="text-sm text-neutral-400 mt-1">
                           <p>{attr.percentage}% have this trait</p>
                           {occurrence && <p>{occurrence} of 7777</p>}
@@ -851,7 +851,7 @@ export default function NFTDetailPage() {
                 </div>
                 <div>
                   <span className="text-neutral-400">Time Remaining:</span>
-                  <p className={`font-medium ${getAuctionEndColor(auctionData?.endTimeInSeconds || 0)}`}>
+                  <p className="font-medium text-white">
                     {isLoadingAuction ? "Loading..." : timeRemaining || "No active auction"}
                   </p>
                 </div>
@@ -866,7 +866,7 @@ export default function NFTDetailPage() {
                   <label htmlFor="bid-amount" className="text-sm font-medium" style={{ color: COLORS.hair }}>
                     Place Your Bid
                   </label>
-                  <div className="text-sm text-neutral-400">
+                  <div className="text-sm text-white">
                     {bidCount} bid{bidCount !== 1 ? 's' : ''} placed
                   </div>
                 </div>
@@ -883,10 +883,10 @@ export default function NFTDetailPage() {
                           setBidAmount(validation.formattedValue);
                         }
                       }}
-                      className="pr-12 border-2 focus:ring-2 focus:ring-offset-2 text-base font-semibold placeholder:text-green-400"
+                      className="pr-12 border-2 focus:ring-2 focus:ring-offset-2 text-base font-semibold placeholder:text-green-400 h-10"
                       style={{
                         borderColor: COLORS.hair + '80',
-                        color: COLORS.hair,
+                        color: '#10B981',
                         backgroundColor: 'transparent'
                       }}
                       step="0.001"
@@ -911,10 +911,11 @@ export default function NFTDetailPage() {
                       console.error("Bid failed:", error);
                       alert(error.message || "Failed to place bid. Please try again.");
                     }}
-                    className="w-32 px-6 py-2 font-semibold text-white transition-all duration-200 hover:scale-105 focus:ring-2 focus:ring-offset-2 hover:bg-emerald-600"
+                    className="w-32 px-6 h-10 font-semibold text-white transition-colors duration-300 ease-in-out focus:ring-2 focus:ring-offset-2 hover:bg-emerald-600 rounded"
                     style={{
                       backgroundColor: COLORS.hair,
-                      borderColor: COLORS.hair
+                      borderColor: COLORS.hair,
+                      borderRadius: "4px"
                     }}
                     aria-describedby="bid-help"
                   >
@@ -946,10 +947,11 @@ export default function NFTDetailPage() {
                       console.error("Buy now failed:", error);
                       alert(error.message || "Failed to buy NFT. Please try again.");
                     }}
-                    className="w-32 px-6 py-2 font-semibold text-white transition-all duration-200 hover:scale-105 focus:ring-2 focus:ring-offset-2 hover:bg-blue-600"
+                    className="w-32 px-6 h-10 font-semibold text-white transition-colors duration-300 ease-in-out focus:ring-2 focus:ring-offset-2 hover:bg-blue-600 rounded"
                     style={{
                       backgroundColor: COLORS.background,
-                      borderColor: COLORS.background
+                      borderColor: COLORS.background,
+                      borderRadius: "4px"
                     }}
                   >
                     BUY NOW

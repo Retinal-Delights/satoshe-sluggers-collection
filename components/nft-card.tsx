@@ -423,7 +423,7 @@ export default function NFTCard({
                   <div className="flex items-end justify-between">
                     <div>
                     <div className="text-xs md:text-sm text-white mb-1">Buy Now</div>
-                    <div className="text-xs md:text-sm font-semibold" style={{ color: "#3B82F6" }}>{buyNow.replace(' ETH', '')} ETH</div>
+                    <div className="text-xs md:text-sm font-medium" style={{ color: "#3B82F6" }}>{buyNow.replace(' ETH', '')} ETH</div>
                     </div>
                     <TransactionButton
                       transaction={createBuyNowTransaction}
