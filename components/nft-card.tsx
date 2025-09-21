@@ -254,7 +254,7 @@ export default function NFTCard({
 
   return (
     <div 
-      className="overflow-visible w-full max-w-xs mx-auto rounded-lg shadow-md flex flex-col h-full bg-neutral-900"
+      className="overflow-visible w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-md xl:max-w-lg 2xl:max-w-lg mx-auto rounded-lg shadow-md flex flex-col h-full bg-neutral-900"
       onClick={handleMobileTilt}
     >
       <Link href={`/nft/${tokenId}`} className="block w-full">
@@ -334,7 +334,7 @@ export default function NFTCard({
             {isForSale && (
               <>
                 {/* Bidding Section */}
-                <div className="pt-2 mb-2 p-3 bg-card rounded" style={{ borderRadius: "2px" }}>
+                <div className="pt-2 mb-2 p-3 bg-card rounded">
                   <div className="text-xs text-white mb-2 font-normal whitespace-nowrap">Minimum Next Bid: {formatBidAmount(minimumBidAmount)} ETH</div>
                   
                   <div className="flex gap-2 mb-2">
@@ -419,7 +419,7 @@ export default function NFTCard({
                 </div>
 
                 {/* Buy Now Section */}
-                <div className="pt-2 p-3 bg-card rounded" style={{ borderRadius: "2px" }}>
+                <div className="pt-2 p-3 bg-card rounded">
                   <div className="flex items-end justify-between">
                     <div>
                     <div className="text-xs text-white mb-1">Buy Now</div>
