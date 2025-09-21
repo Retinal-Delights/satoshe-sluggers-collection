@@ -110,7 +110,6 @@ function getTierPricing(rarity: string) {
 function formatAuctionDate(endTimeSeconds: string | number | bigint) {
   if (!endTimeSeconds) return "N/A";
   const endDate = new Date(Number(endTimeSeconds) * 1000);
-  console.log(`[DEBUG] Auction end timestamp: ${endTimeSeconds}, converted date: ${endDate.toISOString()}`);
   return endDate.toLocaleDateString('en-US', {
     month: '2-digit',
     day: '2-digit',
@@ -122,7 +121,6 @@ function formatAuctionDate(endTimeSeconds: string | number | bigint) {
 function formatAuctionTime(endTimeSeconds: string | number | bigint) {
   if (!endTimeSeconds) return "N/A";
   const endDate = new Date(Number(endTimeSeconds) * 1000);
-  console.log(`[DEBUG] Auction end time: ${endDate.toISOString()}`);
   return endDate.toLocaleTimeString('en-US', {
     hour: 'numeric',
     minute: '2-digit',
@@ -148,7 +146,6 @@ function formatTimeRemaining(endTimeSeconds: string | number | bigint) {
   if (!endTimeSeconds) return "Auction ended";
   
   const timeLeft = Number(endTimeSeconds) - Math.floor(Date.now() / 1000);
-  console.log(`[DEBUG] Time remaining calculation: endTime=${endTimeSeconds}, now=${Math.floor(Date.now() / 1000)}, timeLeft=${timeLeft}`);
   
   if (timeLeft <= 0) return "Auction ended";
   
@@ -223,7 +220,6 @@ export default function NFTDetailPage() {
   const [isLoadingAuction, setIsLoadingAuction] = useState(true);
 
   useEffect(() => {
-    console.log(`[NFT Detail] Loading data for token ID: ${tokenId}`);
     setIsLoading(true);
 
     Promise.all([
@@ -231,13 +227,11 @@ export default function NFTDetailPage() {
       fetch(NFT_URLS).then((r) => r.json()),
     ])
       .then(([metaDataArr, urlArr]) => {
-        console.log(`[NFT Detail] Loaded ${metaDataArr?.length || 0} metadata items and ${urlArr?.length || 0} URL items`);
 
         // Find metadata by token_id (which matches the URL parameter)
         const found = metaDataArr.find((item: any) =>
           item.token_id?.toString() === tokenId
         );
-        console.log(`[NFT Detail] Found metadata for token ${tokenId}:`, found ? 'Yes' : 'No');
 
         if (found) {
           setMetadata(found);
@@ -262,12 +256,8 @@ export default function NFTDetailPage() {
   const fetchAuctionData = async () => {
       try {
         setIsLoadingAuction(true);
-        console.log(`[NFT Detail] Fetching auction data for token ${tokenId}...`);
 
         // Use direct contract call to get all auctions and find this token's auction
-        console.log(`[NFT Detail] Contract address:`, marketplace.address);
-        console.log(`[NFT Detail] Contract chain:`, marketplace.chain);
-        console.log(`[NFT Detail] Client ID:`, client.clientId);
 
         // Use batching approach like in the grid to find this specific token's auction
         const batchSize = 100;
@@ -276,7 +266,6 @@ export default function NFTDetailPage() {
         
         for (let startId = 0; startId < maxPossibleAuctions && !tokenAuction; startId += batchSize) {
           const endId = Math.min(startId + batchSize - 1, maxPossibleAuctions - 1);
-          console.log(`[NFT Detail] Checking batch ${startId}-${endId} for token ${tokenId}`);
           
           try {
             const contractCallPromise = readContract({
@@ -298,14 +287,11 @@ export default function NFTDetailPage() {
               );
               
               if (tokenAuction) {
-                console.log(`[NFT Detail] Found auction for token ${tokenId} in batch ${startId}-${endId}`);
-                console.log(`[DEBUG] Raw auction data:`, tokenAuction);
                 break; // Found it, stop searching
               }
               
               // If we get an empty batch, we've likely reached the end
               if (batchData.length === 0) {
-                console.log(`[NFT Detail] Empty batch at ${startId}-${endId}, stopping search`);
                 break;
               }
             }
@@ -320,7 +306,6 @@ export default function NFTDetailPage() {
         }
 
         if (tokenAuction) {
-          console.log(`[NFT Detail] Found auction for token ${tokenId}:`, tokenAuction);
           const processedAuctionData = {
             id: tokenAuction.auctionId,
             tokenId: tokenAuction.tokenId,
@@ -341,7 +326,6 @@ export default function NFTDetailPage() {
           // Fetch the current winning bid
           await refreshAuctionBid(processedAuctionData.auctionId.toString());
         } else {
-          console.log(`[NFT Detail] No auction found for token ${tokenId}`);
           setAuctionData(null);
         }
       } catch (error) {
@@ -380,11 +364,8 @@ export default function NFTDetailPage() {
 
         // Check for specific error types
         if (errorMessage.includes('AbiDecodingZeroDataError')) {
-          console.log(`[NFT Detail] AbiDecodingZeroDataError - no active auctions found for token ${tokenId}`);
         } else if (errorMessage.includes('Invalid currency token')) {
-          console.log(`[NFT Detail] Currency token error - using fallback for token ${tokenId}`);
         } else if (errorMessage.includes('fetch') || errorMessage.includes('timeout')) {
-          console.log(`[NFT Detail] Network/fetch/timeout error - check RPC connection for token ${tokenId}`);
         } else {
           console.error(`[NFT Detail] Unexpected error type:`, errorName, 'Message:', errorMessage);
         }
@@ -848,7 +829,7 @@ export default function NFTDetailPage() {
                     height={20}
                     className="w-5 h-5 mr-2"
                   />
-                  <p className="text-sm text-neutral-100">{metadata?.platform ?? "Retinal Delights"}</p>
+                  <p className="text-sm text-neutral-400">{metadata?.platform ?? "Retinal Delights"}</p>
                 </div>
               </div>
             </div>

@@ -10,7 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 // Stub analytics function to prevent errors
 const track = (...args: any[]) => {
-  console.log('Analytics:', args);
 };
 
 // Create a context for filter reset functionality

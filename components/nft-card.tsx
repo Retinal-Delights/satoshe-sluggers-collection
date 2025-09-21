@@ -98,6 +98,7 @@ export default function NFTCard({
   const [imgLoading, setImgLoading] = useState(true);
   const [countdown, setCountdown] = useState("");
   const [currentBidAmount, setCurrentBidAmount] = useState<string>(currentBid);
+  const [bidCount, setBidCount] = useState<number>(numBids);
 
   // DISABLED: Fetch current winning bid (prevents RPC charges)
   const fetchWinningBid = async (auctionId: string | number) => {
@@ -187,6 +188,11 @@ export default function NFTCard({
     return () => clearInterval(interval);
   }, [auctionEnd]);
 
+  // Sync bid count with prop changes
+  useEffect(() => {
+    setBidCount(numBids);
+  }, [numBids]);
+
   // Calculate minimum bid amount with 5% increment if bids exist
   const minIncrement = 0.05; // 5%
   const currentBidValue = Number(currentBid.replace(' ETH', ''));
@@ -248,7 +254,7 @@ export default function NFTCard({
 
   return (
     <div 
-      className="overflow-visible w-full max-w-sm mx-auto rounded-lg shadow-md flex flex-col h-full bg-neutral-900"
+      className="overflow-visible w-full max-w-xs mx-auto rounded-lg shadow-md flex flex-col h-full bg-neutral-900"
       onClick={handleMobileTilt}
     >
       <Link href={`/nft/${tokenId}`} className="block w-full">
@@ -278,7 +284,7 @@ export default function NFTCard({
       <div className="p-3 bg-neutral-900 text-neutral-100 flex-1 flex flex-col">
         <div className="mb-2">
           <div className="flex items-center justify-between mb-1">
-            <h4 className="text-base font-medium leading-tight">{name}</h4>
+                  <h4 className="text-sm md:text-base font-medium leading-tight whitespace-nowrap pr-2">{name}</h4>
             <button
               onClick={handleFavoriteClick}
               className="p-1 rounded-full hover:bg-neutral-800 transition-colors"
@@ -294,14 +300,14 @@ export default function NFTCard({
             </button>
           </div>
           {clientReady && auctionEnd && (
-            <div className="text-sm text-neutral-400 mb-2">
-              Ends: {countdown}
-            </div>
+                  <div className="text-xs md:text-sm text-neutral-400 mb-2">
+                    Ends: {countdown}
+                  </div>
           )}
         </div>
         {activeView === "forSale" && (
           <div className="flex flex-col flex-1">
-            <div className="space-y-1 text-sm mb-3 flex-1 leading-tight">
+            <div className="space-y-1 text-xs md:text-sm mb-3 flex-1 leading-tight">
               <div className="flex justify-between">
                 <span className="text-neutral-400">Rank:</span>
                 <span className="text-neutral-400">{rank || '—'} of 7777</span>
@@ -314,6 +320,10 @@ export default function NFTCard({
                 <span className="text-neutral-400">Tier:</span>
                 <span className="text-neutral-400">{rarity || 'Unknown'}</span>
               </div>
+              <div className="flex justify-between">
+                <span className="text-neutral-400">Number of Bids:</span>
+                <span className="text-neutral-400">{bidCount}</span>
+              </div>
               {!isForSale && (
                 <div className="flex justify-between">
                   <span className="text-neutral-400">Status:</span>
@@ -323,125 +333,129 @@ export default function NFTCard({
             </div>
             {isForSale && (
               <>
-                <div className="grid grid-cols-4 gap-2 mb-1 items-center">
-                  <div className="relative col-span-3 min-w-0">
-                    <input
-                      type="number"
-                      id={`bid-amount-${tokenId}`}
-                      placeholder={formatBidAmount(minimumBidAmount)}
-                      value={bidAmount || formatBidAmount(minimumBidAmount)}
-                      onChange={(e) => {
-                        const validation = validateNumericInput(e.target.value, tokenId);
-                        if (validation.isValid) {
-                          onBidAmountChange(tokenId, validation.formattedValue);
-                          // Track bid amount changes
-                          if (validation.formattedValue !== currentBid.replace(' ETH', '')) {
-                            track('Bid Amount Modified', {
-                              tokenId,
-                              newBidAmount: validation.formattedValue,
-                              currentBid: currentBid.replace(' ETH', ''),
-                              rarity
-                            });
+                {/* Bidding Section */}
+                <div className="pt-2 mb-2 p-3 bg-card rounded" style={{ borderRadius: "2px" }}>
+                  <div className="text-xs text-white mb-2 font-normal whitespace-nowrap">Minimum Next Bid: {formatBidAmount(minimumBidAmount)} ETH</div>
+                  
+                  <div className="flex gap-2 mb-2">
+                    <div className="relative flex-1">
+                      <input
+                        type="number"
+                        id={`bid-amount-${tokenId}`}
+                        placeholder={formatBidAmount(minimumBidAmount)}
+                        value={bidAmount || formatBidAmount(minimumBidAmount)}
+                        onChange={(e) => {
+                          const validation = validateNumericInput(e.target.value, tokenId);
+                          if (validation.isValid) {
+                            onBidAmountChange(tokenId, validation.formattedValue);
+                            // Track bid amount changes
+                            if (validation.formattedValue !== currentBid.replace(' ETH', '')) {
+                              track('Bid Amount Modified', {
+                                tokenId,
+                                newBidAmount: validation.formattedValue,
+                                currentBid: currentBid.replace(' ETH', ''),
+                                rarity
+                              });
+                            }
                           }
+                        }}
+                        className="w-full text-xs md:text-sm px-3 bg-neutral-900 border focus:outline-none text-[#10B981] placeholder:text-neutral-500 font-medium"
+                        style={{
+                          height: "32px",
+                          borderColor: "#10B981",
+                          borderWidth: "1px",
+                          borderRadius: "2px"
+                        }}
+                        onFocus={(e) => e.currentTarget.style.borderColor = "#059669"}
+                        onBlur={(e) => e.currentTarget.style.borderColor = "#10B981"}
+                        step="0.00001"
+                        min={currentBid.replace(' ETH', '')}
+                      />
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 text-xs pointer-events-none">
+                        ETH
+                      </div>
+                    </div>
+                    <TransactionButton
+                      transaction={createBidTransaction}
+                      onTransactionConfirmed={async () => {
+                        // Increment bid count
+                        setBidCount(prev => prev + 1);
+                        
+                        // Track bid placement
+                        track('NFT Bid Placed', {
+                          tokenId,
+                          bidAmount: bidAmount || currentBid.replace(' ETH', ''),
+                          currentBid: currentBid.replace(' ETH', ''),
+                          buyNow: buyNow.replace(' ETH', ''),
+                          rarity,
+                          rank: String(rank),
+                          numBids: String(bidCount + 1)
+                        });
+                        // Refresh the winning bid to show the new current bid
+                        if (auctionId) {
+                          await fetchWinningBid(auctionId);
                         }
+                        onPlaceBid();
                       }}
-                      className="w-full h-8 text-sm px-3 py-1 bg-neutral-900 border focus:outline-none text-neutral-100 placeholder:text-neutral-500 truncate font-medium"
-                      style={{
+                      onError={(error) => {
+                        console.error("Bid failed:", error);
+                        alert(error.message || "Failed to place bid. Please try again.");
+                      }}
+                      className="px-3 text-xs md:text-sm font-medium text-white border"
+                      style={{ 
+                        height: "32px",
+                        backgroundColor: "#10B981",
+                        minWidth: "50px",
+                        borderRadius: "2px",
                         borderColor: "#10B981",
-                        color: "#10B981",
-                        borderWidth: "1px",
-                        minWidth: 0,
-                        borderRadius: "4px"
+                        borderWidth: "1px"
                       }}
-                      onFocus={(e) => e.currentTarget.style.borderColor = "#059669"}
-                      onBlur={(e) => e.currentTarget.style.borderColor = "#10B981"}
-                      step="0.00001"
-                      min={currentBid.replace(' ETH', '')}
-                    />
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 text-xs pointer-events-none">
-                      ETH
-                    </div>
+                    >
+                      BID
+                    </TransactionButton>
                   </div>
-                  <TransactionButton
-                    transaction={createBidTransaction}
-                    onTransactionConfirmed={async () => {
-                      // Track bid placement
-                      track('NFT Bid Placed', {
-                        tokenId,
-                        bidAmount: bidAmount || currentBid.replace(' ETH', ''),
-                        currentBid: currentBid.replace(' ETH', ''),
-                        buyNow: buyNow.replace(' ETH', ''),
-                        rarity,
-                        rank: String(rank),
-                        numBids: String(numBids)
-                      });
-                      // Refresh the winning bid to show the new current bid
-                      if (auctionId) {
-                        await fetchWinningBid(auctionId);
-                      }
-                      onPlaceBid();
-                    }}
-                    onError={(error) => {
-                      console.error("Bid failed:", error);
-                      alert(error.message || "Failed to place bid. Please try again.");
-                    }}
-                    className="col-span-1 !w-full !min-w-0 !h-8 text-sm font-medium text-white bg-emerald-500 hover:bg-emerald-600"
-                    style={{ 
-                      backgroundColor: "#10B981",
-                      minWidth: 0,
-                      borderRadius: "4px"
-                    }}
-                  >
-                    BID
-                  </TransactionButton>
+                  
+                  <div className="text-xs text-neutral-400 whitespace-nowrap">Starting Price: {formatBidAmount(minimumBidAmount)} ETH</div>
                 </div>
-                <div className="grid grid-cols-4 gap-2 mt-1 items-center">
-                  <div className="relative col-span-3 min-w-0">
-                    <input
-                      type="text"
-                      value={buyNow.replace(' ETH', '')}
-                      readOnly
-                      className="w-full h-8 text-sm px-3 py-1 border focus:outline-none text-neutral-100 truncate cursor-default font-medium"
-                      style={{
-                        backgroundColor: "#262626",
-                        borderColor: "#3B82F6",
-                        color: "#3B82F6",
-                        borderWidth: "1px",
-                        minWidth: 0,
-                        borderRadius: "4px"
-                      }}
-                    />
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 text-xs pointer-events-none">
-                      ETH
+
+                {/* Buy Now Section */}
+                <div className="pt-2 p-3 bg-card rounded" style={{ borderRadius: "2px" }}>
+                  <div className="flex items-end justify-between">
+                    <div>
+                    <div className="text-xs text-white mb-1">Buy Now</div>
+                    <div className="text-xs md:text-sm font-medium" style={{ color: "#3B82F6" }}>{buyNow.replace(' ETH', '')} ETH</div>
                     </div>
+                    <TransactionButton
+                      transaction={createBuyNowTransaction}
+                      onTransactionConfirmed={() => {
+                        // Track buy now action
+                        track('NFT Buy Now Clicked', {
+                          tokenId,
+                          buyNowPrice: buyNow.replace(' ETH', ''),
+                          currentBid: currentBid.replace(' ETH', ''),
+                          rarity,
+                          rank: String(rank),
+                          numBids: String(numBids)
+                        });
+                        onBuyNow();
+                      }}
+                      onError={(error) => {
+                        console.error("Buy now failed:", error);
+                        alert(error.message || "Failed to buy NFT. Please try again.");
+                      }}
+                      className="px-3 text-xs md:text-sm font-medium text-white border"
+                      style={{ 
+                        height: "32px",
+                        backgroundColor: "#3B82F6",
+                        minWidth: "50px",
+                        borderRadius: "2px",
+                        borderColor: "#3B82F6",
+                        borderWidth: "1px"
+                      }}
+                    >
+                      BUY
+                    </TransactionButton>
                   </div>
-                  <TransactionButton
-                    transaction={createBuyNowTransaction}
-                    onTransactionConfirmed={() => {
-                      // Track buy now action
-                      track('NFT Buy Now Clicked', {
-                        tokenId,
-                        buyNowPrice: buyNow.replace(' ETH', ''),
-                        currentBid: currentBid.replace(' ETH', ''),
-                        rarity,
-                        rank: String(rank),
-                        numBids: String(numBids)
-                      });
-                      onBuyNow();
-                    }}
-                    onError={(error) => {
-                      console.error("Buy now failed:", error);
-                      alert(error.message || "Failed to buy NFT. Please try again.");
-                    }}
-                    className="col-span-1 !w-full !min-w-0 !h-8 text-sm font-medium text-white"
-                    style={{ 
-                      backgroundColor: "#3B82F6",
-                      minWidth: 0,
-                      borderRadius: "4px"
-                    }}
-                  >
-                    BUY
-                  </TransactionButton>
                 </div>
               </>
             )}

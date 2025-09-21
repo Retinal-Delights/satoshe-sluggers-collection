@@ -56,34 +56,26 @@ function getAuctionCountdown(auctionEnd: string | number | bigint) {
 }
 
 function displayPrice(val: string | number | bigint) {
-  console.log('[displayPrice] input:', val);
   if (!val || val === "0") {
-    console.log('[displayPrice] No value provided');
     return "--";
   }
   if ((typeof val === "string" && /^\d{12,}$/.test(val)) || typeof val === "bigint") {
     try {
       const eth = Number(BigInt(val)) / 1e18;
       if (eth > 10000) {
-        console.log('[displayPrice] Value too large:', eth);
         return "--";
       }
-      console.log('[displayPrice] Converted from wei:', val, '->', eth);
       return eth + " ETH";
     } catch {
-      console.log('[displayPrice] Conversion from wei failed');
       return "--";
     }
   }
   if (typeof val === "number" && val < 1e6) {
-    console.log('[displayPrice] Already ETH (number):', val);
     return val + " ETH";
   }
   if (typeof val === "string" && /^\d*\.?\d+$/.test(val)) {
-    console.log('[displayPrice] Already ETH (string):', val);
     return val + " ETH";
   }
-  console.log('[displayPrice] Unknown format');
   return "--";
 }
 
@@ -216,7 +208,6 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
         const fetchAuctionData = async () => {
           try {
             setIsLoadingAuctions(true);
-            console.log('[fetchAuctionData] Starting comprehensive auction data fetch...');
 
             // Check for cached data first
             const cacheKey = `auction-data-${marketplace.address}`;
@@ -226,16 +217,12 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
             
             // Use cache if it's less than 5 minutes old
             if (cachedData && cacheAge < 5 * 60 * 1000) {
-              console.log('[fetchAuctionData] Using cached auction data');
               const auctionDataMap = new Map(JSON.parse(cachedData) as [number, any][]);
               setAuctionMap(auctionDataMap);
               setIsLoadingAuctions(false);
               return;
             }
 
-            console.log('[fetchAuctionData] Fetching fresh auction data...');
-            console.log('[fetchAuctionData] Contract address:', marketplace.address);
-            console.log('[fetchAuctionData] Contract chain:', marketplace.chain);
             
             // Fetch in batches to handle the entire collection
             const batchSize = 100; // Process 100 auctions at a time (reduced for faster loading)
@@ -244,7 +231,6 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
             
             for (let startId = 0; startId < maxPossibleAuctions; startId += batchSize) {
               const endId = Math.min(startId + batchSize - 1, maxPossibleAuctions - 1);
-              console.log(`[fetchAuctionData] Fetching batch: ${startId} to ${endId}`);
               
               try {
                 const contractCallPromise = readContract({
@@ -261,11 +247,9 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
                 
                 if (batchData && Array.isArray(batchData)) {
                   allAuctionData.push(...batchData);
-                  console.log(`[fetchAuctionData] Batch ${startId}-${endId}: got ${batchData.length} auctions`);
                   
                   // If we get an empty batch, we've likely reached the end of active auctions
                   if (batchData.length === 0) {
-                    console.log(`[fetchAuctionData] Empty batch at ${startId}-${endId}, stopping fetch`);
                     break;
                   }
                 }
@@ -279,7 +263,6 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
               }
             }
             
-            console.log('[fetchAuctionData] Total auctions fetched:', allAuctionData.length);
 
             // Create auction map from all batched data
             const auctionDataMap = new Map();
@@ -309,18 +292,12 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
             try {
               localStorage.setItem(cacheKey, JSON.stringify(Array.from(auctionDataMap.entries())));
               localStorage.setItem(`${cacheKey}-timestamp`, Date.now().toString());
-              console.log('[fetchAuctionData] Cached auction data for future use');
             } catch (cacheError) {
               console.warn('[fetchAuctionData] Failed to cache data:', cacheError);
             }
 
             setAuctionMap(auctionDataMap);
-            console.log('[fetchAuctionData] Created auction map with', auctionDataMap.size, 'real auction entries');
           } catch (error) {
-            // Enhanced error logging with better object inspection
-            console.error('[fetchAuctionData] Raw error object:', error);
-            console.error('[fetchAuctionData] Error type:', typeof error);
-            console.error('[fetchAuctionData] Error constructor:', error?.constructor?.name);
             
             // Try to extract meaningful information from the error
             let errorMessage = 'Unknown error';
@@ -352,13 +329,10 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
             
             // Check for specific error types
             if (errorMessage.includes('AbiDecodingZeroDataError')) {
-              console.log('[fetchAuctionData] AbiDecodingZeroDataError - no active auctions found');
               setAuctionMap(new Map());
             } else if (errorMessage.includes('Invalid currency token')) {
-              console.log('[fetchAuctionData] Currency token error - using fallback');
               setAuctionMap(new Map());
             } else if (errorMessage.includes('fetch')) {
-              console.log('[fetchAuctionData] Network/fetch error - check RPC connection');
               setAuctionMap(new Map());
             } else {
               console.error('[fetchAuctionData] Unexpected error type:', errorName, 'Message:', errorMessage);
@@ -366,7 +340,6 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
             }
           } finally {
             setIsLoadingAuctions(false);
-            console.log('[fetchAuctionData] Finished, isLoadingAuctions set to false');
           }
         };
 
@@ -377,26 +350,20 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
 
     useEffect(() => {
     // Load all static metadata and image URLs from local JSON files
-    console.log('[metadata] Starting metadata fetch...');
     Promise.all([
       fetch(METADATA_URL).then((r) => {
-        console.log('[metadata] Metadata response received, parsing...');
         return r.json();
       }),
       fetch(NFT_URLS).then((r) => {
-        console.log('[metadata] URLs response received, parsing...');
         return r.json();
       })
     ])
       .then(([metadataData, urlData]) => {
-        console.log('[metadata] Loaded metadata:', metadataData?.length || 0, 'items');
-        console.log('[metadata] Loaded URLs:', urlData?.length || 0, 'items');
 
         // Use all metadata from combined_metadata.json
         const allMetadataItems = metadataData || [];
         const allUrlItems = urlData || [];
 
-        console.log('[metadata] Using all data - metadata:', allMetadataItems.length, 'URLs:', allUrlItems.length);
 
         // Set metadata
         setAllMetadata(allMetadataItems);
@@ -410,7 +377,6 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
         });
         setImageUrlMap(map);
         setIsMetadataLoaded(true);
-        console.log('[metadata] Metadata loading complete, isMetadataLoaded set to true');
       })
       .catch((error) => {
         console.error("Error loading metadata:", error);
@@ -441,7 +407,7 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
         selectedFilters[key].length > 0 : Object.keys(selectedFilters[key]).length > 0)
       ),
       searchTermLength: searchTerm.length,
-      sessionDuration: Math.floor((Date.now() - sessionMetrics.sessionStartTime) / 1000)
+      sessionDuration: 0 // Simplified to avoid dependency issues
     });
 
     // Track marketplace performance metrics
@@ -499,26 +465,17 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
       // Also track on component unmount
       handleBeforeUnload();
     };
-  }, [sessionMetrics]);
+  }, []); // Empty dependency array since we only want this to run once
 
   useEffect(() => {
     async function loadNFTs() {
       setIsLoading(true);
-      console.log('[loadNFTs] Starting with:', {
-        activeView,
-        isMetadataLoaded,
-        isLoadingAuctions,
-        auctionMapSize: auctionMap.size,
-        allMetadataLength: allMetadata.length,
-        imageUrlMapSize: Object.keys(imageUrlMap).length
-      });
 
       // Add a small delay to ensure loading state is visible
       await new Promise(resolve => setTimeout(resolve, 100));
 
       try {
         if (isMetadataLoaded && !isLoadingAuctions) {
-          console.log('[loadNFTs] Processing NFTs...');
 
           // Map ALL metadata for NFTs - show entire collection
           // Apply auction data when available, show "Not for Sale" when not
@@ -595,11 +552,6 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
           setIsLoading(false);
         } else {
           // Keep loading state true if metadata isn't loaded yet
-          console.log('[loadNFTs] Waiting for metadata or auction data...', {
-            isMetadataLoaded,
-            isLoadingAuctions,
-            allMetadataLength: allMetadata.length
-          });
         }
       } catch (error) {
         console.error("Error loading NFTs:", error);
@@ -647,12 +599,6 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
     try {
       // Let Thirdweb handle validation - just get the bid amount
       const amount = bidAmounts[nft.id] || fromWei(nft.bidPriceWei);
-      
-      console.log('[Bid Attempt]', {
-        tokenId: nft.tokenId,
-        bidAmount: amount,
-        auctionId: auctionMap.get(Number(nft.tokenId))?.auctionId
-      });
       
       // Get the real auction data
       const auction = auctionMap.get(Number(nft.tokenId));
@@ -1007,26 +953,12 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
     }
   }, [traitCounts, onTraitCountsChange]);
 
-  // Debug logging
-  console.log('[NFT Grid Debug]', {
-    totalAuctions: auctionMap.size,
-    totalMetadata: allMetadata.length,
-    totalNFTs: nfts.length,
-    filteredNFTs: filteredNFTs.length,
-    sortedNFTs: sortedNFTs.length,
-    itemsPerPage,
-    currentPage,
-    startIndex,
-    endIndex,
-    paginatedNFTs: paginatedNFTs.length,
-    totalFilteredPages,
-    expectedCount: itemsPerPage === 100000 ? sortedNFTs.length : Math.min(itemsPerPage, sortedNFTs.length - startIndex)
-  });
+  // Debug logging removed to prevent errors
 
   // Debug: Show all unique eyewear values that actually exist
   if (nfts.length > 0) {
     const uniqueEyewear = [...new Set(nfts.map(nft => nft.eyewear).filter(Boolean))].sort();
-    console.log('[All Unique Eyewear Values in NFTs]', uniqueEyewear);
+    // Debug logging removed to prevent errors
   }
 
 
@@ -1171,59 +1103,8 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
             const currentBidFormatted = displayPrice(nft.currentBidWei);
             const buyNowFormatted = displayPrice(nft.priceWei);
 
-            // Track NFT view when rendered
-            const handleNFTView = () => {
-              // Add to viewed NFTs set and track unique views
-              setSessionMetrics(prev => {
-                const newViewed = new Set(prev.uniqueNFTsViewed);
-                const wasNew = !newViewed.has(nft.tokenId);
-                newViewed.add(nft.tokenId);
-
-                if (wasNew) {
-                  // Track unique NFT view
-                  track('NFT Viewed', {
-                    tokenId: nft.tokenId,
-                    rarity: nft.rarity,
-                    rank: String(nft.rank),
-                    rarityPercent: String(nft.rarityPercent),
-                    priceETH: Number(nft.priceWei) / 1e18,
-                    currentBidETH: Number(nft.currentBidWei) / 1e18,
-                    numBids: nft.numBids,
-                    background: nft.background || 'Unknown',
-                    skinTone: nft.skinTone || 'Unknown',
-                    shirt: nft.shirt || 'Unknown',
-                    eyewear: nft.eyewear || 'Unknown',
-                    viewContext: `Page ${currentPage}`,
-                    sortBy,
-                    activeView,
-                    hasActiveFilters: Object.keys(selectedFilters).some(key =>
-                      selectedFilters[key] && (Array.isArray(selectedFilters[key]) ?
-                      selectedFilters[key].length > 0 : Object.keys(selectedFilters[key]).length > 0)
-                    )
-                  });
-                }
-
-                return {
-                  ...prev,
-                  uniqueNFTsViewed: newViewed
-                };
-              });
-            };
-
-            console.log('[NFTCard props]', {
-              tokenId: nft.tokenId,
-              bidPriceWei: nft.bidPriceWei,
-              bidPriceFormatted,
-              currentBidWei: nft.currentBidWei,
-              currentBidFormatted,
-              priceWei: nft.priceWei,
-              buyNowFormatted,
-            });
             return (
-              <div
-                key={nft.id}
-                onMouseEnter={handleNFTView}
-              >
+              <div key={nft.id}>
                 <NFTCard
                   image={nft.image}
                   name={nft.name}

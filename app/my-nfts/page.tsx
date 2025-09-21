@@ -100,7 +100,6 @@ export default function MyNFTsPage() {
           return;
         }
 
-        console.log(`[My NFTs] Loading NFTs for wallet: ${account.address}`);
         
         // Fetch owned NFTs from the specific collection
         const ownedNFTsData = await Insight.getOwnedNFTs({
@@ -109,14 +108,12 @@ export default function MyNFTsPage() {
           ownerAddress: account.address,
         });
 
-        console.log(`[My NFTs] Found ${ownedNFTsData.length} owned NFTs`);
         
         // Filter NFTs to only include those from our collection
         const filteredNFTs = ownedNFTsData.filter((nft: any) => 
           nft.contractAddress?.toLowerCase() === nftCollection.address.toLowerCase()
         );
         
-        console.log(`[My NFTs] Found ${filteredNFTs.length} NFTs from our collection`);
         
         // Process the NFT data to match our interface
         const processedNFTs = filteredNFTs.map((nft: any) => {
@@ -182,7 +179,6 @@ export default function MyNFTsPage() {
   const refreshUserData = async () => {
     if (!account?.address) return;
     
-    console.log("[My NFTs] Refreshing user data due to event");
     
     // Refresh owned NFTs
     const ownedNFTsData = await Insight.getOwnedNFTs({
@@ -220,7 +216,6 @@ export default function MyNFTsPage() {
   // Fetch user's listed NFTs (auctions they created)
   const fetchUserListedNFTs = async (userAddress: string) => {
     try {
-      console.log(`[My NFTs] Fetching listed NFTs for user: ${userAddress}`);
       
       // Get all active auctions
       const allAuctions = await getAllAuctions({
@@ -269,7 +264,6 @@ export default function MyNFTsPage() {
         }
       }
 
-      console.log(`[My NFTs] Found ${userListedNFTs.length} listed NFTs`);
       setListedNFTs(userListedNFTs);
     } catch (error) {
       console.error("Error fetching user listed NFTs:", error);
@@ -280,14 +274,12 @@ export default function MyNFTsPage() {
   // Fetch user's active bids
   const fetchUserBids = async (userAddress: string) => {
     try {
-      console.log(`[My NFTs] Fetching bids for user: ${userAddress}`);
       
       // Get all active auctions
       const allAuctions = await getAllAuctions({
         contract: marketplace,
       });
 
-      console.log(`[My NFTs] Found ${allAuctions.length} total auctions`);
 
       const userBids: BidNFT[] = [];
 
@@ -320,7 +312,6 @@ export default function MyNFTsPage() {
         }
       }
 
-      console.log(`[My NFTs] Found ${userBids.length} active bids`);
       setBidsPlacedNFTs(userBids);
     } catch (error) {
       console.error("Error fetching user bids:", error);
