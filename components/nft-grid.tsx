@@ -973,7 +973,7 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
             <div className="text-sm font-medium text-brand-pink mt-1">Loading...</div>
           </div>
         </div>
-        <div className="mt-8 mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-4 justify-between">
+        <div className="mt-8 mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 justify-between">
           {Array.from({ length: 12 }).map((_, index) => (
             <div key={index} className="bg-neutral-800 rounded p-4 animate-pulse">
               <div className="aspect-square bg-neutral-700 rounded mb-3"></div>
@@ -1097,7 +1097,7 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
       </div>
       {/* Only render the grid if there are NFTs, otherwise show empty state */}
       {paginatedNFTs.length > 0 ? (
-        <div className="mt-8 mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-4 justify-between">
+        <div className="mt-8 mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 justify-between">
           {paginatedNFTs.map((nft) => {
             const bidPriceFormatted = displayPrice(nft.bidPriceWei);
             const currentBidFormatted = displayPrice(nft.currentBidWei);

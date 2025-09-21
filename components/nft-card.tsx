@@ -254,7 +254,7 @@ export default function NFTCard({
 
   return (
     <div 
-      className="overflow-visible w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-md xl:max-w-lg 2xl:max-w-lg mx-auto rounded-lg shadow-md flex flex-col h-full bg-neutral-900"
+      className="overflow-visible w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl 2xl:max-w-2xl mx-auto rounded-lg shadow-md flex flex-col h-full bg-neutral-900"
       onClick={handleMobileTilt}
     >
       <Link href={`/nft/${tokenId}`} className="block w-full">
@@ -284,7 +284,7 @@ export default function NFTCard({
       <div className="p-3 bg-neutral-900 text-neutral-100 flex-1 flex flex-col">
         <div className="mb-2">
           <div className="flex items-center justify-between mb-1">
-                  <h4 className="text-sm md:text-base font-medium leading-tight whitespace-nowrap pr-2">{name}</h4>
+                  <h4 className="text-sm md:text-base lg:text-lg font-medium leading-tight whitespace-nowrap pr-2">{name}</h4>
             <button
               onClick={handleFavoriteClick}
               className="p-1 rounded-full hover:bg-neutral-800 transition-colors"
@@ -335,7 +335,7 @@ export default function NFTCard({
               <>
                 {/* Bidding Section */}
                 <div className="pt-2 mb-2 p-3 bg-card rounded">
-                  <div className="text-xs text-white mb-2 font-normal whitespace-nowrap">Minimum Next Bid: {formatBidAmount(minimumBidAmount)} ETH</div>
+                  <div className="text-xs md:text-sm text-white mb-2 font-normal whitespace-nowrap">Min Bid: {formatBidAmount(minimumBidAmount)} ETH</div>
                   
                   <div className="flex gap-2 mb-2">
                     <div className="relative flex-1">
@@ -364,7 +364,7 @@ export default function NFTCard({
                           height: "32px",
                           borderColor: "#10B981",
                           borderWidth: "1px",
-                          borderRadius: "2px"
+                          borderRadius: "4px"
                         }}
                         onFocus={(e) => e.currentTarget.style.borderColor = "#059669"}
                         onBlur={(e) => e.currentTarget.style.borderColor = "#10B981"}
@@ -401,12 +401,12 @@ export default function NFTCard({
                         console.error("Bid failed:", error);
                         alert(error.message || "Failed to place bid. Please try again.");
                       }}
-                      className="px-3 text-xs md:text-sm font-medium text-white border"
+                      className="px-3 text-xs md:text-sm font-medium text-white border rounded"
                       style={{ 
                         height: "32px",
                         backgroundColor: "#10B981",
                         minWidth: "50px",
-                        borderRadius: "2px",
+                        borderRadius: "4px",
                         borderColor: "#10B981",
                         borderWidth: "1px"
                       }}
@@ -415,15 +415,15 @@ export default function NFTCard({
                     </TransactionButton>
                   </div>
                   
-                  <div className="text-xs text-neutral-400 whitespace-nowrap">Starting Price: {formatBidAmount(minimumBidAmount)} ETH</div>
+                  <div className="text-xs md:text-sm text-neutral-400 whitespace-nowrap">Start: {formatBidAmount(minimumBidAmount)} ETH</div>
                 </div>
 
                 {/* Buy Now Section */}
                 <div className="pt-2 p-3 bg-card rounded">
                   <div className="flex items-end justify-between">
                     <div>
-                    <div className="text-xs text-white mb-1">Buy Now</div>
-                    <div className="text-xs md:text-sm font-medium" style={{ color: "#3B82F6" }}>{buyNow.replace(' ETH', '')} ETH</div>
+                    <div className="text-xs md:text-sm text-white mb-1">Buy Now</div>
+                    <div className="text-xs md:text-sm font-semibold" style={{ color: "#3B82F6" }}>{buyNow.replace(' ETH', '')} ETH</div>
                     </div>
                     <TransactionButton
                       transaction={createBuyNowTransaction}
@@ -443,12 +443,12 @@ export default function NFTCard({
                         console.error("Buy now failed:", error);
                         alert(error.message || "Failed to buy NFT. Please try again.");
                       }}
-                      className="px-3 text-xs md:text-sm font-medium text-white border"
+                      className="px-3 text-xs md:text-sm font-medium text-white border rounded"
                       style={{ 
                         height: "32px",
                         backgroundColor: "#3B82F6",
                         minWidth: "50px",
-                        borderRadius: "2px",
+                        borderRadius: "4px",
                         borderColor: "#3B82F6",
                         borderWidth: "1px"
                       }}
