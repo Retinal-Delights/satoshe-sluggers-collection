@@ -712,7 +712,7 @@ export default function NFTDetailPage() {
           </div>
 
           {/* Right Column - NFT Details */}
-          <div className="space-y-6">
+          <div className="space-y-6 -mt-12">
             {/* NFT Name with Heart Icon */}
             <div className="flex items-start justify-between gap-4">
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-neutral-100 leading-tight">
@@ -810,11 +810,11 @@ export default function NFTDetailPage() {
                 <p className="text-neutral-400 text-sm mb-2">Artist</p>
                 <div className="flex items-center">
                   <Image
-                    src="/icons/artist-logo-kristen-woerdeman-20px.png"
+                    src="/icons/artist-logo-kristen-woerdeman-26px.png"
                     alt="Kristen Woerdeman"
-                    width={20}
-                    height={20}
-                    className="w-5 h-5 mr-2"
+                    width={26}
+                    height={26}
+                    className="w-6 h-6 mr-2"
                   />
                   <p className="text-sm text-neutral-100">{metadata?.artist ?? "Kristen Woerdeman"}</p>
                 </div>
@@ -823,13 +823,13 @@ export default function NFTDetailPage() {
                 <p className="text-neutral-400 text-sm mb-2">Platform</p>
                 <div className="flex items-center">
                   <Image
-                    src="/icons/platform-logo-retinal-delights-20px.png"
+                    src="/icons/platform-logo-retinal-delights-26px.png"
                     alt="Retinal Delights"
-                    width={20}
-                    height={20}
-                    className="w-5 h-5 mr-2"
+                    width={26}
+                    height={26}
+                    className="w-6 h-6 mr-2"
                   />
-                  <p className="text-sm text-neutral-400">{metadata?.platform ?? "Retinal Delights"}</p>
+                  <p className="text-sm text-neutral-100">{metadata?.platform ?? "Retinal Delights"}</p>
                 </div>
               </div>
             </div>
@@ -839,7 +839,7 @@ export default function NFTDetailPage() {
               <div className="grid grid-cols-2 gap-6">
                 <div>
                   <span className="text-neutral-400">Auction Ends:</span>
-                  <p className="text-neutral-100 font-normal">
+                  <p className="text-neutral-100 font-semibold">
                     {isLoadingAuction ? (
                       "Loading..."
                     ) : auctionData ? (
@@ -912,7 +912,7 @@ export default function NFTDetailPage() {
                       console.error("Bid failed:", error);
                       alert(error.message || "Failed to place bid. Please try again.");
                     }}
-                    className="w-32 px-6 h-10 font-semibold text-white transition-colors duration-300 ease-in-out focus:ring-2 focus:ring-offset-2 hover:bg-emerald-600 rounded"
+                    className="w-32 px-6 h-10 font-bold text-white transition-colors duration-300 ease-in-out focus:ring-2 focus:ring-offset-2 hover:bg-emerald-600 rounded"
                     style={{
                       backgroundColor: COLORS.hair,
                       borderColor: COLORS.hair,
@@ -948,7 +948,7 @@ export default function NFTDetailPage() {
                       console.error("Buy now failed:", error);
                       alert(error.message || "Failed to buy NFT. Please try again.");
                     }}
-                    className="w-32 px-6 h-10 font-semibold text-white transition-colors duration-300 ease-in-out focus:ring-2 focus:ring-offset-2 hover:bg-blue-600 rounded"
+                    className="w-32 px-6 h-10 font-bold text-white transition-colors duration-300 ease-in-out focus:ring-2 focus:ring-offset-2 hover:bg-blue-600 rounded"
                     style={{
                       backgroundColor: COLORS.background,
                       borderColor: COLORS.background,

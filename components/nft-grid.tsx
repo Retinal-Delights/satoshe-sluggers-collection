@@ -215,8 +215,8 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
             const cacheTimestamp = localStorage.getItem(`${cacheKey}-timestamp`);
             const cacheAge = cacheTimestamp ? Date.now() - parseInt(cacheTimestamp) : Infinity;
             
-            // Use cache if it's less than 5 minutes old
-            if (cachedData && cacheAge < 5 * 60 * 1000) {
+            // Use cache if it's less than 15 minutes old
+            if (cachedData && cacheAge < 15 * 60 * 1000) {
               const auctionDataMap = new Map(JSON.parse(cachedData) as [number, any][]);
               setAuctionMap(auctionDataMap);
               setIsLoadingAuctions(false);
@@ -225,7 +225,7 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
 
             
             // Fetch in batches to handle the entire collection
-            const batchSize = 100; // Process 100 auctions at a time (reduced for faster loading)
+            const batchSize = 200; // Process 200 auctions at a time (increased for faster loading)
             const maxPossibleAuctions = 7777; // Maximum possible based on collection size
             const allAuctionData: any[] = [];
             
@@ -240,7 +240,7 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
                 });
                 
                 const timeoutPromise = new Promise((_, reject) => 
-                  setTimeout(() => reject(new Error(`Batch ${startId}-${endId} timeout after 30 seconds`)), 30000)
+                  setTimeout(() => reject(new Error(`Batch ${startId}-${endId} timeout after 10 seconds`)), 10000)
                 );
                 
                 const batchData = await Promise.race([contractCallPromise, timeoutPromise]) as any[];
@@ -255,7 +255,7 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
                 }
                 
                 // Small delay between batches to be respectful to RPC
-                await new Promise(resolve => setTimeout(resolve, 100));
+                await new Promise(resolve => setTimeout(resolve, 50));
                 
               } catch (batchError) {
                 console.warn(`[fetchAuctionData] Batch ${startId}-${endId} failed:`, batchError);
