@@ -8,6 +8,7 @@ import { bidInAuction, buyoutAuction } from "thirdweb/extensions/marketplace";
 import { toWei } from "thirdweb";
 import { marketplace } from "@/lib/contracts";
 import { useBidCount } from "@/hooks/useBidCount";
+import { useCurrentBid } from "@/hooks/useCurrentBid";
 import { BidControl } from "@/components/BidControl";
 
 interface NFTCardProps {
@@ -116,10 +117,17 @@ export default function NFTCard({
     tokenId 
   });
 
-  // Calculate minNextBid (5% over current bid, or starting price if none)
+  // Live current bid from Insight API
+  const { currentBid: liveCurrentBid, isLoading: currentBidLoading } = useCurrentBid({
+    contractAddress,
+    tokenId
+  });
+
+  // Calculate minNextBid (5% over live current bid, or starting price if none)
+  const effectiveCurrentBid = liveCurrentBid || currentBid;
   const minNextBid = (
-    Number(currentBid || 0) > 0
-      ? Number(currentBid) * 1.05
+    Number(effectiveCurrentBid || 0) > 0
+      ? Number(effectiveCurrentBid) * 1.05
       : Number(startingPrice)
   ).toFixed(5);
 
@@ -217,7 +225,7 @@ export default function NFTCard({
     track('NFT Bid Placed', {
       tokenId,
       bidAmount,
-      currentBid: currentBid || "0",
+      currentBid: effectiveCurrentBid || "0",
       buyNow: buyNow,
       rarity,
       rank: String(rank),
@@ -231,7 +239,7 @@ export default function NFTCard({
     track('NFT Buy Now Clicked', {
       tokenId,
       buyNowPrice: buyNow,
-      currentBid: currentBid || "0",
+      currentBid: effectiveCurrentBid || "0",
       rarity,
       rank: String(rank),
       numBids: String(numBids || 0)
@@ -320,9 +328,12 @@ export default function NFTCard({
                     <span className="text-neutral-100 font-medium truncate max-w-[120px]">{startingPrice} ETH</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-neutral-400">{numBids && numBids > 0 ? "Current Bid:" : "Starting Bid:"}</span>
-                    <span className="font-medium truncate max-w-[120px]" style={{ color: "#10B981" }}>
-                      {currentBid || startingPrice} ETH
+                    <span className="text-neutral-400">
+                      {numBids && numBids > 0 ? "Current Bid:" : "Starting Bid:"}
+                      {currentBidLoading && " (loading...)"}
+                    </span>
+                    <span className="font-medium truncate max-w-[120px]" style={{ color: "#FF0099" }}>
+                      {effectiveCurrentBid || startingPrice} ETH
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -345,9 +356,9 @@ export default function NFTCard({
                 <BidControl 
                   minNextBid={minNextBid} 
                   onBid={handleBid}
-                  currentBid={currentBid}
+                  currentBid={effectiveCurrentBid}
                   tokenId={tokenId}
-                  disabled={isProcessingBid}
+                  disabled={isProcessingBid || currentBidLoading}
                 />
                 <TransactionButton
                   transaction={createBuyNowTransaction}

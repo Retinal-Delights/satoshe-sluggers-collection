@@ -14,7 +14,17 @@ Refactored the NFTCard component to use a containerized, modular pattern that se
   - Error handling and loading states
   - Calculates net bids (placed - cancelled)
 
-### 2. Created `BidControl.tsx` Component
+### 2. Created `useCurrentBid.ts` Hook
+- **Purpose**: Fetches live current highest bid using thirdweb Insight API
+- **Chain**: Base (8453) only
+- **Features**:
+  - Real-time highest bid detection via event aggregation
+  - Automatic polling every 15 seconds
+  - Error handling and loading states
+  - Converts wei to ETH with proper formatting
+  - Immune to local state issues
+
+### 3. Created `BidControl.tsx` Component
 - **Purpose**: Modular bid input and button component
 - **Features**:
   - Auto-populates with minimum next bid (5% over current)
@@ -22,14 +32,18 @@ Refactored the NFTCard component to use a containerized, modular pattern that se
   - Brand-aligned styling (#FF0099 primary pink)
   - Composable and reusable
 
-### 3. Refactored `NFTCard.tsx` (as `NFTCardNew.tsx`)
+### 4. Refactored `NFTCard.tsx` (as `NFTCardNew.tsx`)
 - **Purpose**: Containerized NFT card with clear separation of concerns
 - **Pattern**: Static + Live + Controls
 - **Features**:
   - Static props from metadata JSON
   - Live props from wallet/auction state
-  - Modular bid control integration
-  - Brand color consistency
+  - Modular BidControl integration
+  - Real-time bid counting via useBidCount
+  - Live current bid via useCurrentBid
+  - Brand-aligned styling (#FF0099 primary pink)
+  - Base chain optimized (8453)
+  - Immune to local state issues
 
 ## Architecture Benefits
 
