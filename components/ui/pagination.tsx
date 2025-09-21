@@ -135,7 +135,6 @@ export default function NFTPagination({
             aria-label="First page"
             className="bg-neutral-800 border-neutral-700 hover:bg-neutral-700 h-8 w-8 p-0"
             style={{ borderRadius: "4px" }}
-            style={{ borderRadius: "4px" }}
           >
             <ChevronFirst className="h-4 w-4" />
           </Button>

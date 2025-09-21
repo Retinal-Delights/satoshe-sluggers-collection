@@ -1,0 +1,82 @@
+# 🔥 NFT English Auction Gallery – Comprehensive Builder Context Prompt
+
+**You are continuing the work of a one-person team (not a dev by trade) building a fully modular NFT English auction gallery for Base (chainId 8453). The site delivers a high-performance, real-time, batch-fetched NFT auction experience—no claim/mint, no user listings, only secondary English auctions.**
+
+---
+
+## 1. Tech & UI Stack
+
+- **Frameworks:** Next.js 15, React 19, TypeScript, Tailwind CSS, shadcn/ui ("neutral" theme with CSS vars)
+- **Blockchain:** BASE mainnet (chainId: 8453)
+- **Marketplace Contracts:** thirdweb V3 English Auction marketplace (already deployed, addresses in .env)
+- **Data APIs:** thirdweb v5 SDK, thirdweb Insight (primary batch fetch/data aggregation), Insight webhooks (optional, for real-time updates)
+- **UI Design:** All shadcn/ui registry components scaffolded (nav, sidebar, card, pagination, badge, accordion, etc.), with only `pnpm` used for installs/scripts/builds.
+- **Notifications:** Optionally (not MVP), Insight webhook backend → frontend socket for wallet-linked auction/bid alerts.
+- **Directory Example:**
+  - /apps/frontend (Next.js UI)
+  - /apps/backend (optional; notifications/webhooks)
+  - /packages/components (all reusable/tailwind/shadcn UI)
+  - /packages/types (TS types, BAD_LISTING_IDS array)
+  - /providers/AuctionNFTProvider.tsx (batches and merges all auction+NFT meta, polling)
+  - /hooks/useAuctionNFTs.ts (batch fetch, filtering, sorting, paginated view)
+  - /pages/index.tsx (public gallery)
+  - /components/Grid/NFTGrid.tsx (paginated grid)
+  - /components/Grid/NFTCard.tsx (one NFT+auction per card)
+  - /components/Layout/Sidebar.tsx (sort/search/filter UI via shadcn)
+
+---
+
+## 2. Project Scope & Rules
+
+- **NO mint/claim/primary sale UI or contract calls** (ignore claim-eligibility & unclaimed supply).
+- **NO listing/sell/approval actions for users** (NFTs are already owned/"secondary sales" only).
+- **ONLY English auction sales** (never fixed price/direct buy).
+- **NO per-item onchain fetches:** All NFT+auction data is loaded in batch via thirdweb Insight API (via `/nfts` for meta and `/v1/events` for auctions). No loops or per-item RPC/network calls.
+- **Critical exclusion:** NEVER render or reference these Marketplace Listing IDs: `0,1,2,3,4,5,6,7782,7783,7784,7785,7786,7787,7788`. Filter these ASAP and document/test the exclusion logic.
+- **Global sorting, filtering, and search:** Everything acts on the full in-memory batch—never triggers a refetch/remote sort/filter.
+- **Pagination:** Only the current page (default 25, dropdown up to 250) gets rendered to DOM.
+- **Bid/Buyout actions:** Use thirdweb v5 SDK extension methods, not handwritten txs.
+- **Polling:** Auction state is kept live via polling (every 10–30s, or via websocket push if backend is set up).
+
+---
+
+## 3. To-Do Build Roadmap
+
+1. **Prepare env** (.env.local: NFT, market addresses, chainId, tw clientId, RPC url).
+2. **Build UI skeleton:** Navbar (shadcn/nav, ConnectButton on right), Sidebar (shadcn filters), NFTGrid (placeholder).
+3. **Provider/hook:** Batch fetch all English auction events for contract, batch fetch NFT meta for those tokenIds, merge in memory, expose via context/hooks.
+4. **NFTCard:** shadcn Card; shows image, name, tokenId, live price/highest bid, timer, bid/buyout action; start with mock data, then props-driven.
+5. **NFTGrid:** Slices filtered/sorted/paginated data to display; paginates in memory.
+6. **Sidebar filtering/search/sort:** shadcn checkboxes/toggles/selects to allow search by name/tokenId, price sort, attributes, etc.; all logic acts in memory over full, merged data set.
+7. **Auction actions:** Implement Bid/Buyout with thirdweb SDK; connect wallet state.
+8. **Polling/Live state:** Setup polling for auction status, OR (if ready) backend+socket for live push events/toasts.
+9. **Final polish:** Test full user flow (connect, browse, filter, bid/buyout, live updates, error handling, notification UX).
+10. **Deploy.**
+
+---
+
+## 4. UI/UX Principles
+
+- All components are modular, props-driven, and **must not wire network/data loading into the visual layer.** Reuse shadcn wherever possible.
+- Use skeleton loaders for grid/cards; memoize/virtualize if >1K NFTs.
+- Only batch fetch all data (no "per NFT" RPCs, ever).
+- All logic for filtering out bad listing IDs is centralized and tested.
+- No listing/claim/primary sale UI.
+- ConnectButton in nav right, data context at high level if needed by hooks.
+
+---
+
+## 5. References & Links
+
+- [thirdweb Insight NFT meta API](https://portal.thirdweb.com/insight/functions#nfts)
+- [thirdweb Event API for Auctions](https://portal.thirdweb.com/insight/events#marketplace)
+- [thirdweb SDK v5 docs](https://portal.thirdweb.com/typescript/v5)
+- [shadcn/ui component registry](https://github.com/kwoerd/component-registry)
+- [pnpm install guide](https://pnpm.io/installation)
+
+---
+
+## 6. Critical Notes For Any Future Contributor
+
+- This is a solo-built project (owner is non-dev); all context/work described above—DO NOT suggest “hand off to a dev”.
+- All questions/decisions about build, data flow, or architecture come back to the project owner, who must be able to pick up or transfer this as needed.

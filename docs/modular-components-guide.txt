@@ -1,0 +1,34 @@
+🧩 NFT Gallery Component Modularity: Solo Builder Guide
+1. Best Practices for Modularity & Repairability
+One Feature, One File:
+Keep individual components—Navbar, Sidebar, NFTCard, NFTTabs, etc.—in separate .tsx files.
+Props-Driven:
+UI components receive all their data via props, not direct global state access.
+Strict Data/UI Separation:
+Put ALL data fetching/filtering in hooks or providers (e.g. /hooks/useAuctionNFTs.ts, /providers/AuctionNFTProvider.tsx). Components just render props.
+No Hardcoded Theme Values:
+Corner radius, colors, etc., are always set via CSS variables and Tailwind/shadcn config. Update theme in one place to affect all components.
+Low Coupling:
+Components only import direct "parents/children"—never reach across unrelated modules.
+Test & Repair Friendly:
+You can safely edit, replace, or debug one component at a time without breaking the site—if isolation is maintained.
+Single Responsibility:
+If a file grows or does too many things, split it for clarity.
+2. Visual Overview (Component Relationship)
+Provider/hooks → supply pure data to all UI
+
+(Provider/Hook Layer) ↓ ┌───────────────┐ │ Navbar │ │ Sidebar │ │ NFTTabs │ └─────┬─┬──┬────┘ │ │ │ NFTGrid │ NFTCard
+
+Changing NFTCard (style/logic) does NOT break grid/sidebar/nav.
+
+All state/theme logic is centralized and reusable.
+
+3. In Practice
+Want to restyle NFTCard? Edit /components/Grid/NFTCard.tsx only.
+Fix a search bug? Tweak /hooks/useAuctionNFTs.ts.
+Sidebar filter changes? Only touch /components/Layout/Sidebar.tsx.
+You can comment/unplug any UI module and the rest stays functional.
+
+Bottom line:
+This structure makes solo work safe, flexible, and quick to adjust or debug.
+Let me know if you want audit checklists or a sample provider-to-grid wiring pattern!

@@ -638,15 +638,15 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
     }));
   };
 
-  const handlePlaceBid = async (nft: NFTGridItem) => {
+  const handlePlaceBid = async (nft: NFTGridItem, bidAmount?: string) => {
     if (!account?.address) {
       alert("Please connect your wallet first");
       return;
     }
     setIsProcessingBid((prev) => ({ ...prev, [nft.id]: true }));
     try {
-      // Let Thirdweb handle validation - just get the bid amount
-      const amount = bidAmounts[nft.id] || fromWei(nft.bidPriceWei);
+      // Use the provided bidAmount or fall back to stored amount
+      const amount = bidAmount || bidAmounts[nft.id] || fromWei(nft.bidPriceWei);
       
       console.log('[Bid Attempt]', {
         tokenId: nft.tokenId,
@@ -1225,28 +1225,33 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
                 onMouseEnter={handleNFTView}
               >
                 <NFTCard
+                  // Static props
                   image={nft.image}
                   name={nft.name}
                   rank={nft.rank}
                   rarity={nft.rarity}
                   rarityPercent={nft.rarityPercent}
-                  bidPrice={bidPriceFormatted}
-                  currentBid={currentBidFormatted}
+                  tier={nft.rarity}
+                  startingPrice={bidPriceFormatted}
                   buyNow={buyNowFormatted}
                   tokenId={nft.tokenId}
                   auctionEnd={nft.auctionEnd}
-                  numBids={nft.numBids ?? 0}
+                  contractAddress="0xF0f26455b9869d4A788191f6AEdc78410731072C"
+                  
+                  // Live props
+                  isForSale={nft.isForSale}
+                  currentBid={currentBidFormatted}
+                  
+                  // Handlers
+                  onBid={(bidAmount) => handlePlaceBid(nft, bidAmount)}
+                  onBuyNow={() => handleBuyNow(nft)}
+                  
+                  // Legacy props
                   activeView="forSale"
                   clientReady={true}
-                  bidAmount={bidAmounts[nft.id]}
                   isProcessingBid={isProcessingBid[nft.id]}
                   isProcessingBuyNow={isProcessingBuyNow[nft.id]}
-                  isForSale={nft.isForSale}
                   auctionId={nft.auctionId.toString()}
-                  onBidAmountChange={(id, value) => handleBidAmountChange(nft.id, value)}
-                  onPlaceBid={() => handlePlaceBid(nft)}
-                  onBuyNow={() => handleBuyNow(nft)}
-                  buyNowValue={Number(nft.priceWei) / 1e18}
                 />
               </div>
             );

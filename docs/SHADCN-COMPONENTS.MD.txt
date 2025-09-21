@@ -1,0 +1,110 @@
+SHADCN
+repo: https://github.com/kwoerd/component-registry
+
+accordian
+use for answers to most common questions
+pnpm dlx shadcn@latest add accordion
+
+alert
+use for notifications
+pnpm dlx shadcn@latest add alert
+
+badge
+icon for badge/notification bubbles
+pnpm dlx shadcn@latest add badge
+
+breadcrumbs
+pnpm dlx shadcn@latest add breadcrumb
+
+button
+pnpm dlx shadcn@latest add button
+
+card
+contact form
+pnpm dlx shadcn@latest add card
+
+chart
+pnpm dlx shadcn@latest add chart
+
+checkbox
+sidebar options
+pnpm dlx shadcn@latest add checkbox
+
+data-table
+recent events, nft purchaser, token id, etc.
+pnpm dlx shadcn@latest add table
+
+dropdown menu
+pnpm dlx shadcn@latest add dropdown-menu
+
+input
+pnpm dlx shadcn@latest add input
+
+label
+for things like accepting terms and policies
+pnpm dlx shadcn@latest add label
+
+
+nav menu
+pnpm dlx shadcn@latest add navigation-menu
+
+pagination
+pnpm dlx shadcn@latest add pagination
+
+progress bar
+pnpm dlx shadcn@latest add progress
+
+radio buttons
+pnpm dlx shadcn@latest add radio-group
+
+resizable
+Accessible resizable panel groups and layouts with keyboard support
+pnpm dlx shadcn@latest add resizable
+(withHandle prop on the ResizableHandle) -- allows you to resize the sidebar for example
+
+scroll area
+pnpm dlx shadcn@latest add scroll-area
+
+select
+dropdown
+pnpm dlx shadcn@latest add select
+
+separator
+pnpm dlx shadcn@latest add separator
+
+sheet
+we can use this for when users want to sell their nft(s)
+pnpm dlx shadcn@latest add sheet
+
+sidebar
+pnpm dlx shadcn@latest add sidebar
+
+skeleton
+pnpm dlx shadcn@latest add skeleton
+
+switch
+toggle
+pnpm dlx shadcn@latest add switch
+
+table
+displaying blockchain data
+pnpm dlx shadcn@latest add table
+
+tabs
+pnpm dlx shadcn@latest add tabs
+
+text area
+pnpm dlx shadcn@latest add textarea
+
+toggle group
+can be used for search, sort and filterability
+pnpm dlx shadcn@latest add toggle-group
+
+tooltip
+pnpm dlx shadcn@latest add tooltip
+
+adding dark mode
+pnpm add next-themes
+
+
+

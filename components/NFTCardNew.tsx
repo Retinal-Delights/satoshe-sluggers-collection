@@ -110,40 +110,18 @@ export default function NFTCard({
   const [imgLoading, setImgLoading] = useState(true);
   const [countdown, setCountdown] = useState("");
 
-  // DISABLED: Fetch current winning bid (prevents RPC charges)
-  const fetchWinningBid = async (auctionId: string | number) => {
-    console.log(`[DISABLED] Would fetch winning bid for auction ${auctionId} - RPC calls disabled to prevent charges`);
-    return;
-  };
+  // Live bid count from Insight API
+  const { bidCount: numBids, isLoading: bidCountLoading } = useBidCount({ 
+    contractAddress, 
+    tokenId 
+  });
 
-  // Fetch winning bid on mount
-  useEffect(() => {
-    if (auctionId) {
-      fetchWinningBid(auctionId);
-    }
-  }, [auctionId]);
-
-  // DISABLED: Listen for new bid events (prevents RPC charges)
-  // const { data: bidEvents } = useContractEvents({
-  //   contract: marketplace,
-  //   events: [newBidEvent()],
-  // });
-
-  // DISABLED: Listen for auction closed events (prevents RPC charges)
-  // const { data: auctionClosedEvents } = useContractEvents({
-  //   contract: marketplace,
-  //   events: [auctionClosedEvent()],
-  // });
-
-  // DISABLED: Handle new bid events (prevents RPC charges)
-  // useEffect(() => {
-  //   // Event handling disabled to prevent RPC calls
-  // }, [bidEvents, auctionId]);
-
-  // DISABLED: Handle auction closed events (prevents RPC charges)
-  // useEffect(() => {
-  //   // Event handling disabled to prevent RPC calls
-  // }, [auctionClosedEvents, auctionId]);
+  // Calculate minNextBid (5% over current bid, or starting price if none)
+  const minNextBid = (
+    Number(currentBid || 0) > 0
+      ? Number(currentBid) * 1.05
+      : Number(startingPrice)
+  ).toFixed(5);
 
   // Transaction function for placing a bid
   const createBidTransaction = (bidAmount: string) => {
@@ -173,6 +151,7 @@ export default function NFTCard({
       auctionId: BigInt(auctionId),
     });
   };
+
   const [isTilted, setIsTilted] = useState(false);
   const placeholder = "/placeholder-nft.webp";
   const showPlaceholder = !imgLoaded || imgError;
@@ -190,22 +169,9 @@ export default function NFTCard({
     return () => clearInterval(interval);
   }, [auctionEnd]);
 
-  // Live bid count from Insight API
-  const { bidCount: numBids, isLoading: bidCountLoading } = useBidCount({ 
-    contractAddress, 
-    tokenId 
-  });
-
-  // Calculate minNextBid (5% over current bid, or starting price if none)
-  const minNextBid = (
-    Number(currentBid || 0) > 0
-      ? Number(currentBid) * 1.05
-      : Number(startingPrice)
-  ).toFixed(5);
-
   // Favorites functionality
   const { isFavorited, toggleFavorite, isConnected } = useFavorites();
-  const isFav = isFavorited(tokenId);
+  const isFav = propIsFavorited !== undefined ? propIsFavorited : isFavorited(tokenId);
 
   // Mobile tilt interaction
   const handleMobileTilt = () => {
@@ -217,29 +183,60 @@ export default function NFTCard({
     e.preventDefault(); // Prevent navigation when clicking heart
     e.stopPropagation();
 
-    if (!isConnected) {
-      alert('Please connect your wallet to favorite NFTs');
-      return;
+    if (propOnFavorite) {
+      propOnFavorite();
+    } else {
+      if (!isConnected) {
+        alert('Please connect your wallet to favorite NFTs');
+        return;
+      }
+
+      const wasFavorited = isFav;
+      toggleFavorite({
+        tokenId,
+        name,
+        image,
+        rarity,
+        rank,
+        rarityPercent,
+      });
+
+      // Track favorite action
+      track(wasFavorited ? 'NFT Unfavorited' : 'NFT Favorited', {
+        tokenId,
+        name,
+        rarity,
+        rank: String(rank),
+        rarityPercent: String(rarityPercent)
+      });
     }
+  };
 
-    const wasFavorited = isFav;
-    toggleFavorite({
+  const handleBid = (bidAmount: string) => {
+    // Track bid placement
+    track('NFT Bid Placed', {
       tokenId,
-      name,
-      image,
-      rarity,
-      rank,
-      rarityPercent,
-    });
-
-    // Track favorite action
-    track(wasFavorited ? 'NFT Unfavorited' : 'NFT Favorited', {
-      tokenId,
-      name,
+      bidAmount,
+      currentBid: currentBid || "0",
+      buyNow: buyNow,
       rarity,
       rank: String(rank),
-      rarityPercent: String(rarityPercent)
+      numBids: String(numBids || 0)
     });
+    onBid(bidAmount);
+  };
+
+  const handleBuyNow = () => {
+    // Track buy now action
+    track('NFT Buy Now Clicked', {
+      tokenId,
+      buyNowPrice: buyNow,
+      currentBid: currentBid || "0",
+      rarity,
+      rank: String(rank),
+      numBids: String(numBids || 0)
+    });
+    onBuyNow();
   };
 
   return (
@@ -290,8 +287,8 @@ export default function NFTCard({
                   <Heart
                     className={`w-5 h-5 transition-colors ${
                       isFav
-                        ? "fill-brand-pink text-brand-pink"
-                        : "text-neutral-400 hover:text-brand-pink"
+                        ? "fill-[#FF0099] text-[#FF0099]"
+                        : "text-neutral-400 hover:text-[#FF0099]"
                     }`}
                   />
                 </button>
@@ -308,13 +305,15 @@ export default function NFTCard({
               </div>
               <div className="flex justify-between">
                 <span className="text-neutral-400">Tier:</span>
-                <span className="text-neutral-100">{rarity || 'Unknown'}</span>
+                <span className="text-neutral-100">{tier || rarity || 'Unknown'}</span>
               </div>
               {isForSale ? (
                 <>
                   <div className="flex justify-between">
                     <span className="text-neutral-400">Number of Bids:</span>
-                    <span className="text-neutral-100">{numBids}</span>
+                    <span className="text-neutral-100">
+                      {bidCountLoading ? "—" : (numBids ?? "—")}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-neutral-400">Starting Price:</span>
@@ -322,11 +321,15 @@ export default function NFTCard({
                   </div>
                   <div className="flex justify-between">
                     <span className="text-neutral-400">{numBids && numBids > 0 ? "Current Bid:" : "Starting Bid:"}</span>
-                    <span className="font-medium truncate max-w-[120px]" style={{ color: "#FF0099" }}>{currentBid || startingPrice} ETH</span>
+                    <span className="font-medium truncate max-w-[120px]" style={{ color: "#10B981" }}>
+                      {currentBid || startingPrice} ETH
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-neutral-400">Buy Now:</span>
-                    <span className="font-medium truncate max-w-[120px]" style={{ color: "#FF0099" }}>{buyNow} ETH</span>
+                    <span className="font-medium truncate max-w-[120px]" style={{ color: "#FF0099" }}>
+                      {buyNow} ETH
+                    </span>
                   </div>
                 </>
               ) : (
@@ -338,32 +341,22 @@ export default function NFTCard({
             </div>
             {isForSale && (
               <>
-                <BidControl
-                  minNextBid={minNextBid}
-                  onBid={onBid}
-                  disabled={isProcessingBid}
+                {/* Modular BidControl component */}
+                <BidControl 
+                  minNextBid={minNextBid} 
+                  onBid={handleBid}
                   currentBid={currentBid}
                   tokenId={tokenId}
+                  disabled={isProcessingBid}
                 />
                 <TransactionButton
                   transaction={createBuyNowTransaction}
-                  onTransactionConfirmed={() => {
-                    // Track buy now action
-                    track('NFT Buy Now Clicked', {
-                      tokenId,
-                      buyNowPrice: buyNow.replace(' ETH', ''),
-                      currentBid: currentBid || startingPrice,
-                      rarity,
-                      rank: String(rank),
-                      numBids: String(numBids || 0)
-                    });
-                    onBuyNow();
-                  }}
+                  onTransactionConfirmed={handleBuyNow}
                   onError={(error) => {
                     console.error("Buy now failed:", error);
                     alert(error.message || "Failed to buy NFT. Please try again.");
                   }}
-                  className="w-full text-sm py-1 h-9 text-white transition-all duration-300 ease-out font-medium hover:scale-[1.02] hover:shadow-lg"
+                  className="w-full text-sm py-1 h-9 text-white transition-all duration-300 ease-out font-medium hover:scale-[1.02] hover:shadow-lg hover:bg-[#E6008A]"
                   style={{ 
                     backgroundColor: "#FF0099",
                     borderRadius: "4px"
