@@ -295,7 +295,7 @@ export default function NFTCard({
           </div>
           {clientReady && auctionEnd && (
             <div className="text-sm text-neutral-400 mb-2">
-              {countdown} remaining • {numBids} bids
+              Ends: {countdown}
             </div>
           )}
         </div>
@@ -314,18 +314,7 @@ export default function NFTCard({
                 <span className="text-neutral-400">Tier:</span>
                 <span className="text-neutral-400">{rarity || 'Unknown'}</span>
               </div>
-              {isForSale ? (
-                <>
-                  <div className="flex justify-between mb-2">
-                    <span className="text-sm text-neutral-100 font-light">Current Price:</span>
-                    <span className="text-sm font-light truncate max-w-[120px] text-neutral-100">{currentBidAmount}</span>
-                  </div>
-                  <div className="flex justify-between mb-2">
-                    <span className="text-sm" style={{ color: "#10B981" }}>Minimum Bid:</span>
-                    <span className="text-sm font-normal" style={{ color: "#10B981" }}>{formatBidAmount(minimumBidAmount)} ETH</span>
-                  </div>
-                </>
-              ) : (
+              {!isForSale && (
                 <div className="flex justify-between">
                   <span className="text-neutral-400">Status:</span>
                   <span className="text-neutral-500">Not for Sale</span>
