@@ -19,33 +19,17 @@ export function useBidCount({ contractAddress, tokenId, chainId = 8453 }: UseBid
         setIsLoading(true);
         setError(null);
 
-        // Use Insight API for Base chain event aggregation
-        const baseUrl = "https://api.thirdweb.com/v1/contracts";
-        const headers = {
-          "Content-Type": "application/json",
-          "x-secret-key": process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID || "",
-        };
-
-        // Fetch placed bids count
-        const placedResponse = await fetch(
-          `${baseUrl}/${chainId}/${contractAddress}/events?eventSignature=event NewBid(uint256 indexed auctionId, address indexed bidder, address indexed assetContract, uint256 bidAmount, struct IEnglishAuctions.Auction auction)`,
-          { headers }
+        // Use internal API endpoint for bid count
+        const response = await fetch(
+          `/api/insight/bid-count?contract=${contractAddress}&tokenId=${tokenId}`
         );
-        
-        const placedData = await placedResponse.json();
-        const placedCount = placedData?.data?.length || 0;
 
-        // Fetch cancelled auctions count (for this specific token)
-        const cancelledResponse = await fetch(
-          `${baseUrl}/${chainId}/${contractAddress}/events?eventSignature=event CancelledAuction(address indexed auctionCreator, uint256 indexed auctionId)`,
-          { headers }
-        );
-        
-        const cancelledData = await cancelledResponse.json();
-        const cancelledCount = cancelledData?.data?.length || 0;
+        if (!response.ok) {
+          throw new Error(`Failed to fetch bid count: ${response.statusText}`);
+        }
 
-        // Calculate net bids (placed - cancelled)
-        const netBidCount = Math.max(0, placedCount - cancelledCount);
+        const data = await response.json();
+        const netBidCount = data.count || 0;
 
         if (!cancelled) {
           setBidCount(netBidCount);

@@ -5,8 +5,8 @@ import { ArrowUp, ArrowDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export default function ScrollButtons() {
-  const [showScrollUp, setShowScrollUp] = useState(false)
-  const [showScrollDown, setShowScrollDown] = useState(false)
+  const [showButton, setShowButton] = useState(false)
+  const [isAtTop, setIsAtTop] = useState(true)
   const [isInitialized, setIsInitialized] = useState(false)
 
   useEffect(() => {
@@ -22,14 +22,13 @@ export default function ScrollButtons() {
         const windowHeight = window.innerHeight
         const documentHeight = document.documentElement.scrollHeight
         
-        // Show scroll-up button when user has scrolled down a bit
-        const shouldShowUp = scrollY > 300
-        setShowScrollUp(shouldShowUp)
+        // Show button when user has scrolled down a bit or when there's content below
+        const shouldShowButton = scrollY > 300 || (scrollY + windowHeight < documentHeight - 200)
+        setShowButton(shouldShowButton)
         
-        // Show scroll-down button only when there's content below the current viewport
-        // Add a buffer to prevent flickering
-        const shouldShowDown = scrollY + windowHeight < documentHeight - 200
-        setShowScrollDown(shouldShowDown)
+        // Determine if we're at the top (within 100px of top)
+        const atTop = scrollY < 100
+        setIsAtTop(atTop)
       }, 50) // 50ms debounce
     }
 
@@ -79,19 +78,21 @@ export default function ScrollButtons() {
     requestAnimationFrame(animateScroll)
   }
 
-  const scrollToTop = () => {
-    const currentScrollY = window.scrollY
-    const duration = Math.max(1000, currentScrollY * 0.5) // Proportional duration, minimum 1 second
-    smoothScrollTo(0, duration)
-  }
-
-  const scrollToBottom = () => {
-    const currentScrollY = window.scrollY
-    const documentHeight = document.documentElement.scrollHeight
-    const windowHeight = window.innerHeight
-    const remainingDistance = documentHeight - currentScrollY - windowHeight
-    const duration = Math.max(1000, remainingDistance * 0.5) // Proportional duration, minimum 1 second
-    smoothScrollTo(documentHeight, duration)
+  const handleScrollToggle = () => {
+    if (isAtTop) {
+      // If at top, scroll to bottom
+      const currentScrollY = window.scrollY
+      const documentHeight = document.documentElement.scrollHeight
+      const windowHeight = window.innerHeight
+      const remainingDistance = documentHeight - currentScrollY - windowHeight
+      const duration = Math.max(1000, remainingDistance * 0.5) // Proportional duration, minimum 1 second
+      smoothScrollTo(documentHeight, duration)
+    } else {
+      // If not at top, scroll to top
+      const currentScrollY = window.scrollY
+      const duration = Math.max(1000, currentScrollY * 0.5) // Proportional duration, minimum 1 second
+      smoothScrollTo(0, duration)
+    }
   }
 
   // Don't render anything until initialized to prevent flashing
@@ -100,25 +101,19 @@ export default function ScrollButtons() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2">
-      {showScrollUp && (
+    <div className="fixed bottom-6 right-6 z-50">
+      {showButton && (
         <Button
-          onClick={scrollToTop}
+          onClick={handleScrollToggle}
           size="icon"
           className="rounded-full bg-brand-pink hover:bg-brand-pink-hover shadow-lg transition-all duration-300 hover:scale-105"
-          aria-label="Scroll to top"
+          aria-label={isAtTop ? "Scroll to bottom" : "Scroll to top"}
         >
-          <ArrowUp className="h-5 w-5 text-white" />
-        </Button>
-      )}
-      {showScrollDown && (
-        <Button
-          onClick={scrollToBottom}
-          size="icon"
-          className="rounded-full bg-brand-pink hover:bg-brand-pink-hover shadow-lg transition-all duration-300 hover:scale-105"
-          aria-label="Scroll to bottom"
-        >
-          <ArrowDown className="h-5 w-5 text-white" />
+          {isAtTop ? (
+            <ArrowDown className="h-5 w-5 text-white" />
+          ) : (
+            <ArrowUp className="h-5 w-5 text-white" />
+          )}
         </Button>
       )}
     </div>

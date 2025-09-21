@@ -19,41 +19,17 @@ export function useCurrentBid({ contractAddress, tokenId, chainId = 8453 }: UseC
         setIsLoading(true);
         setError(null);
 
-        // Use thirdweb Insight API for Base chain event aggregation
-        const baseUrl = "https://api.thirdweb.com/v1/contracts";
-        const headers = {
-          "Content-Type": "application/json",
-          "x-secret-key": process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID || "",
-        };
-
-        // Fetch all BidPlaced events for this token/auction
+        // Use internal API endpoint for current bid
         const response = await fetch(
-          `${baseUrl}/${chainId}/${contractAddress}/events?eventSignature=event NewBid(uint256 indexed auctionId, address indexed bidder, address indexed assetContract, uint256 bidAmount, struct IEnglishAuctions.Auction auction)`,
-          { headers }
+          `/api/insight/current-bid?contract=${contractAddress}&tokenId=${tokenId}`
         );
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch bid events: ${response.statusText}`);
+          throw new Error(`Failed to fetch current bid: ${response.statusText}`);
         }
 
         const data = await response.json();
-        const bidEvents = data.result || [];
-
-        // Find the highest bid amount
-        let highestBid = null;
-        for (const event of bidEvents) {
-          const bidAmount = event.data?.bidAmount;
-          if (bidAmount) {
-            if (!highestBid || Number(bidAmount) > Number(highestBid)) {
-              highestBid = bidAmount;
-            }
-          }
-        }
-
-        // Convert from wei to ETH and format
-        const bidEth = highestBid 
-          ? (Number(highestBid) / 1e18).toFixed(5)
-          : null;
+        const bidEth = data.highest;
 
         if (!cancelled) {
           setCurrentBid(bidEth);

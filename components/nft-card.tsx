@@ -318,15 +318,15 @@ export default function NFTCard({
                   </div>
                   <div className="flex justify-between">
                     <span className="text-neutral-400">Starting Price:</span>
-                    <span className="text-neutral-100 font-medium truncate max-w-[120px]">{startingPrice} ETH</span>
+                    <span className="text-neutral-100 font-medium truncate max-w-[120px]">{startingPrice}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-neutral-400">{numBids && numBids > 0 ? "Current Bid:" : "Starting Bid:"}</span>
-                    <span className="font-medium truncate max-w-[120px]" style={{ color: "#FF0099" }}>{currentBid || startingPrice} ETH</span>
+                    <span className="font-medium truncate max-w-[120px] text-green-500">{currentBid || startingPrice}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-neutral-400">Buy Now:</span>
-                    <span className="font-medium truncate max-w-[120px]" style={{ color: "#FF0099" }}>{buyNow} ETH</span>
+                    <span className="font-medium truncate max-w-[120px] text-blue-400">{buyNow}</span>
                   </div>
                 </>
               ) : (
