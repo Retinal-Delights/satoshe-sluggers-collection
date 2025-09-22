@@ -272,7 +272,7 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
                 console.warn(`[fetchAuctionData] Batch ${startId}-${endId} failed:`, batchError);
                 // If it's an "invalid range" error, we've likely reached the end of valid auctions
                 if (batchError.message && batchError.message.includes('invalid range')) {
-                  console.log(`[fetchAuctionData] Reached end of valid auctions at range ${startId}-${endId}`);
+                  // Reached end of valid auctions
                   break;
                 }
                 // Continue with next batch for other errors

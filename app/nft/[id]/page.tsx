@@ -913,8 +913,8 @@ export default function NFTDetailPage() {
                       alert(error.message || "Failed to place bid. Please try again.");
                     }}
                     className="w-32 px-6 h-10 font-bold transition-colors duration-300 ease-in-out focus:ring-2 focus:ring-offset-2 hover:bg-emerald-600 rounded"
-                    style={{ color: "#fffbeb" }}
                     style={{
+                      color: "#fffbeb",
                       backgroundColor: COLORS.hair,
                       borderColor: COLORS.hair,
                       borderRadius: "4px"
@@ -950,8 +950,8 @@ export default function NFTDetailPage() {
                       alert(error.message || "Failed to buy NFT. Please try again.");
                     }}
                     className="w-32 px-6 h-10 font-bold transition-colors duration-300 ease-in-out focus:ring-2 focus:ring-offset-2 hover:bg-blue-600 rounded"
-                    style={{ color: "#fffbeb" }}
                     style={{
+                      color: "#fffbeb",
                       backgroundColor: COLORS.background,
                       borderColor: COLORS.background,
                       borderRadius: "4px"

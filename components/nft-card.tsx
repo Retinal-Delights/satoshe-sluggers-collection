@@ -102,7 +102,7 @@ export default function NFTCard({
 
   // DISABLED: Fetch current winning bid (prevents RPC charges)
   const fetchWinningBid = async (auctionId: string | number) => {
-    console.log(`[DISABLED] Would fetch winning bid for auction ${auctionId} - RPC calls disabled to prevent charges`);
+    // RPC calls disabled to prevent charges
     return;
   };
 
@@ -402,8 +402,8 @@ export default function NFTCard({
                         alert(error.message || "Failed to place bid. Please try again.");
                       }}
                       className="px-3 text-xs md:text-sm font-black border rounded"
-                      style={{ color: "#fffbeb" }}
                       style={{ 
+                        color: "#fffbeb",
                         height: "32px",
                         backgroundColor: "#10B981",
                         minWidth: "50px",
@@ -445,8 +445,8 @@ export default function NFTCard({
                         alert(error.message || "Failed to buy NFT. Please try again.");
                       }}
                       className="px-3 text-xs md:text-sm font-black border rounded"
-                      style={{ color: "#fffbeb" }}
                       style={{ 
+                        color: "#fffbeb",
                         height: "32px",
                         backgroundColor: "#3B82F6",
                         minWidth: "50px",
