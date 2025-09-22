@@ -321,7 +321,7 @@ export default function NFTCard({
                 <span className="text-neutral-400">{rarity || 'Unknown'}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-neutral-400">Number of Bids:</span>
+                <span className="text-neutral-400">Bids:</span>
                 <span className="text-neutral-400">{bidCount}</span>
               </div>
               {!isForSale && (
