@@ -168,10 +168,10 @@ export default function NFTPagination({
                   size="sm"
                   className={
                     currentPage === page
-                      ? "bg-brand-pink hover:bg-brand-pink-hover text-white text-xs h-8 w-8 p-0"
-                      : "bg-neutral-800 border-neutral-700 hover:bg-neutral-700 text-white text-xs h-8 w-8 p-0"
+                      ? "bg-brand-pink hover:bg-brand-pink-hover text-xs h-8 w-8 p-0"
+                      : "bg-neutral-800 border-neutral-700 hover:bg-neutral-700 text-xs h-8 w-8 p-0"
                   }
-                  style={{ borderRadius: "4px" }}
+                  style={{ borderRadius: "4px", color: "#fffbeb" }}
                   onClick={() => onPageChange(page as number)}
                 >
                   {page}
