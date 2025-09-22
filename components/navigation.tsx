@@ -23,7 +23,7 @@ export default function Navigation({ activePage = "home" }: NavigationProps) {
             alt="Retinal Delights"
             width={200}
             height={50}
-            className="w-auto h-8 sm:h-10 md:h-12 max-h-12"
+            className="w-auto h-9 sm:h-11 md:h-13 max-h-13"
           />
         </Link>
       </div>
