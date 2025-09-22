@@ -32,7 +32,7 @@ export default function Footer() {
         <div className="flex flex-col items-center justify-center gap-6">
           <div className="flex items-center justify-center py-2">
             <Image
-              src="/retinal-delights-nav-brand-white.svg"
+              src="/retinal_delights-horizontal-brand-offwhite.png"
               alt="Retinal Delights"
               width={220}
               height={50}

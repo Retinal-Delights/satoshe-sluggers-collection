@@ -19,7 +19,7 @@ export default function Navigation({ activePage = "home" }: NavigationProps) {
       <div className="flex items-center">
         <Link href="/" className="flex items-center">
           <Image
-            src="/retinal-delights-nav-brand-white.svg"
+            src="/retinal_delights-horizontal-brand-offwhite.png"
             alt="Retinal Delights"
             width={200}
             height={50}
