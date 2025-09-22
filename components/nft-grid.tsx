@@ -559,6 +559,10 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
           console.log(`[NFT Grid] Total NFTs: ${mappedNFTs.length}, For Sale: ${forSaleCount}, Cancelled: ${cancelledCount}`);
           console.log(`[NFT Grid] Cancelled NFTs:`, cancelledNFTs.map(nft => ({ tokenId: nft.tokenId, auctionId: nft.auctionId, isCancelled: nft.isCancelled, isForSale: nft.isForSale })));
           
+          // Debug: Show all auction IDs to see what we're working with
+          const allAuctionIds = mappedNFTs.map(nft => nft.auctionId).filter(id => id !== 0n).slice(0, 20);
+          console.log(`[NFT Grid] Sample auction IDs from contract:`, allAuctionIds);
+          
           setNfts(mappedNFTs);
           // Set bid amounts (default to minimum bid, format as ETH)
           const initialBids: { [id: string]: string } = {};
