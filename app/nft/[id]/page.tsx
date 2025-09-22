@@ -639,7 +639,9 @@ export default function NFTDetailPage() {
       <main className="min-h-screen bg-background text-foreground flex flex-col">
         <Navigation activePage="nfts" />
         <div className="flex-grow flex flex-col items-center justify-center pt-24 sm:pt-28">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2" style={{ borderTopColor: COLORS.background, borderBottomColor: COLORS.background }}></div>
+          <div className="text-center">
+            <p className="text-neutral-400">Loading...</p>
+          </div>
         </div>
         <Footer />
       </main>

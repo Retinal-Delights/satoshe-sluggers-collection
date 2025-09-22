@@ -84,7 +84,7 @@ export default function RefreshControls({
         size="sm"
         className="flex items-center gap-2"
       >
-        <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+        <RefreshCw className="h-4 w-4" />
         {isLoading ? 'Refreshing...' : 'Refresh Data'}
       </Button>
 

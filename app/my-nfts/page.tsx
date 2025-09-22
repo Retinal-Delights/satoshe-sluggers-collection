@@ -365,7 +365,9 @@ export default function MyNFTsPage() {
       <main className="min-h-screen bg-background text-foreground flex flex-col">
         <Navigation activePage="my-nfts" />
         <div className="flex-grow flex justify-center items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2" style={{ borderColor: "#ff0099" }}></div>
+          <div className="text-center">
+            <p className="text-neutral-400">Loading...</p>
+          </div>
         </div>
         <Footer />
       </main>
@@ -440,7 +442,6 @@ export default function MyNFTsPage() {
         {/* NFT Grid */}
         {activeTab === "owned" && isLoadingOwned ? (
           <div className="text-center py-20">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4" style={{ borderColor: "#ff0099" }}></div>
             <p className="text-neutral-400">Checking your NFTs...</p>
           </div>
         ) : activeNFTs.length === 0 ? (

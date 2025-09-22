@@ -14,6 +14,45 @@ export default function PixelsTransition() {
     setIsClient(true);
   }, []);
 
+  // Single animation function optimized for functional loading buffer
+  const animateGrid = (cells: NodeListOf<Element>, COLS: number, ROWS: number, isExit: boolean = false, href?: string) => {
+    const grid = gridRef.current!;
+    
+    if (isExit) {
+      // Exit: Show grid, animate squares in with proper timing for loading buffer
+      gsap.set(grid, { display: "grid" });
+      gsap.fromTo(cells, { opacity: 0 }, {
+        opacity: 1,
+        duration: 0.3, // Slower for better visual flow
+        stagger: { 
+          amount: 0.8, // Reduced stagger for faster completion
+          from: "random",
+          grid: [COLS, ROWS],
+        },
+        onComplete: () => {
+          // Navigate after squares fill the screen
+          if (href) {
+            window.location.href = href;
+          }
+        }
+      });
+    } else {
+      // Entrance: Animate squares out with proper timing to reveal page
+      gsap.to(cells, {
+        opacity: 0,
+        duration: 0.3, // Slower for better visual flow
+        stagger: { 
+          amount: 0.8, // Reduced stagger for faster completion
+          from: "random",
+          grid: [COLS, ROWS],
+        },
+        onComplete: () => { 
+          grid.style.display = "none";
+        },
+      });
+    }
+  };
+
   useEffect(() => {
     if (!isClient) return;
     
@@ -33,15 +72,21 @@ export default function PixelsTransition() {
       }
       grid.appendChild(frag);
     }
+
     const cells = grid.querySelectorAll(".load-grid__item");
 
-    // Entrance animation on page load - solid squares
+    // Entrance animation on page load - optimized for functional loading buffer
     if (!prefersReduced) {
+      // Start with grid visible and squares visible
+      gsap.set(grid, { display: "grid" });
+      gsap.set(cells, { opacity: 1 });
+      
+      // Animate squares out to reveal page with proper timing
       gsap.to(cells, {
         opacity: 0,
-        duration: 0.001,
+        duration: 0.3, // Slower for better visual flow
         stagger: { 
-          amount: 1.2, 
+          amount: 0.8, // Reduced stagger for faster completion
           from: "random",
           grid: [COLS, ROWS],
         },
@@ -66,7 +111,7 @@ export default function PixelsTransition() {
 
     if (!grid || !cells?.length || prefersReduced) return;
 
-    // Exit animation for internal link clicks
+    // Handle navigation clicks
     const onClick = (e: MouseEvent) => {
       const a = (e.target as HTMLElement).closest("a") as HTMLAnchorElement | null;
       if (!a || isTransitioning) return;
@@ -82,40 +127,15 @@ export default function PixelsTransition() {
       e.stopPropagation();
       setIsTransitioning(true);
 
-      // Hide the current page content immediately
+      // Hide current page content
       const main = document.querySelector('main');
       if (main) {
         main.style.opacity = '0';
         main.style.transition = 'opacity 0.1s ease-out';
       }
 
-      // Show grid and animate out - solid squares
-      gsap.set(grid, { 
-        display: "grid", 
-        zIndex: 99999,
-        background: "#ff0099"
-      });
-      
-      gsap.fromTo(cells, { opacity: 0 }, {
-        opacity: 1,
-        duration: 0.001,
-        stagger: { 
-          amount: 1.2, 
-          from: "random",
-          grid: [COLS, ROWS],
-        },
-        onComplete: () => {
-          // Ensure grid stays visible and covers everything
-          gsap.set(grid, { 
-            zIndex: 99999,
-            background: "#ff0099",
-            display: "grid"
-          });
-          
-          // Navigate immediately after animation completes
-          window.location.href = href;
-        }
-      });
+      // Animate exit
+      animateGrid(cells, COLS, ROWS, true, href);
     };
     
     document.addEventListener("click", onClick, true);
@@ -130,11 +150,10 @@ export default function PixelsTransition() {
           inset:0; 
           display:grid; 
           gap:0; 
-          z-index:99999; 
+          z-index:9999; 
           pointer-events:none;
           grid-template-columns:repeat(12,1fr);
           grid-template-rows:repeat(8,1fr);
-          background: #ff0099;
         }
         @media (max-width:768px){
           .load-grid{ 
