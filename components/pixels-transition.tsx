@@ -37,12 +37,6 @@ export default function PixelsTransition() {
 
     // Entrance animation on page load - solid squares
     if (!prefersReduced) {
-      // Hide page content initially
-      const mainContent = document.querySelector('main');
-      if (mainContent) {
-        mainContent.classList.add('page-content-hidden');
-      }
-      
       gsap.to(cells, {
         opacity: 0,
         duration: 0.001,
@@ -53,11 +47,6 @@ export default function PixelsTransition() {
         },
         onComplete: () => { 
           grid.style.display = "none";
-          // Show page content after animation
-          if (mainContent) {
-            mainContent.classList.remove('page-content-hidden');
-            mainContent.classList.add('page-content-visible');
-          }
         },
       });
     } else {
@@ -135,15 +124,6 @@ export default function PixelsTransition() {
         .load-grid__item{ 
           background:#ff0099; 
           opacity:1;
-        }
-        .page-content-hidden {
-          opacity: 0;
-          visibility: hidden;
-        }
-        .page-content-visible {
-          opacity: 1;
-          visibility: visible;
-          transition: opacity 0.3s ease-in-out;
         }
       `}</style>
       <div ref={gridRef} className="load-grid" aria-hidden="true" />

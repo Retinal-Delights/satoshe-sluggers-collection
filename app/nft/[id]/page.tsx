@@ -2,6 +2,9 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useParams } from "next/navigation";
+import { safeRpcCall } from "@/lib/circuit-breaker";
+import { emergencySafeRpcCall } from "@/lib/emergency-stop";
+import { cacheManager, CACHE_KEYS, CACHE_TTL, getCachedDataFromStorage, setCachedDataToStorage } from "@/lib/cache-manager";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, Heart } from "lucide-react";
@@ -257,10 +260,28 @@ export default function NFTDetailPage() {
       try {
         setIsLoadingAuction(true);
 
+        // Check for cached auction data first (both in-memory and localStorage)
+        const cacheKey = CACHE_KEYS.AUCTION_DETAIL(marketplace.address, tokenId);
+        
+        // Try in-memory cache first
+        let cachedData = cacheManager.get<any>(cacheKey);
+        
+        // Fallback to localStorage cache
+        if (!cachedData) {
+          cachedData = getCachedDataFromStorage<any>(cacheKey);
+        }
+        
+        if (cachedData) {
+          console.log('[NFT Detail] Using cached auction data');
+          setAuctionData(cachedData);
+          setIsLoadingAuction(false);
+          return;
+        }
+
         // Use direct contract call to get all auctions and find this token's auction
 
-        // Use batching approach like in the grid to find this specific token's auction
-        const batchSize = 100;
+        // Use larger batches to reduce API calls and respect rate limits
+        const batchSize = 1000; // Increased from 100 to reduce API calls
         const maxPossibleAuctions = 7798;
         let tokenAuction = null;
         
@@ -268,17 +289,22 @@ export default function NFTDetailPage() {
           const endId = Math.min(startId + batchSize - 1, maxPossibleAuctions - 1);
           
           try {
-            const contractCallPromise = readContract({
-              contract: marketplace,
-              method: "function getAllValidAuctions(uint256 _startId, uint256 _endId) view returns ((uint256 auctionId, uint256 tokenId, uint256 quantity, uint256 minimumBidAmount, uint256 buyoutBidAmount, uint64 timeBufferInSeconds, uint64 bidBufferBps, uint64 startTimestamp, uint64 endTimestamp, address auctionCreator, address assetContract, address currency, uint8 tokenType, uint8 status)[] _validAuctions)",
-              params: [BigInt(startId), BigInt(endId)],
-            });
+            const batchData = await emergencySafeRpcCall(
+              async () => {
+                const contractCallPromise = readContract({
+                  contract: marketplace,
+                  method: "function getAllValidAuctions(uint256 _startId, uint256 _endId) view returns ((uint256 auctionId, uint256 tokenId, uint256 quantity, uint256 minimumBidAmount, uint256 buyoutBidAmount, uint64 timeBufferInSeconds, uint64 bidBufferBps, uint64 startTimestamp, uint64 endTimestamp, address auctionCreator, address assetContract, address currency, uint8 tokenType, uint8 status)[] _validAuctions)",
+                  params: [BigInt(startId), BigInt(endId)],
+                });
 
-            const timeoutPromise = new Promise((_, reject) =>
-              setTimeout(() => reject(new Error(`Batch ${startId}-${endId} timeout after 30 seconds`)), 30000)
+                const timeoutPromise = new Promise((_, reject) =>
+                  setTimeout(() => reject(new Error(`Batch ${startId}-${endId} timeout after 30 seconds`)), 30000)
+                );
+
+                return Promise.race([contractCallPromise, timeoutPromise]) as Promise<any[]>;
+              },
+              `NFT Detail batch ${startId}-${endId}`
             );
-
-            const batchData = await Promise.race([contractCallPromise, timeoutPromise]) as any[];
             
             if (batchData && Array.isArray(batchData)) {
               // Find auction for this specific token in this batch
@@ -296,12 +322,19 @@ export default function NFTDetailPage() {
               }
             }
             
-            // Small delay between batches
-            await new Promise(resolve => setTimeout(resolve, 50));
+            // Longer delay between batches to respect rate limits
+            await new Promise(resolve => setTimeout(resolve, 500)); // Increased delay
             
-          } catch (batchError) {
+          } catch (batchError: any) {
             console.warn(`[NFT Detail] Batch ${startId}-${endId} failed:`, batchError);
-            // Continue with next batch
+            
+            // If circuit breaker is open, stop trying
+            if (batchError.message && batchError.message.includes('Circuit breaker is OPEN')) {
+              console.error('[NFT Detail] Circuit breaker is OPEN - stopping auction data fetch');
+              break;
+            }
+            
+            // Continue with next batch for other errors
           }
         }
 
@@ -323,6 +356,20 @@ export default function NFTDetailPage() {
           };
           setAuctionData(processedAuctionData);
           setBidCount(processedAuctionData.totalBids || 0);
+          
+          // Cache the auction data for future use (both in-memory and localStorage)
+          try {
+            // Cache in memory
+            cacheManager.set(cacheKey, processedAuctionData, CACHE_TTL.AUCTION_DETAIL);
+            
+            // Cache in localStorage
+            setCachedDataToStorage(cacheKey, processedAuctionData, CACHE_TTL.AUCTION_DETAIL);
+            
+            console.log('[NFT Detail] Cached auction data successfully');
+          } catch (cacheError) {
+            console.warn('[NFT Detail] Failed to cache auction data:', cacheError);
+          }
+          
           // Fetch the current winning bid
           await refreshAuctionBid(processedAuctionData.auctionId.toString());
         } else {
@@ -815,6 +862,7 @@ export default function NFTDetailPage() {
                     width={26}
                     height={26}
                     className="w-6 h-6 mr-2"
+                    sizes="26px"
                   />
                   <p className="text-sm" style={{ color: "#fffbeb" }}>{metadata?.artist ?? "Kristen Woerdeman"}</p>
                 </div>
@@ -828,6 +876,7 @@ export default function NFTDetailPage() {
                     width={26}
                     height={26}
                     className="w-6 h-6 mr-2"
+                    sizes="26px"
                   />
                   <p className="text-sm" style={{ color: "#fffbeb" }}>{metadata?.platform ?? "Retinal Delights"}</p>
                 </div>

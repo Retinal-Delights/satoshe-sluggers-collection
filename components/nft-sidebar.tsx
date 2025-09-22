@@ -769,7 +769,7 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, searchMode, setS
           color="amber"
           twoColumns={false}
           icon={
-            <Image src="/icons/skin-tone-yellow.svg" alt="Skin Tone" width={18} height={18} className="text-amber-400" />
+            <Image src="/icons/skin-tone-yellow.svg" alt="Skin Tone" width={18} height={18} className="text-amber-400" sizes="18px" />
           }
           options={traitCounts["skinTone"] ? Object.keys(traitCounts["skinTone"]).sort().map(value => ({ value, display: value })) : []}
           selected={selectedFilters.skinTone || []}
@@ -781,7 +781,7 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, searchMode, setS
           title="Shirt"
           color="red"
           twoColumns={false}
-          icon={<Image src="/icons/shirt-red.svg" alt="Shirt" width={18} height={18} className="text-red-400" />}
+          icon={<Image src="/icons/shirt-red.svg" alt="Shirt" width={18} height={18} className="text-red-400" sizes="18px" />}
           options={traitCounts["shirt"] ? Object.keys(traitCounts["shirt"]).sort().map(value => ({ value, display: value })) : []}
           selected={selectedFilters.shirt || []}
           onChange={arr => setSelectedFilters((f: any) => ({ ...f, shirt: arr }))}
@@ -792,7 +792,7 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, searchMode, setS
           title="Hair"
           color="green"
           twoColumns={false}
-          icon={<Image src="/icons/hair-green.svg" alt="Hair" width={18} height={18} className="text-green-400" />}
+          icon={<Image src="/icons/hair-green.svg" alt="Hair" width={18} height={18} className="text-green-400" sizes="18px" />}
           subcategories={[
             {
               name: "Banana Clip",
@@ -836,7 +836,7 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, searchMode, setS
           title="Eyewear"
           color="cyan"
           twoColumns={false}
-          icon={<Image src="/icons/eyewear-blue.svg" alt="Eyewear" width={18} height={18} className="text-cyan-400" />}
+          icon={<Image src="/icons/eyewear-blue.svg" alt="Eyewear" width={18} height={18} className="text-cyan-400" sizes="18px" />}
           options={[
             // Values match the cleaned combined_metadata.json (no "Eyewear" prefix)
             "Eyeglasses",
@@ -856,7 +856,7 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, searchMode, setS
           color="purple"
           twoColumns={false}
           icon={
-            <Image src="/icons/headwear-purple.svg" alt="Headwear" width={18} height={18} className="text-purple-400" />
+            <Image src="/icons/headwear-purple.svg" alt="Headwear" width={18} height={18} className="text-purple-400" sizes="18px" />
           }
           subcategories={[
             {

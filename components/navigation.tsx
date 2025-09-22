@@ -24,6 +24,8 @@ export default function Navigation({ activePage = "home" }: NavigationProps) {
             width={200}
             height={50}
             className="w-auto h-10 sm:h-12 md:h-14 max-h-14"
+            priority
+            sizes="(max-width: 640px) 200px, (max-width: 768px) 240px, 280px"
           />
         </Link>
       </div>

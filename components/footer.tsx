@@ -37,6 +37,7 @@ export default function Footer() {
               width={200}
               height={50}
               className="w-auto h-10 sm:h-12 md:h-14 max-h-14"
+              sizes="(max-width: 640px) 200px, (max-width: 768px) 240px, 280px"
             />
           </div>
 
