@@ -254,20 +254,12 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
                 
                 const batchData = await Promise.race([contractCallPromise, timeoutPromise]) as any[];
                 
-                // Debug: Log what we're querying and what we get back
-                console.log(`[Contract Call] Querying range ${startId}-${endId}, got ${batchData?.length || 0} auctions`);
-                if (batchData && batchData.length > 0) {
-                  const auctionIds = batchData.map(auction => auction.auctionId).slice(0, 5);
-                  console.log(`[Contract Call] Sample auction IDs from range ${startId}-${endId}:`, auctionIds);
-                }
                 
                 if (batchData && Array.isArray(batchData)) {
                   allAuctionData.push(...batchData);
                   
                   // If we get an empty batch, we've likely reached the end of active auctions
-                  // But only break if we've queried a reasonable range (not too early)
-                  if (batchData.length === 0 && startId > 100) {
-                    console.log(`[Contract Call] Breaking at empty batch ${startId}-${endId} (queried ${startId} auctions so far)`);
+                  if (batchData.length === 0) {
                     break;
                   }
                 }
@@ -561,30 +553,6 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
               };
             });
 
-          // Debug: Count cancelled listings
-          const cancelledCount = mappedNFTs.filter(nft => isCancelledListing(nft.auctionId)).length;
-          const forSaleCount = mappedNFTs.filter(nft => nft.isForSale).length;
-          const cancelledNFTs = mappedNFTs.filter(nft => nft.isCancelled);
-          console.log(`[NFT Grid] Total NFTs: ${mappedNFTs.length}, For Sale: ${forSaleCount}, Cancelled: ${cancelledCount}`);
-          console.log(`[NFT Grid] Cancelled NFTs:`, cancelledNFTs.map(nft => ({ tokenId: nft.tokenId, auctionId: nft.auctionId, isCancelled: nft.isCancelled, isForSale: nft.isForSale })));
-          
-          // Debug: Show all auction IDs to see what we're working with
-          const allAuctionIds = mappedNFTs.map(nft => nft.auctionId).filter(id => id !== 0n).slice(0, 20);
-          console.log(`[NFT Grid] Sample auction IDs from contract:`, allAuctionIds);
-          
-          // Debug: Check for high auction IDs (7777+)
-          const highAuctionIds = mappedNFTs.map(nft => nft.auctionId).filter(id => id >= 7777n);
-          console.log(`[NFT Grid] High auction IDs (7777+):`, highAuctionIds);
-          
-          // Debug: Check for relisted NFTs specifically
-          const relistedTokenIds = [5366, 5372, 5373, 5374, 5375, 486, 1019, 0, 1515, 506, 2610, 3610, 59];
-          const relistedNFTs = mappedNFTs.filter(nft => relistedTokenIds.includes(Number(nft.tokenId)));
-          console.log(`[NFT Grid] Relisted NFTs:`, relistedNFTs.map(nft => ({ 
-            tokenId: nft.tokenId, 
-            auctionId: nft.auctionId, 
-            isForSale: nft.isForSale, 
-            isCancelled: nft.isCancelled 
-          })));
           
           setNfts(mappedNFTs);
           // Set bid amounts (default to minimum bid, format as ETH)
@@ -856,10 +824,6 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
     ? nft.isForSale 
     : !nft.isForSale && !nft.isCancelled && nft.auctionId !== 0n;
     
-  // Debug logging for sold tab
-  if (activeView === "sold" && !nft.isForSale) {
-    console.log(`[Sold Tab Debug] Token ${nft.tokenId}: isForSale=${nft.isForSale}, isCancelled=${nft.isCancelled}, auctionId=${nft.auctionId}, matchesView=${matchesView}`);
-  }
 
     // Rarity filter
     const matchesRarity =
