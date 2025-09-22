@@ -27,7 +27,7 @@ export default function NFTsPage() {
       <section className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
         <div className="mb-6">
           <h1 id="collection-heading" className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-center mb-1">
-            SATO<span className="text-brand-pink">SHE</span> SLUGGERS
+            <span style={{ color: "#fffbeb" }}>SATO</span><span className="text-brand-pink">SHE</span><span style={{ color: "#fffbeb" }}> SLUGGERS</span>
           </h1>
           <p className="text-lg sm:text-2xl text-neutral-400 text-center max-w-2xl mx-auto tracking-wider">
             A RETINAL DELIGHTS NFT MARKETPLACE
