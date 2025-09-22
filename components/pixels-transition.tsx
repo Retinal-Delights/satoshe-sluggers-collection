@@ -27,13 +27,17 @@ export default function PixelsTransition() {
     }
     const cells = grid.querySelectorAll(".load-grid__item");
 
-    // Entrance animation on page load
+    // Entrance animation on page load - solid squares
     if (!prefersReduced) {
       gsap.to(cells, {
         opacity: 0,
         duration: 0.001,
-        stagger: { amount: 0.5, from: "random" },
-        onComplete: () => (grid.style.display = "none"),
+        stagger: { 
+          amount: 1.2, 
+          from: "random",
+          grid: [COLS, ROWS],
+        },
+        onComplete: () => { grid.style.display = "none"; },
       });
     } else {
       grid.style.display = "none";
@@ -44,6 +48,9 @@ export default function PixelsTransition() {
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const grid = gridRef.current!;
     const cells = grid?.querySelectorAll(".load-grid__item");
+    const mq = window.matchMedia("(max-width:768px)");
+    const COLS = mq.matches ? 8 : 12;
+    const ROWS = mq.matches ? 10 : 8;
 
     if (!grid || !cells?.length || prefersReduced) return;
 
@@ -62,12 +69,16 @@ export default function PixelsTransition() {
       e.preventDefault();
       setIsTransitioning(true);
 
-      // Show grid and animate out
+      // Show grid and animate out - solid squares
       gsap.set(grid, { display: "grid" });
       gsap.fromTo(cells, { opacity: 0 }, {
         opacity: 1,
         duration: 0.001,
-        stagger: { amount: 0.5, from: "random" },
+        stagger: { 
+          amount: 1.2, 
+          from: "random",
+          grid: [COLS, ROWS],
+        },
         onComplete: () => {
           // Navigate after animation completes
           window.location.href = href;
@@ -100,7 +111,7 @@ export default function PixelsTransition() {
         }
         .load-grid__item{ 
           background:#ff0099; 
-          opacity:1; 
+          opacity:1;
         }
       `}</style>
       <div ref={gridRef} className="load-grid" aria-hidden="true" />

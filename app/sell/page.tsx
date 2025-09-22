@@ -37,12 +37,7 @@ export default function SellPage() {
 
             {account ? (
               <div className="flex flex-col items-center gap-3">
-                <div className="flex items-center gap-2 bg-neutral-700 px-4 py-2 rounded-md">
-                  <Image src="/profile-icon-yellow.png" alt="Profile" width={24} height={24} className="rounded-full" />
-                  <span className="text-sm font-medium">
-                    {`${account.address.slice(0, 6)}...${account.address.slice(-4)}`}
-                  </span>
-                </div>
+                <ConnectWalletButton />
                 <Button
                   onClick={navigateToMyNFTs}
                   className="relative z-10 text-base px-6 py-3 font-medium text-brand-pink border-brand-pink border-2 hover:border-brand-pink hover:bg-brand-pink transition-all duration-300 shadow-[0_0_15px_rgba(255,0,153,0.5)] hover:shadow-[0_0_25px_rgba(255,0,153,0.7)] bg-neutral-900/80 rounded"
