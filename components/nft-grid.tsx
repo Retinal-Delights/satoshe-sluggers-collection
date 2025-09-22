@@ -254,6 +254,13 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
                 
                 const batchData = await Promise.race([contractCallPromise, timeoutPromise]) as any[];
                 
+                // Debug: Log what we're querying and what we get back
+                console.log(`[Contract Call] Querying range ${startId}-${endId}, got ${batchData?.length || 0} auctions`);
+                if (batchData && batchData.length > 0) {
+                  const auctionIds = batchData.map(auction => auction.auctionId).slice(0, 5);
+                  console.log(`[Contract Call] Sample auction IDs from range ${startId}-${endId}:`, auctionIds);
+                }
+                
                 if (batchData && Array.isArray(batchData)) {
                   allAuctionData.push(...batchData);
                   
