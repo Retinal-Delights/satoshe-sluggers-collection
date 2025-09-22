@@ -11,10 +11,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Pagination from "@/components/ui/pagination";
-import { useActiveAccount, useWalletBalance, useSendTransaction, TransactionButton } from "thirdweb/react";
+import { useActiveAccount, useWalletBalance, useSendTransaction, TransactionButton, useContractEvents } from "thirdweb/react";
 import { format } from "date-fns";
 import { readContract } from "thirdweb";
-import { bidInAuction, buyoutAuction } from "thirdweb/extensions/marketplace";
+import { bidInAuction, buyoutAuction, auctionClosedEvent } from "thirdweb/extensions/marketplace";
 import { base } from "thirdweb/chains";
 import { client } from "@/lib/thirdweb";
 import { marketplace } from "@/lib/contracts";
@@ -100,6 +100,7 @@ type NFTGridItem = {
   numBids: number;
   isForSale: boolean;
   isCancelled: boolean;
+  isSold: boolean;
   background?: string;
   skinTone?: string;
   shirt?: string;
@@ -211,6 +212,8 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
       // Create a more efficient approach: use static metadata and minimal auction data
   // Only fetch auction IDs and basic info, not full NFT metadata
   const [auctionMap, setAuctionMap] = useState<Map<number, any>>(new Map());
+  const [soldNFTs, setSoldNFTs] = useState<Set<number>>(new Set());
+  const [cancelledNFTs, setCancelledNFTs] = useState<Set<number>>(new Set());
   const [isLoadingAuctions, setIsLoadingAuctions] = useState(true);
 
         // Fetch real auction data from marketplace contract with batching
@@ -364,6 +367,44 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
       }, []); // Run once on mount
   const { mutate: sendBid } = useSendTransaction();
   const { mutate: sendBuyout } = useSendTransaction();
+
+  // Listen for auction closed events to track sold NFTs
+  const { data: auctionClosedEvents } = useContractEvents({
+    contract: marketplace,
+    events: [auctionClosedEvent()],
+  });
+
+  // Load sold NFTs from localStorage on mount
+  useEffect(() => {
+    const savedSoldNFTs = localStorage.getItem('sold-nfts');
+    if (savedSoldNFTs) {
+      try {
+        const soldArray = JSON.parse(savedSoldNFTs);
+        setSoldNFTs(new Set(soldArray));
+      } catch (error) {
+        console.warn('Failed to load sold NFTs from localStorage:', error);
+      }
+    }
+  }, []);
+
+  // Save sold NFTs to localStorage whenever it changes
+  useEffect(() => {
+    if (soldNFTs.size > 0) {
+      localStorage.setItem('sold-nfts', JSON.stringify(Array.from(soldNFTs)));
+    }
+  }, [soldNFTs]);
+
+  // Handle auction closed events to track sold NFTs
+  useEffect(() => {
+    if (auctionClosedEvents) {
+      auctionClosedEvents.forEach((event: any) => {
+        const tokenId = Number(event.args.tokenId);
+        if (tokenId !== undefined) {
+          setSoldNFTs(prev => new Set(prev).add(tokenId));
+        }
+      });
+    }
+  }, [auctionClosedEvents]);
 
     useEffect(() => {
     // Load all static metadata and image URLs from local JSON files
@@ -539,10 +580,12 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
                     : auction?.price && auction.price !== "0"
                     ? auction.price
                     : "0",
-                // Add flag to indicate if NFT is for sale (exclude cancelled listings)
-                isForSale: !!auction && !isCancelledListing(auction?.auctionId),
-                // Add flag to indicate if NFT listing was cancelled
-                isCancelled: !!auction && isCancelledListing(auction?.auctionId),
+                 // Add flag to indicate if NFT is for sale (exclude cancelled and sold listings)
+                 isForSale: !!auction && !isCancelledListing(auction?.auctionId) && !soldNFTs.has(Number(tokenId)),
+                 // Add flag to indicate if NFT listing was cancelled
+                 isCancelled: !!auction && isCancelledListing(auction?.auctionId),
+                 // Add flag to indicate if NFT was sold
+                 isSold: soldNFTs.has(Number(tokenId)),
                 auctionEnd: auction?.endTimeInSeconds ?? "",
                 auctionStart,
                 rank,
@@ -734,12 +777,8 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
       await new Promise((resolve, reject) => {
         sendBuyout(tx, {
           onSuccess: () => {
-            // Remove auction from map since it's completed
-            setAuctionMap(prev => {
-              const newMap = new Map(prev);
-              newMap.delete(Number(nft.tokenId));
-              return newMap;
-            });
+            // Mark NFT as sold instead of removing from auction map
+            setSoldNFTs(prev => new Set(prev).add(Number(nft.tokenId)));
             resolve(true);
           },
           onError: reject,
@@ -825,9 +864,11 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
     let matchesSearch = false;
     
     if (searchMode === "exact") {
-      // Exact mode: match exact token ID or exact name
+      // Exact mode: match exact token ID, NFT number, or exact name
+      const nftNumber = (parseInt(nft.tokenId) + 1).toString(); // NFT number is token ID + 1
       matchesSearch = 
         nft.tokenId.toString() === searchTerm ||
+        nftNumber === searchTerm ||
         nft.name.toLowerCase() === searchTerm.toLowerCase();
     } else {
       // Contains mode: match partial token ID or name (original behavior)
@@ -836,10 +877,10 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
         nft.tokenId.toString().includes(searchTerm);
     }
 
-  // View filter (Live vs Sold) - exclude cancelled listings and NFTs without auctions from both tabs
+  // View filter (Live vs Sold) - proper handling of different NFT states
   const matchesView = activeView === "forSale" 
     ? nft.isForSale 
-    : !nft.isForSale && !nft.isCancelled && nft.auctionId !== 0n;
+    : nft.isSold;
     
 
     // Rarity filter

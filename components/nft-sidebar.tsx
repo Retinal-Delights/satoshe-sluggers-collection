@@ -667,16 +667,6 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, searchMode, setS
           <div className="text-xs text-neutral-400 mb-2">Search Mode:</div>
           <div className="flex bg-neutral-800 rounded p-1">
             <button
-              onClick={() => setSearchMode("exact")}
-              className={`flex-1 px-3 py-1.5 text-xs rounded transition-colors ${
-                searchMode === "exact"
-                  ? "bg-brand-pink text-white"
-                  : "text-neutral-400 hover:text-white"
-              }`}
-            >
-              Exact
-            </button>
-            <button
               onClick={() => setSearchMode("contains")}
               className={`flex-1 px-3 py-1.5 text-xs rounded transition-colors ${
                 searchMode === "contains"
@@ -685,6 +675,16 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, searchMode, setS
               }`}
             >
               Contains
+            </button>
+            <button
+              onClick={() => setSearchMode("exact")}
+              className={`flex-1 px-3 py-1.5 text-xs rounded transition-colors ${
+                searchMode === "exact"
+                  ? "bg-brand-pink text-white"
+                  : "text-neutral-400 hover:text-white"
+              }`}
+            >
+              Exact
             </button>
           </div>
           <div className="text-xs text-neutral-500 mt-1">
