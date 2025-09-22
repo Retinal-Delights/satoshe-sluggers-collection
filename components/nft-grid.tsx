@@ -268,7 +268,7 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
                 // Small delay between batches to be respectful to RPC
                 await new Promise(resolve => setTimeout(resolve, 50));
                 
-              } catch (batchError) {
+              } catch (batchError: any) {
                 console.warn(`[fetchAuctionData] Batch ${startId}-${endId} failed:`, batchError);
                 // If it's an "invalid range" error, we've likely reached the end of valid auctions
                 if (batchError.message && batchError.message.includes('invalid range')) {

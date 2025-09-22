@@ -401,7 +401,7 @@ export default function NFTCard({
                         console.error("Bid failed:", error);
                         alert(error.message || "Failed to place bid. Please try again.");
                       }}
-                      className="px-3 text-xs md:text-sm font-semibold text-white border rounded"
+                      className="px-3 text-xs md:text-sm font-bold text-white border rounded"
                       style={{ 
                         height: "32px",
                         backgroundColor: "#10B981",
@@ -422,8 +422,8 @@ export default function NFTCard({
                 <div className="pt-2 p-3 bg-card rounded">
                   <div className="flex items-end justify-between">
                     <div>
-                    <div className="text-xs md:text-sm text-white mb-1">Buy Now</div>
-                    <div className="text-sm md:text-base font-semibold" style={{ color: "#3B82F6" }}>{buyNow.replace(' ETH', '')} ETH</div>
+                    <div className="text-xs md:text-sm text-white mb-0.5">Buy Now</div>
+                    <div className="text-sm md:text-base font-semibold leading-tight" style={{ color: "#3B82F6" }}>{buyNow.replace(' ETH', '')} ETH</div>
                     </div>
                     <TransactionButton
                       transaction={createBuyNowTransaction}
@@ -443,7 +443,7 @@ export default function NFTCard({
                         console.error("Buy now failed:", error);
                         alert(error.message || "Failed to buy NFT. Please try again.");
                       }}
-                      className="px-3 text-xs md:text-sm font-semibold text-white border rounded"
+                      className="px-3 text-xs md:text-sm font-bold text-white border rounded"
                       style={{ 
                         height: "32px",
                         backgroundColor: "#3B82F6",
