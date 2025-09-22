@@ -32,11 +32,11 @@ export default function Footer() {
         <div className="flex flex-col items-center justify-center gap-6">
           <div className="flex items-center justify-center py-2">
             <Image
-              src="/retinal_delights-horizontal-brand-offwhite.png"
+              src="/retinal_delights-horizontal-brand-offwhite.svg"
               alt="Retinal Delights"
-              width={220}
-              height={50}
-              className="h-12 w-auto"
+              width={240}
+              height={60}
+              className="h-14 sm:h-16 md:h-18 w-auto max-h-18"
             />
           </div>
 

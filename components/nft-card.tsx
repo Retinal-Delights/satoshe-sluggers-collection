@@ -281,7 +281,7 @@ export default function NFTCard({
           )}
         </div>
       </Link>
-      <div className="p-3 bg-neutral-900 text-neutral-100 flex-1 flex flex-col">
+      <div className="p-3 bg-neutral-900 flex-1 flex flex-col" style={{ color: "#fffbeb" }}>
         <div className="mb-2">
           <div className="flex items-center justify-between mb-1">
                   <h4 className="text-sm md:text-base lg:text-lg font-medium leading-tight whitespace-nowrap pr-2" style={{ color: "#fffbeb" }}>{name}</h4>
