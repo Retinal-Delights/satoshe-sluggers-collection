@@ -1,9 +1,12 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { gsap } from "gsap";
 
 export default function PixelsTransition() {
   const gridRef = useRef<HTMLDivElement | null>(null);
+  const pathname = usePathname();
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -35,26 +38,29 @@ export default function PixelsTransition() {
     } else {
       grid.style.display = "none";
     }
+  }, [pathname]);
+
+  useEffect(() => {
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const grid = gridRef.current!;
+    const cells = grid?.querySelectorAll(".load-grid__item");
+
+    if (!grid || !cells?.length || prefersReduced) return;
 
     // Exit animation for internal link clicks
     const onClick = (e: MouseEvent) => {
       const a = (e.target as HTMLElement).closest("a") as HTMLAnchorElement | null;
-      if (!a) return;
+      if (!a || isTransitioning) return;
       
       const href = a.getAttribute("href") || "";
-      const sameHost = a.hostname === window.location.hostname;
       const isHash = href.startsWith("#");
       const newTab = a.target === "_blank";
       const download = a.hasAttribute("download");
       
-      if (!sameHost || isHash || newTab || download) return;
+      if (isHash || newTab || download) return;
 
       e.preventDefault();
-
-      if (prefersReduced) {
-        window.location.href = href;
-        return;
-      }
+      setIsTransitioning(true);
 
       // Show grid and animate out
       gsap.set(grid, { display: "grid" });
@@ -62,13 +68,16 @@ export default function PixelsTransition() {
         opacity: 1,
         duration: 0.001,
         stagger: { amount: 0.5, from: "random" },
-        onComplete: () => (window.location.href = href)
+        onComplete: () => {
+          // Navigate after animation completes
+          window.location.href = href;
+        }
       });
     };
     
     document.addEventListener("click", onClick, true);
     return () => document.removeEventListener("click", onClick, true);
-  }, []);
+  }, [isTransitioning]);
 
   return (
     <>
