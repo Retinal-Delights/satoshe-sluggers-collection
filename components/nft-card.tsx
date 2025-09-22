@@ -335,7 +335,7 @@ export default function NFTCard({
               <>
                 {/* Bidding Section */}
                 <div className="pt-2 mb-2 p-3 bg-card rounded">
-                  <div className="text-xs md:text-sm mb-2 font-normal" style={{ color: "#fffbeb" }}>Enter your max bid</div>
+                  <div className="text-xs md:text-sm mb-2 font-normal text-[#fffbeb]" style={{ color: "#fffbeb" }}>Enter your max bid</div>
                   
                   <div className="flex gap-2 mb-2">
                     <div className="relative flex-1">
