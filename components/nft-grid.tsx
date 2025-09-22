@@ -134,6 +134,14 @@ interface NFTGridProps {
 // Set the total number of NFTs in your collection
 const TOTAL_NFTS = 7777;
 
+// Cancelled/Expired Listings - DO NOT USE THESE LISTING IDS
+const CANCELLED_LISTING_IDS = [0, 1, 2, 3, 4, 5, 6, 7782, 7783, 7784, 7785, 7786, 7787, 7788];
+
+// Helper function to check if a listing ID is cancelled
+const isCancelledListing = (listingId: string | number | bigint) => {
+  return CANCELLED_LISTING_IDS.includes(Number(listingId));
+};
+
 // Helper to extract attribute value from metadata
 function getAttribute(meta: any, traitType: string) {
   return meta?.attributes?.find((attr: any) => attr.trait_type === traitType)?.value;
@@ -479,6 +487,7 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
 
           // Map ALL metadata for NFTs - show entire collection
           // Apply auction data when available, show "Not for Sale" when not
+          // Filter out cancelled/expired listings from being considered "for sale"
           const mappedNFTs: NFTGridItem[] = allMetadata
             .map((meta: any) => {
               const tokenId = meta.token_id?.toString() || "";
@@ -521,8 +530,8 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
                     : auction?.price && auction.price !== "0"
                     ? auction.price
                     : "0",
-                // Add flag to indicate if NFT is for sale
-                isForSale: !!auction,
+                // Add flag to indicate if NFT is for sale (exclude cancelled listings)
+                isForSale: !!auction && !isCancelledListing(auction?.auctionId),
                 auctionEnd: auction?.endTimeInSeconds ?? "",
                 auctionStart,
                 rank,
@@ -540,6 +549,11 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
               };
             });
 
+          // Debug: Count cancelled listings
+          const cancelledCount = mappedNFTs.filter(nft => isCancelledListing(nft.auctionId)).length;
+          const forSaleCount = mappedNFTs.filter(nft => nft.isForSale).length;
+          console.log(`[NFT Grid] Total NFTs: ${mappedNFTs.length}, For Sale: ${forSaleCount}, Cancelled: ${cancelledCount}`);
+          
           setNfts(mappedNFTs);
           // Set bid amounts (default to minimum bid, format as ETH)
           const initialBids: { [id: string]: string } = {};
