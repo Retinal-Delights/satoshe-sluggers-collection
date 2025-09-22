@@ -235,7 +235,7 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
             
             // Fetch in batches to handle the entire collection
             const batchSize = 200; // Process 200 auctions at a time (increased for faster loading)
-            const maxPossibleAuctions = 8000; // Increased to include new listings (7777-7796)
+            const maxPossibleAuctions = 7777; // Reverted to original value
             const allAuctionData: any[] = [];
             
             for (let startId = 0; startId < maxPossibleAuctions; startId += batchSize) {
@@ -265,7 +265,9 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
                   allAuctionData.push(...batchData);
                   
                   // If we get an empty batch, we've likely reached the end of active auctions
-                  if (batchData.length === 0) {
+                  // But only break if we've queried a reasonable range (not too early)
+                  if (batchData.length === 0 && startId > 100) {
+                    console.log(`[Contract Call] Breaking at empty batch ${startId}-${endId} (queried ${startId} auctions so far)`);
                     break;
                   }
                 }
