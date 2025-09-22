@@ -448,12 +448,12 @@ export default function MyNFTsPage() {
           <div className="text-center py-20">
             <p className="text-neutral-400 mb-4">
               {activeTab === "favorites"
-                ? "Favorite your first NFT! Click to Browse."
+                ? "Favorite your first NFT! Click to browse."
                 : activeTab === "owned"
-                ? "Mint A Slugger"
+                ? "Mint a Slugger."
                 : activeTab === "bids"
-                ? "Make your first bid with the browse button"
-                : "No NFTs found in this category"
+                ? "Make your first bid with the browse button."
+                : "No NFTs found in this category."
               }
             </p>
             {(activeTab === "owned" || activeTab === "favorites" || activeTab === "bids") && (
