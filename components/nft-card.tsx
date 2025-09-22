@@ -147,6 +147,11 @@ export default function NFTCard({
       throw new Error(`Bid must be at least ${formatBidAmount(minimumBidAmount)} ETH`);
     }
 
+    // Check if bid is above buyout amount
+    if (typeof buyNowValue === 'number' && Number(amount) >= buyNowValue) {
+      throw new Error(`Bid amount is above the buyout amount of ${buyNowValue} ETH`);
+    }
+
     // Validate bid amount
     const validation = validateNumericInput(amount);
     if (!validation.isValid) {
