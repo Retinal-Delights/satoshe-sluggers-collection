@@ -908,9 +908,6 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
         return Number(a.priceWei) - Number(b.priceWei);
       case "price-desc":
         return Number(b.priceWei) - Number(a.priceWei);
-      case "newly-listed":
-        // Sort by auction start time descending (newest first)
-        return Number(b.auctionStart ?? 0) - Number(a.auctionStart ?? 0);
       case "ending-soonest":
         // Sort by auction end time ascending (soonest first)
         return Number(a.auctionEnd ?? 0) - Number(b.auctionEnd ?? 0);
@@ -1073,7 +1070,6 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
                 <SelectItem value="rank-desc">Rank: High to Low</SelectItem>
                 <SelectItem value="price-asc">Price: Low to High</SelectItem>
                 <SelectItem value="price-desc">Price: High to Low</SelectItem>
-                <SelectItem value="newly-listed">Newly Listed</SelectItem>
                 <SelectItem value="ending-soonest">Ending Soonest</SelectItem>
               </SelectContent>
             </Select>
