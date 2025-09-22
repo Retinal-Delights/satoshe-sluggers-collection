@@ -19,17 +19,6 @@ import { getWinningBid, getAllAuctions, bidInAuction } from "thirdweb/extensions
 import { sendTransaction } from "thirdweb"
 
 // Types for NFT data
-interface ListedNFT {
-  id: string;
-  tokenId: string;
-  name: string;
-  image: string;
-  price: string;
-  highestBid: string;
-  rarity: string;
-  isListed: boolean;
-}
-
 interface BidNFT {
   id: string;
   name: string;
@@ -47,7 +36,6 @@ export default function MyNFTsPage() {
 
   const [activeTab, setActiveTab] = useState(tabParam || "owned")
   const [isLoading, setIsLoading] = useState(true)
-  const [listedNFTs, setListedNFTs] = useState<ListedNFT[]>([])
   const [bidsPlacedNFTs, setBidsPlacedNFTs] = useState<BidNFT[]>([])
 
   const [ownedNFTs, setOwnedNFTs] = useState<any[]>([])
@@ -99,7 +87,6 @@ export default function MyNFTsPage() {
       try {
         if (!account?.address) {
           setOwnedNFTs([]);
-          setListedNFTs([]);
           setBidsPlacedNFTs([]);
           return;
         }
@@ -141,15 +128,11 @@ export default function MyNFTsPage() {
         setOwnedNFTs(processedNFTs);
         
         // DISABLED: Fetch user's active bids and listed NFTs (prevents RPC charges)
-        // await Promise.all([
-        //   fetchUserBids(account.address),
-        //   fetchUserListedNFTs(account.address)
-        // ]);
+    // await fetchUserBids(account.address);
         
       } catch (error) {
         console.error("Error loading user data:", error);
         setOwnedNFTs([]);
-        setListedNFTs([]);
         setBidsPlacedNFTs([]);
       } finally {
         setIsLoading(false);
@@ -174,10 +157,6 @@ export default function MyNFTsPage() {
     router.push(`/list-nft/${nftId}`)
   }
 
-  const handleCancelListing = async (listingId: string) => {
-    // In a real app, this would call the contract to cancel the listing
-    alert(`Listing for NFT #${listingId} has been canceled`)
-  }
 
   // Refresh all user data (called when events occur)
   const refreshUserData = async () => {
@@ -211,69 +190,9 @@ export default function MyNFTsPage() {
     setOwnedNFTs(processedNFTs);
     
     // DISABLED: Refresh bids and listed NFTs (prevents RPC charges)
-    // await Promise.all([
-    //   fetchUserBids(account.address),
-    //   fetchUserListedNFTs(account.address)
-    // ]);
+    // await fetchUserBids(account.address);
   };
 
-  // Fetch user's listed NFTs (auctions they created)
-  const fetchUserListedNFTs = async (userAddress: string) => {
-    try {
-      
-      // Get all active auctions
-      const allAuctions = await getAllAuctions({
-        contract: marketplace,
-      });
-
-      const userListedNFTs: ListedNFT[] = [];
-
-      // Check each auction to see if user is the creator
-      for (const auction of allAuctions) {
-        try {
-          // Check if user is the auction creator
-          if ((auction as any).seller?.toLowerCase() === userAddress.toLowerCase()) {
-            const tokenId = auction.tokenId?.toString();
-            if (tokenId) {
-              const metadata = allMetadata[parseInt(tokenId)] || {};
-              
-              // Get current winning bid if any
-              let currentBid = "0";
-              try {
-                const winningBid = await getWinningBid({
-                  contract: marketplace,
-                  auctionId: auction.id,
-                });
-                if (winningBid?.bidAmountWei) {
-                  currentBid = (Number(winningBid.bidAmountWei) / 1e18).toString();
-                }
-              } catch (error) {
-                console.error(`Error fetching winning bid for auction ${auction.id}:`, error);
-              }
-              
-              userListedNFTs.push({
-                id: auction.id.toString(),
-                tokenId: tokenId,
-                name: metadata.name || `Satoshe Slugger #${parseInt(tokenId) + 1}`,
-                image: imageUrlMap[tokenId] || "/placeholder-nft.webp",
-                price: auction.buyoutBidAmount ? (Number(auction.buyoutBidAmount) / 1e18).toString() : "0",
-                highestBid: currentBid,
-                rarity: metadata.rarity_tier || "common",
-                isListed: true,
-              });
-            }
-          }
-        } catch (error) {
-          console.error(`Error checking auction ${auction.id}:`, error);
-        }
-      }
-
-      setListedNFTs(userListedNFTs);
-    } catch (error) {
-      console.error("Error fetching user listed NFTs:", error);
-      setListedNFTs([]);
-    }
-  };
 
   // Fetch user's active bids
   const fetchUserBids = async (userAddress: string) => {
@@ -377,8 +296,6 @@ export default function MyNFTsPage() {
         rarity: nft.rarity || "common",
         isListed: false,
       }))
-    } else if (activeTab === "listed") {
-      return listedNFTs
     } else if (activeTab === "favorites") {
       // Convert favorites to the expected format
       return favorites.map((fav) => ({
@@ -455,13 +372,6 @@ export default function MyNFTsPage() {
               onClick={() => setActiveTab("owned")}
             >
               Owned ({ownedNFTs?.length || 0})
-            </button>
-            <button
-              className={`py-2 px-4 ${activeTab === "listed" ? "border-b-2 border-brand-pink font-medium" : "text-neutral-400 hover:text-[#ff0099]"} transition-colors`}
-              style={activeTab === "listed" ? { color: "#fffbeb" } : {}}
-              onClick={() => setActiveTab("listed")}
-            >
-              Listed ({listedNFTs.length})
             </button>
             <button
               className={`py-2 px-4 flex items-center gap-2 ${activeTab === "favorites" ? "border-b-2 border-brand-pink font-medium" : "text-neutral-400 hover:text-[#ff0099]"} transition-colors`}
@@ -562,7 +472,7 @@ export default function MyNFTsPage() {
                   )}
 
                   {/* Action buttons based on tab */}
-                  {activeTab === "owned" && !(nft as ListedNFT).isListed && (
+                  {activeTab === "owned" && (
                     <Button
                       onClick={() => handleListForSale(nft.id)}
                       className="w-full bg-brand-pink hover:bg-brand-pink-hover text-sm py-2 transition-colors"
@@ -582,24 +492,6 @@ export default function MyNFTsPage() {
                     </Button>
                   )}
 
-                  {activeTab === "listed" && (
-                    <div className="flex flex-col gap-2">
-                      <Button
-                        onClick={() => handleCancelListing(nft.id)}
-                        variant="outline"
-                        className="w-full text-sm py-2 border-red-500 text-red-500 hover:bg-red-500/10"
-                      >
-                        Cancel Listing
-                      </Button>
-                      <Button
-                        onClick={() => handleListForSale(nft.id)}
-                        className="w-full bg-blue-500 hover:bg-blue-600 text-sm py-2"
-                        style={{ color: "#fffbeb" }}
-                      >
-                        Update Listing
-                      </Button>
-                    </div>
-                  )}
 
                   {activeTab === "bids" && (
                     <div className="space-y-3">
