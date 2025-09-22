@@ -261,7 +261,7 @@ export default function NFTDetailPage() {
 
         // Use batching approach like in the grid to find this specific token's auction
         const batchSize = 100;
-        const maxPossibleAuctions = 7777;
+        const maxPossibleAuctions = 7798;
         let tokenAuction = null;
         
         for (let startId = 0; startId < maxPossibleAuctions && !tokenAuction; startId += batchSize) {

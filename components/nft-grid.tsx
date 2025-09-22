@@ -235,10 +235,10 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
             
             // Fetch in batches to handle the entire collection
             const batchSize = 200; // Process 200 auctions at a time (increased for faster loading)
-            const maxPossibleAuctions = 7796; // Query up to 7796 (last listing ID)
+            const maxPossibleAuctions = 7798; // Query up to 7798 (last listing ID)
             const allAuctionData: any[] = [];
             
-            // Query the entire range (0-7796)
+            // Query the entire range (0-7798)
             for (let startId = 0; startId < maxPossibleAuctions; startId += batchSize) {
               const endId = Math.min(startId + batchSize - 1, maxPossibleAuctions - 1);
               
