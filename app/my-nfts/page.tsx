@@ -94,6 +94,7 @@ export default function MyNFTsPage() {
 
       // Wait for imageUrlMap to be loaded before processing owned NFTs
       if (Object.keys(imageUrlMap).length === 0) {
+        setIsLoading(false);
         return;
       }
 
@@ -364,7 +365,7 @@ export default function MyNFTsPage() {
       <main className="min-h-screen bg-background text-foreground flex flex-col">
         <Navigation activePage="my-nfts" />
         <div className="flex-grow flex justify-center items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2" style={{ borderColor: "#ff0099" }}></div>
         </div>
         <Footer />
       </main>

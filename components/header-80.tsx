@@ -30,7 +30,10 @@ const useRelume = (): RelumeValues => {
     return () => window.removeEventListener('resize', checkScreenSize)
   }, [])
 
-  const { scrollYProgress } = useScroll({ target: transformRef })
+  const { scrollYProgress } = useScroll({ 
+    target: transformRef,
+    offset: ["start start", "end start"]
+  })
   const animatedScrollYProgress = useSpring(scrollYProgress, { bounce: 0 })
 
   // Different animation ranges based on screen size
