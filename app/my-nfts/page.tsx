@@ -17,7 +17,7 @@ import { base } from "thirdweb/chains"
 import { nftCollection, marketplace } from "@/lib/contracts"
 import { bidInAuction } from "thirdweb/extensions/marketplace"
 import { sendTransaction } from "thirdweb"
-import { getCurrentWinningBids } from "@/lib/insight-api"
+import { useUserBids } from "@/hooks/useUserBids"
 
 // Types for NFT data
 interface BidNFT {
@@ -36,10 +36,6 @@ export default function MyNFTsPage() {
   const tabParam = searchParams.get("tab")
 
   const [activeTab, setActiveTab] = useState(tabParam || "bids")
-  const [isLoading, setIsLoading] = useState(true)
-  const [isLoadingBids, setIsLoadingBids] = useState(false)
-  const [bidsPlacedNFTs, setBidsPlacedNFTs] = useState<BidNFT[]>([])
-
   const [allMetadata, setAllMetadata] = useState<any[]>([])
   const [imageUrlMap, setImageUrlMap] = useState<{ [tokenId: string]: string }>({})
   const [bidAmounts, setBidAmounts] = useState<{ [auctionId: string]: string }>({})
@@ -48,6 +44,7 @@ export default function MyNFTsPage() {
   const account = useActiveAccount()
   const { favorites } = useFavorites()
   const { getCurrentBid, getBidCount, getAuctionStatus, refreshAuctionBid } = useMarketplaceEvents()
+  const { bids: userBids, isLoading: isLoadingBids, refresh: refreshBids } = useUserBids()
 
   useEffect(() => {
     // Set active tab from URL parameter if available
@@ -82,35 +79,8 @@ export default function MyNFTsPage() {
     loadMetadata();
   }, []);
 
-  useEffect(() => {
-    const loadUserData = async () => {
-      if (!account?.address) {
-        setBidsPlacedNFTs([]);
-        setIsLoading(false);
-        return;
-      }
-
-      // Wait for imageUrlMap to be loaded before processing
-      if (Object.keys(imageUrlMap).length === 0) {
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        setIsLoading(true);
-        
-        // Fetch user's active bids using the efficient approach
-        await fetchUserBids(account.address);
-        
-      } catch (error) {
-        console.error("Error loading user data:", error);
-        setBidsPlacedNFTs([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadUserData();
-  }, [account?.address, imageUrlMap])
+  // Set loading state based on hook and metadata loading
+  const isLoading = isLoadingBids || Object.keys(imageUrlMap).length === 0;
 
   // Listen for marketplace events and refresh data
   useEffect(() => {
@@ -132,43 +102,30 @@ export default function MyNFTsPage() {
   // Refresh all user data (called when events occur)
   const refreshUserData = async () => {
     if (!account?.address) return;
-    await fetchUserBids(account.address);
+    refreshBids();
   };
 
 
-  // Fetch user's active bids efficiently using getAllValidAuctions in batches
-  const fetchUserBids = async (userAddress: string) => {
-    try {
-      setIsLoadingBids(true);
-      
-      // Use Insight API for efficient data fetching
-      // This replaces the expensive 7,799 RPC calls with a single API call
-      const winningBids = await getCurrentWinningBids(userAddress);
-      
-      const userBids: BidNFT[] = winningBids.map((bid) => {
-        const tokenId = bid.tokenId;
-        const metadata = allMetadata[parseInt(tokenId)] || {};
-        
-        return {
-          id: bid.auctionId,
-          name: metadata.name || `Satoshe Slugger #${parseInt(tokenId) + 1}`,
-          image: imageUrlMap[tokenId] || "/placeholder-nft.webp",
-          price: "0", // We'll need to fetch buyout price separately if needed
-          yourBid: (Number(bid.bidAmount) / 1e18).toFixed(6),
-          rarity: metadata.rarity_tier || "Unknown",
-          auctionId: bid.auctionId,
-        };
-      });
-      
-      setBidsPlacedNFTs(userBids);
-      setIsLoadingBids(false);
-      
-    } catch (error) {
-      console.error("Error fetching user bids:", error);
-      setBidsPlacedNFTs([]);
-      setIsLoadingBids(false);
-    }
-  };
+  // Convert user bids from hook to BidNFT format for display
+  const bidsPlacedNFTs: BidNFT[] = userBids.map((bid) => {
+    const tokenId = bid.tokenId;
+    const metadata = allMetadata[parseInt(tokenId)] || {};
+    
+    // Use auction data for buyout price if available
+    const buyoutPrice = bid.auctionData?.data.buyoutBid 
+      ? (Number(bid.auctionData.data.buyoutBid) / 1e18).toFixed(6)
+      : "0";
+    
+    return {
+      id: bid.auctionId,
+      name: metadata.name || `Satoshe Slugger #${parseInt(tokenId) + 1}`,
+      image: imageUrlMap[tokenId] || "/placeholder-nft.webp",
+      price: buyoutPrice,
+      yourBid: (Number(bid.bidAmount) / 1e18).toFixed(6),
+      rarity: metadata.rarity_tier || "Unknown",
+      auctionId: bid.auctionId,
+    };
+  });
 
   // Handle increasing bid
   const handleIncreaseBid = async (auctionId: string, currentBid: string) => {
@@ -197,9 +154,7 @@ export default function MyNFTsPage() {
       alert("Bid increased successfully!");
       
       // Refresh the bids data
-      if (account.address) {
-        await fetchUserBids(account.address);
-      }
+      refreshBids();
       
       // Clear the input
       setBidAmounts(prev => ({ ...prev, [auctionId]: "" }));
