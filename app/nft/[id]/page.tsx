@@ -740,7 +740,7 @@ export default function NFTDetailPage() {
             {/* Price Information */}
             <div className="grid grid-cols-3 gap-3 sm:gap-4">
               <div className="bg-neutral-800 p-3 sm:p-4 rounded border border-neutral-700">
-                <p className="text-xs sm:text-sm mb-1" style={{ color: "#fffbeb" }}>Starting Price</p>
+                <p className="text-neutral-400 text-xs sm:text-sm mb-1">Starting Price</p>
                 <p className="text-sm sm:text-base font-semibold" style={{ color: "#fffbeb" }}>
                   {tierPricing.start} ETH
                 </p>
