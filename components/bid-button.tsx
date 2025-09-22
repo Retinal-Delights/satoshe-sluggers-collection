@@ -168,8 +168,8 @@ export function BidButton({
           onError={onError}
           disabled={!bidAmount || isInvalidBid}
           className="w-full h-8 text-sm font-medium"
-          style={{ color: "#fffbeb" }}
           style={{ 
+            color: "#fffbeb",
             backgroundColor: "#10B981",
             borderRadius: "4px"
           }}

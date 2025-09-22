@@ -33,8 +33,8 @@ export function BuyButton({
       onTransactionConfirmed={onSuccess}
       onError={onError}
       className={`w-full h-8 text-sm font-medium ${className || ""}`}
-      style={{ color: "#fffbeb" }}
       style={{ 
+        color: "#fffbeb",
         backgroundColor: "#3B82F6",
         borderRadius: "4px"
       }}

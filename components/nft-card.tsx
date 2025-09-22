@@ -474,7 +474,7 @@ export default function NFTCard({
                           alert(`NFT purchased successfully for ${buyNow.replace(' ETH', '')} ETH!`);
                         } catch (error) {
                           console.error(`[Buy Now] Error in buy now flow for token ${tokenId}:`, error);
-                          alert(error.message || "Failed to buy NFT. Please try again.");
+                          alert(error instanceof Error ? error.message : "Failed to buy NFT. Please try again.");
                         }
                       }}
                       className="px-3 text-xs md:text-sm font-black border rounded"

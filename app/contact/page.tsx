@@ -111,8 +111,8 @@ export default function ContactPage() {
               <Button
                 onClick={() => setSubmitted(false)}
                 className="py-3 px-6 text-base font-medium focus:ring-4 transition-colors"
-                style={{ color: "#fffbeb" }}
                 style={{
+                  color: "#fffbeb",
                   backgroundColor: "#FF0099",
                   borderColor: "#FF0099"
                 }}
@@ -286,8 +286,8 @@ export default function ContactPage() {
                   type="submit"
                   disabled={isSubmitting}
                   className="py-3 px-8 text-lg font-medium focus:ring-4 transition-colors"
-                  style={{ color: "#fffbeb" }}
                   style={{
+                    color: "#fffbeb",
                     backgroundColor: "#FF0099",
                     borderColor: "#FF0099"
                   }}
