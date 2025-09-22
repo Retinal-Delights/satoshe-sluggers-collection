@@ -15,7 +15,8 @@ import { Heart } from "lucide-react"
 import { Insight } from "thirdweb"
 import { base } from "thirdweb/chains"
 import { nftCollection, marketplace } from "@/lib/contracts"
-import { getWinningBid, getAllAuctions } from "thirdweb/extensions/marketplace"
+import { getWinningBid, getAllAuctions, bidInAuction } from "thirdweb/extensions/marketplace"
+import { sendTransaction } from "thirdweb"
 
 // Types for NFT data
 interface ListedNFT {
@@ -36,6 +37,7 @@ interface BidNFT {
   price: string;
   yourBid: string;
   rarity: string;
+  auctionId?: string;
 }
 
 export default function MyNFTsPage() {
@@ -51,6 +53,8 @@ export default function MyNFTsPage() {
   const [ownedNFTs, setOwnedNFTs] = useState<any[]>([])
   const [allMetadata, setAllMetadata] = useState<any[]>([])
   const [imageUrlMap, setImageUrlMap] = useState<{ [tokenId: string]: string }>({})
+  const [bidAmounts, setBidAmounts] = useState<{ [auctionId: string]: string }>({})
+  const [isIncreasingBid, setIsIncreasingBid] = useState<{ [auctionId: string]: boolean }>({})
 
   const account = useActiveAccount()
   const { favorites } = useFavorites()
@@ -304,6 +308,7 @@ export default function MyNFTsPage() {
                 price: auction.buyoutBidAmount ? (Number(auction.buyoutBidAmount) / 1e18).toString() : "0",
                 yourBid: winningBid.bidAmountWei ? (Number(winningBid.bidAmountWei) / 1e18).toString() : "0",
                 rarity: metadata.rarity_tier || "common",
+                auctionId: auction.id.toString(),
               });
             }
           }
@@ -316,6 +321,47 @@ export default function MyNFTsPage() {
     } catch (error) {
       console.error("Error fetching user bids:", error);
       setBidsPlacedNFTs([]);
+    }
+  };
+
+  // Handle increasing bid
+  const handleIncreaseBid = async (auctionId: string, currentBid: string) => {
+    if (!account) {
+      alert("Please connect your wallet first");
+      return;
+    }
+
+    const newBidAmount = bidAmounts[auctionId];
+    if (!newBidAmount || parseFloat(newBidAmount) <= parseFloat(currentBid)) {
+      alert("New bid amount must be higher than current bid");
+      return;
+    }
+
+    try {
+      setIsIncreasingBid(prev => ({ ...prev, [auctionId]: true }));
+
+      const transaction = bidInAuction({
+        contract: marketplace,
+        auctionId: BigInt(auctionId),
+        bidAmount: (parseFloat(newBidAmount) * 1e18).toString(),
+      });
+
+      await sendTransaction({ transaction, account });
+      
+      alert("Bid increased successfully!");
+      
+      // Refresh the bids data
+      if (account.address) {
+        await fetchUserBids(account.address);
+      }
+      
+      // Clear the input
+      setBidAmounts(prev => ({ ...prev, [auctionId]: "" }));
+    } catch (error) {
+      console.error("Error increasing bid:", error);
+      alert("Failed to increase bid. Please try again.");
+    } finally {
+      setIsIncreasingBid(prev => ({ ...prev, [auctionId]: false }));
     }
   };
 
@@ -556,13 +602,36 @@ export default function MyNFTsPage() {
                   )}
 
                   {activeTab === "bids" && (
-                    <Button
-                      variant="outline"
-                      className="w-full text-sm py-2 border-blue-500 text-blue-500 hover:bg-blue-500/10"
-                      onClick={() => {/* TODO: Implement increase bid functionality */}}
-                    >
-                      Increase Bid
-                    </Button>
+                    <div className="space-y-3">
+                      <div className="flex gap-2">
+                        <input
+                          type="number"
+                          step="0.001"
+                          min={parseFloat((nft as BidNFT).yourBid) + 0.001}
+                          placeholder={`Min: ${(parseFloat((nft as BidNFT).yourBid) + 0.001).toFixed(3)} ETH`}
+                          value={bidAmounts[(nft as BidNFT).auctionId || nft.id] || ""}
+                          onChange={(e) => setBidAmounts(prev => ({ ...prev, [(nft as BidNFT).auctionId || nft.id]: e.target.value }))}
+                          className="flex-1 px-3 py-2 text-sm border border-neutral-600 rounded bg-neutral-800 text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          style={{ color: "#fffbeb" }}
+                        />
+                        <Button
+                          onClick={() => handleIncreaseBid((nft as BidNFT).auctionId || nft.id, (nft as BidNFT).yourBid)}
+                          disabled={isIncreasingBid[(nft as BidNFT).auctionId || nft.id] || !bidAmounts[(nft as BidNFT).auctionId || nft.id]}
+                          className="px-4 py-2 text-sm bg-blue-500 hover:bg-blue-600 disabled:bg-neutral-600 disabled:cursor-not-allowed"
+                          style={{ color: "#fffbeb" }}
+                        >
+                          {isIncreasingBid[(nft as BidNFT).auctionId || nft.id] ? "..." : "Increase"}
+                        </Button>
+                      </div>
+                      <Button
+                        onClick={() => router.push(`/nft/${(nft as BidNFT).id}`)}
+                        variant="outline"
+                        className="w-full text-sm py-2 border-neutral-600 text-neutral-400 hover:bg-neutral-700"
+                        style={{ color: "#fffbeb" }}
+                      >
+                        View Auction
+                      </Button>
+                    </div>
                   )}
                 </div>
               </div>
