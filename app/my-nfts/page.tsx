@@ -358,7 +358,7 @@ export default function MyNFTsPage() {
         {/* Header with title */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold mb-1">My NFTs</h1>
+            <h1 className="text-2xl font-bold mb-1" style={{ color: "#fffbeb" }}>My NFTs</h1>
             <p className="text-neutral-400 text-sm">Manage your Satoshe Sluggers collection</p>
           </div>
         </div>
