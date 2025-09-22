@@ -598,7 +598,7 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, selectedFilters,
                 style={{ color: "#fffbeb" }}
               >
                 BaseScan
-                <ExternalLink className="h-3 w-3" />
+                <ExternalLink className="h-3 w-3" style={{ color: "#fffbeb" }} />
               </button>
               <button
                 onClick={() => window.open('https://base.blockscout.com/address/0xF0f26455b9869d4A788191f6AEdc78410731072C', '_blank')}
@@ -606,7 +606,7 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, selectedFilters,
                 style={{ color: "#fffbeb" }}
               >
                 Blockscout
-                <ExternalLink className="h-3 w-3" />
+                <ExternalLink className="h-3 w-3" style={{ color: "#fffbeb" }} />
               </button>
             </div>
           </div>
@@ -620,7 +620,7 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, selectedFilters,
                 style={{ color: "#fffbeb" }}
               >
                 BaseScan
-                <ExternalLink className="h-3 w-3" />
+                <ExternalLink className="h-3 w-3" style={{ color: "#fffbeb" }} />
               </button>
               <button
                 onClick={() => window.open('https://base.blockscout.com/address/0xE3f1694adCe46ffcF82D15dd88859147c72f7C5a', '_blank')}
@@ -628,7 +628,7 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, selectedFilters,
                 style={{ color: "#fffbeb" }}
               >
                 Blockscout
-                <ExternalLink className="h-3 w-3" />
+                <ExternalLink className="h-3 w-3" style={{ color: "#fffbeb" }} />
               </button>
             </div>
           </div>
