@@ -810,7 +810,7 @@ export default function NFTDetailPage() {
                 <p className="text-neutral-400 text-sm mb-2">Artist</p>
                 <div className="flex items-center">
                   <Image
-                    src="/icons/artist-logo-kristen-woerdeman-26px.png"
+                    src="/icons/artist-logo-kristen-woerdeman-26px-off-white.svg"
                     alt="Kristen Woerdeman"
                     width={26}
                     height={26}
@@ -823,7 +823,7 @@ export default function NFTDetailPage() {
                 <p className="text-neutral-400 text-sm mb-2">Platform</p>
                 <div className="flex items-center">
                   <Image
-                    src="/icons/platform-logo-retinal-delights-26px.png"
+                    src="/icons/platform-logo-retinal-delights-26px-off-white.svg"
                     alt="Retinal Delights"
                     width={26}
                     height={26}
