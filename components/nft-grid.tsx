@@ -563,6 +563,10 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
           const allAuctionIds = mappedNFTs.map(nft => nft.auctionId).filter(id => id !== 0n).slice(0, 20);
           console.log(`[NFT Grid] Sample auction IDs from contract:`, allAuctionIds);
           
+          // Debug: Check for high auction IDs (7777+)
+          const highAuctionIds = mappedNFTs.map(nft => nft.auctionId).filter(id => id >= 7777n);
+          console.log(`[NFT Grid] High auction IDs (7777+):`, highAuctionIds);
+          
           // Debug: Check for relisted NFTs specifically
           const relistedTokenIds = [5366, 5372, 5373, 5374, 5375, 486, 1019, 0, 1515, 506, 2610, 3610, 59];
           const relistedNFTs = mappedNFTs.filter(nft => relistedTokenIds.includes(Number(nft.tokenId)));
