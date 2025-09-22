@@ -79,7 +79,15 @@ export default function PixelsTransition() {
       if (isHash || newTab || download) return;
 
       e.preventDefault();
+      e.stopPropagation();
       setIsTransitioning(true);
+
+      // Hide the current page content immediately
+      const main = document.querySelector('main');
+      if (main) {
+        main.style.opacity = '0';
+        main.style.transition = 'opacity 0.1s ease-out';
+      }
 
       // Show grid and animate out - solid squares
       gsap.set(grid, { display: "grid" });
