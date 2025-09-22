@@ -989,7 +989,7 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
       <div className="w-full max-w-full">
         <div className="mb-6">
           <div className="mb-4">
-            <h2 className="text-lg font-medium">NFT Collection</h2>
+            <h2 className="text-lg font-medium" style={{ color: "#fffbeb" }}>NFT Collection</h2>
             <div className="text-sm font-medium text-brand-pink mt-1">Loading...</div>
           </div>
         </div>
@@ -1018,7 +1018,7 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
     <div className="w-full max-w-full">
       <div className="mb-6">
         <div className="mb-4">
-          <h2 className="text-lg font-medium">
+          <h2 className="text-lg font-medium" style={{ color: "#fffbeb" }}>
             NFT Collection
           </h2>
           {filteredNFTs.length > 0 && (
@@ -1070,7 +1070,7 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
                 setSortBy(value);
               }}
             >
-              <SelectTrigger className="w-[180px] h-9 text-sm rounded">
+              <SelectTrigger className="w-[180px] h-9 text-sm rounded" style={{ color: "#fffbeb" }}>
                 <SelectValue placeholder="Default" />
               </SelectTrigger>
               <SelectContent className="text-sm rounded">
@@ -1100,7 +1100,7 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
                 setItemsPerPage(newValue);
               }}
             >
-              <SelectTrigger className="w-[110px] h-9 text-sm rounded">
+              <SelectTrigger className="w-[110px] h-9 text-sm rounded" style={{ color: "#fffbeb" }}>
                 <SelectValue placeholder="12 items" />
               </SelectTrigger>
               <SelectContent className="text-sm rounded">
