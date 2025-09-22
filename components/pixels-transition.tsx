@@ -90,7 +90,12 @@ export default function PixelsTransition() {
       }
 
       // Show grid and animate out - solid squares
-      gsap.set(grid, { display: "grid" });
+      gsap.set(grid, { 
+        display: "grid", 
+        zIndex: 99999,
+        background: "#ff0099"
+      });
+      
       gsap.fromTo(cells, { opacity: 0 }, {
         opacity: 1,
         duration: 0.001,
@@ -100,7 +105,14 @@ export default function PixelsTransition() {
           grid: [COLS, ROWS],
         },
         onComplete: () => {
-          // Navigate after animation completes
+          // Ensure grid stays visible and covers everything
+          gsap.set(grid, { 
+            zIndex: 99999,
+            background: "#ff0099",
+            display: "grid"
+          });
+          
+          // Navigate immediately after animation completes
           window.location.href = href;
         }
       });
@@ -118,10 +130,11 @@ export default function PixelsTransition() {
           inset:0; 
           display:grid; 
           gap:0; 
-          z-index:9999; 
+          z-index:99999; 
           pointer-events:none;
           grid-template-columns:repeat(12,1fr);
           grid-template-rows:repeat(8,1fr);
+          background: #ff0099;
         }
         @media (max-width:768px){
           .load-grid{ 
