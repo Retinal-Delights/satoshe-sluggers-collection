@@ -375,7 +375,8 @@ export default function MyNFTsPage() {
             </p>
             <Button 
               onClick={() => router.push("/nfts")} 
-              className="bg-brand-pink hover:bg-brand-pink-hover text-white transition-colors"
+              className="bg-brand-pink hover:bg-brand-pink-hover transition-colors"
+              style={{ color: "#fffbeb" }}
             >
               Browse All NFTs
             </Button>
@@ -403,26 +404,30 @@ export default function MyNFTsPage() {
         <div className="mb-6">
           <div className="flex border-b border-neutral-700">
             <button
-              className={`py-2 px-4 ${activeTab === "owned" ? "border-b-2 border-brand-pink text-white font-medium" : "text-neutral-400 hover:text-[#ff0099]"} transition-colors`}
+              className={`py-2 px-4 ${activeTab === "owned" ? "border-b-2 border-brand-pink font-medium" : "text-neutral-400 hover:text-[#ff0099]"} transition-colors`}
+              style={activeTab === "owned" ? { color: "#fffbeb" } : {}}
               onClick={() => setActiveTab("owned")}
             >
               Owned ({ownedNFTs?.length || 0})
             </button>
             <button
-              className={`py-2 px-4 ${activeTab === "listed" ? "border-b-2 border-brand-pink text-white font-medium" : "text-neutral-400 hover:text-[#ff0099]"} transition-colors`}
+              className={`py-2 px-4 ${activeTab === "listed" ? "border-b-2 border-brand-pink font-medium" : "text-neutral-400 hover:text-[#ff0099]"} transition-colors`}
+              style={activeTab === "listed" ? { color: "#fffbeb" } : {}}
               onClick={() => setActiveTab("listed")}
             >
               Listed ({listedNFTs.length})
             </button>
             <button
-              className={`py-2 px-4 flex items-center gap-2 ${activeTab === "favorites" ? "border-b-2 border-brand-pink text-white font-medium" : "text-neutral-400 hover:text-[#ff0099]"} transition-colors`}
+              className={`py-2 px-4 flex items-center gap-2 ${activeTab === "favorites" ? "border-b-2 border-brand-pink font-medium" : "text-neutral-400 hover:text-[#ff0099]"} transition-colors`}
+              style={activeTab === "favorites" ? { color: "#fffbeb" } : {}}
               onClick={() => setActiveTab("favorites")}
             >
               <Heart className={`w-4 h-4 ${activeTab === "favorites" ? "fill-brand-pink text-brand-pink" : ""}`} />
               Favorites ({favorites.length})
             </button>
             <button
-              className={`py-2 px-4 ${activeTab === "bids" ? "border-b-2 border-brand-pink text-white font-medium" : "text-neutral-400 hover:text-[#ff0099]"} transition-colors`}
+              className={`py-2 px-4 ${activeTab === "bids" ? "border-b-2 border-brand-pink font-medium" : "text-neutral-400 hover:text-[#ff0099]"} transition-colors`}
+              style={activeTab === "bids" ? { color: "#fffbeb" } : {}}
               onClick={() => setActiveTab("bids")}
             >
               Bids Placed ({bidsPlacedNFTs.length})
@@ -440,7 +445,7 @@ export default function MyNFTsPage() {
               }
             </p>
             {(activeTab === "owned" || activeTab === "favorites") && (
-              <Button onClick={() => router.push("/nfts")} className="bg-brand-pink hover:bg-brand-pink-hover text-white transition-colors">
+              <Button onClick={() => router.push("/nfts")} className="bg-brand-pink hover:bg-brand-pink-hover transition-colors" style={{ color: "#fffbeb" }}>
                 Browse NFTs
               </Button>
             )}
@@ -514,7 +519,8 @@ export default function MyNFTsPage() {
                   {activeTab === "owned" && !(nft as ListedNFT).isListed && (
                     <Button
                       onClick={() => handleListForSale(nft.id)}
-                      className="w-full bg-brand-pink hover:bg-brand-pink-hover text-white text-sm py-2 transition-colors"
+                      className="w-full bg-brand-pink hover:bg-brand-pink-hover text-sm py-2 transition-colors"
+                      style={{ color: "#fffbeb" }}
                     >
                       List for Sale
                     </Button>
@@ -523,7 +529,8 @@ export default function MyNFTsPage() {
                   {activeTab === "favorites" && (
                     <Button
                       onClick={() => router.push(`/nft/${nft.id}`)}
-                      className="w-full bg-brand-pink hover:bg-brand-pink-hover text-white text-sm py-2 transition-colors"
+                      className="w-full bg-brand-pink hover:bg-brand-pink-hover text-sm py-2 transition-colors"
+                      style={{ color: "#fffbeb" }}
                     >
                       View on Marketplace
                     </Button>
@@ -540,7 +547,8 @@ export default function MyNFTsPage() {
                       </Button>
                       <Button
                         onClick={() => handleListForSale(nft.id)}
-                        className="w-full bg-blue-500 hover:bg-blue-600 text-white text-sm py-2"
+                        className="w-full bg-blue-500 hover:bg-blue-600 text-sm py-2"
+                        style={{ color: "#fffbeb" }}
                       >
                         Update Listing
                       </Button>

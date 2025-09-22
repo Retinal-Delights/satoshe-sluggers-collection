@@ -401,7 +401,8 @@ export default function NFTCard({
                         console.error("Bid failed:", error);
                         alert(error.message || "Failed to place bid. Please try again.");
                       }}
-                      className="px-3 text-xs md:text-sm font-bold text-white border rounded"
+                      className="px-3 text-xs md:text-sm font-bold border rounded"
+                      style={{ color: "#fffbeb" }}
                       style={{ 
                         height: "32px",
                         backgroundColor: "#10B981",
@@ -443,7 +444,8 @@ export default function NFTCard({
                         console.error("Buy now failed:", error);
                         alert(error.message || "Failed to buy NFT. Please try again.");
                       }}
-                      className="px-3 text-xs md:text-sm font-bold text-white border rounded"
+                      className="px-3 text-xs md:text-sm font-bold border rounded"
+                      style={{ color: "#fffbeb" }}
                       style={{ 
                         height: "32px",
                         backgroundColor: "#3B82F6",

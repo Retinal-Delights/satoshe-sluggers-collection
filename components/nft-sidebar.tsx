@@ -272,7 +272,8 @@ function RarityTiersCategory({ title, color, icon, selected = [], onChange, trai
     <div className={`${isOpen ? 'pt-3 pb-3' : 'pt-1'}`}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between text-neutral-100 py-2 focus:outline-none ${isOpen ? `border-b-4 border-orange-500 pb-2` : ''}`}
+        className={`w-full flex items-center justify-between py-2 focus:outline-none ${isOpen ? `border-b-4 border-orange-500 pb-2` : ''}`}
+        style={{ color: "#fffbeb" }}
         aria-expanded={isOpen}
       >
         <div className="flex items-center gap-2">

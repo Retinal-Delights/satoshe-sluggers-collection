@@ -45,7 +45,8 @@ export default function SellPage() {
                 </div>
                 <Button
                   onClick={navigateToMyNFTs}
-                  className="relative z-10 text-base px-6 py-3 font-medium text-brand-pink border-brand-pink border-2 hover:text-white hover:border-brand-pink hover:bg-brand-pink transition-all duration-300 shadow-[0_0_15px_rgba(255,0,153,0.5)] hover:shadow-[0_0_25px_rgba(255,0,153,0.7)] bg-neutral-900/80 rounded"
+                  className="relative z-10 text-base px-6 py-3 font-medium text-brand-pink border-brand-pink border-2 hover:border-brand-pink hover:bg-brand-pink transition-all duration-300 shadow-[0_0_15px_rgba(255,0,153,0.5)] hover:shadow-[0_0_25px_rgba(255,0,153,0.7)] bg-neutral-900/80 rounded"
+                  style={{ color: "#fffbeb" }}
                 >
                   View My NFTs
                 </Button>

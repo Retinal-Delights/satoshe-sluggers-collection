@@ -374,13 +374,15 @@ export default function ListNFTPage() {
 
               <Button
                 type="submit"
-                className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+                className="w-full bg-blue-500 hover:bg-blue-600"
+                style={{ color: "#fffbeb" }}
                 disabled={isSubmitting || !account?.address}
               >
                 {isSubmitting ? (
                   <>
                     <svg
-                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                      className="animate-spin -ml-1 mr-2 h-4 w-4"
+                      style={{ color: "#fffbeb" }}
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"

@@ -851,7 +851,7 @@ export default function NFTDetailPage() {
                 </div>
                 <div>
                   <span className="text-neutral-400">Time Remaining:</span>
-                  <p className="font-semibold text-white">
+                  <p className="font-semibold" style={{ color: "#fffbeb" }}>
                     {isLoadingAuction ? "Loading..." : timeRemaining || "No active auction"}
                   </p>
                 </div>
@@ -866,7 +866,7 @@ export default function NFTDetailPage() {
                   <label htmlFor="bid-amount" className="text-sm font-medium" style={{ color: COLORS.hair }}>
                     Place Your Bid
                   </label>
-                  <div className="text-sm text-white">
+                  <div className="text-sm" style={{ color: "#fffbeb" }}>
                     {bidCount} bid{bidCount !== 1 ? 's' : ''} placed
                   </div>
                 </div>
@@ -912,7 +912,8 @@ export default function NFTDetailPage() {
                       console.error("Bid failed:", error);
                       alert(error.message || "Failed to place bid. Please try again.");
                     }}
-                    className="w-32 px-6 h-10 font-bold text-white transition-colors duration-300 ease-in-out focus:ring-2 focus:ring-offset-2 hover:bg-emerald-600 rounded"
+                    className="w-32 px-6 h-10 font-bold transition-colors duration-300 ease-in-out focus:ring-2 focus:ring-offset-2 hover:bg-emerald-600 rounded"
+                    style={{ color: "#fffbeb" }}
                     style={{
                       backgroundColor: COLORS.hair,
                       borderColor: COLORS.hair,
@@ -948,7 +949,8 @@ export default function NFTDetailPage() {
                       console.error("Buy now failed:", error);
                       alert(error.message || "Failed to buy NFT. Please try again.");
                     }}
-                    className="w-32 px-6 h-10 font-bold text-white transition-colors duration-300 ease-in-out focus:ring-2 focus:ring-offset-2 hover:bg-blue-600 rounded"
+                    className="w-32 px-6 h-10 font-bold transition-colors duration-300 ease-in-out focus:ring-2 focus:ring-offset-2 hover:bg-blue-600 rounded"
+                    style={{ color: "#fffbeb" }}
                     style={{
                       backgroundColor: COLORS.background,
                       borderColor: COLORS.background,

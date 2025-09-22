@@ -167,7 +167,8 @@ export function BidButton({
           onTransactionConfirmed={onSuccess}
           onError={onError}
           disabled={!bidAmount || isInvalidBid}
-          className="w-full h-8 text-sm font-medium text-white"
+          className="w-full h-8 text-sm font-medium"
+          style={{ color: "#fffbeb" }}
           style={{ 
             backgroundColor: "#10B981",
             borderRadius: "4px"

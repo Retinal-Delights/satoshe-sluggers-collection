@@ -110,7 +110,8 @@ export default function ContactPage() {
               <p className="text-neutral-300 mb-6">Thank you for reaching out. We'll get back to you as soon as possible.</p>
               <Button
                 onClick={() => setSubmitted(false)}
-                className="text-white py-3 px-6 text-base font-medium focus:ring-4 transition-colors"
+                className="py-3 px-6 text-base font-medium focus:ring-4 transition-colors"
+                style={{ color: "#fffbeb" }}
                 style={{
                   backgroundColor: "#FF0099",
                   borderColor: "#FF0099"
@@ -284,7 +285,8 @@ export default function ContactPage() {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="text-white py-3 px-8 text-lg font-medium focus:ring-4 transition-colors"
+                  className="py-3 px-8 text-lg font-medium focus:ring-4 transition-colors"
+                  style={{ color: "#fffbeb" }}
                   style={{
                     backgroundColor: "#FF0099",
                     borderColor: "#FF0099"
@@ -296,7 +298,8 @@ export default function ContactPage() {
                   {isSubmitting ? (
                     <>
                       <svg
-                        className="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
+                        className="animate-spin -ml-1 mr-2 h-5 w-5"
+                        style={{ color: "#fffbeb" }}
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
