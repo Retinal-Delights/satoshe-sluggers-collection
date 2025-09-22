@@ -828,10 +828,10 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
       nft.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       nft.tokenId.toString().includes(searchTerm);
 
-  // View filter (Live vs Sold) - exclude cancelled listings from both tabs
+  // View filter (Live vs Sold) - exclude cancelled listings and NFTs without auctions from both tabs
   const matchesView = activeView === "forSale" 
     ? nft.isForSale 
-    : !nft.isForSale && !nft.isCancelled;
+    : !nft.isForSale && !nft.isCancelled && nft.auctionId !== 0n;
     
   // Debug logging for sold tab
   if (activeView === "sold" && !nft.isForSale) {
