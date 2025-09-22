@@ -150,7 +150,7 @@ export default function AttributeRarityChart({ attributes, overallRarity }: Attr
                 className="w-3 h-3 rounded-full flex-shrink-0"
                 style={{ backgroundColor: item.fill }}
               />
-              <span className="text-neutral-300 font-medium">
+              <span className="font-medium" style={{ color: "#fffbeb" }}>
                 {item.name}, {item.value}, {item.percentage}%
               </span>
             </div>

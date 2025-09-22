@@ -1036,7 +1036,7 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
               className={`px-3 py-1 text-sm rounded transition-colors ${
                 activeView === "forSale"
                   ? "bg-brand-pink text-white"
-                  : "text-neutral-300 hover:text-[#ff0099]"
+                  : "hover:text-[#ff0099]"
               }`}
               onClick={() => setActiveView("forSale")}
             >
@@ -1046,7 +1046,7 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
               className={`px-3 py-1 text-sm rounded transition-colors ${
                 activeView === "sold"
                   ? "bg-brand-pink text-white"
-                  : "text-neutral-300 hover:text-[#ff0099]"
+                  : "hover:text-[#ff0099]"
               }`}
               onClick={() => setActiveView("sold")}
             >
@@ -1055,7 +1055,7 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
           </div>
           <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-neutral-500 w-16 flex-shrink-0 sm:w-16">
+            <span className="text-sm w-16 flex-shrink-0 sm:w-16" style={{ color: "#fffbeb" }}>
               Sort by:
             </span>
             <Select
@@ -1084,7 +1084,7 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
             </Select>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-neutral-500 w-12 flex-shrink-0 sm:w-12">
+            <span className="text-sm w-12 flex-shrink-0 sm:w-12" style={{ color: "#fffbeb" }}>
               Show:
             </span>
             <Select
@@ -1154,7 +1154,7 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
         </div>
       ) : (
         <div className="text-center py-12">
-          <div className="text-neutral-400 text-lg mb-2">No NFTs found</div>
+          <div className="text-lg mb-2" style={{ color: "#fffbeb" }}>No NFTs found</div>
           <div className="text-neutral-500 text-sm">
             {searchTerm
               ? `No NFTs match "${searchTerm}"`

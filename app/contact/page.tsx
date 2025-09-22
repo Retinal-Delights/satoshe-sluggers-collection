@@ -77,10 +77,10 @@ export default function ContactPage() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 flex-grow" role="main" aria-labelledby="contact-heading">
         <div className="text-center mb-6 sm:mb-8">
-          <h1 id="contact-heading" className="text-2xl sm:text-3xl font-bold mb-3 text-neutral-100">
+          <h1 id="contact-heading" className="text-2xl sm:text-3xl font-bold mb-3" style={{ color: "#fffbeb" }}>
             CONTACT US
           </h1>
-          <p className="text-neutral-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed px-4">
+          <p className="text-base sm:text-lg max-w-2xl mx-auto leading-relaxed px-4" style={{ color: "#fffbeb" }}>
             Reach out with questions, feedback, or press inquiries.
           </p>
         </div>
@@ -107,7 +107,7 @@ export default function ContactPage() {
               <h2 id="submission-status" className="text-xl font-bold mb-2">
                 Message Sent!
               </h2>
-              <p className="text-neutral-300 mb-6">Thank you for reaching out. We'll get back to you as soon as possible.</p>
+              <p className="mb-6" style={{ color: "#fffbeb" }}>Thank you for reaching out. We'll get back to you as soon as possible.</p>
               <Button
                 onClick={() => setSubmitted(false)}
                 className="py-3 px-6 text-base font-medium focus:ring-4 transition-colors"
@@ -129,7 +129,7 @@ export default function ContactPage() {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label htmlFor="name" className="block text-base font-medium text-neutral-200">
+                  <label htmlFor="name" className="block text-base font-medium" style={{ color: "#fffbeb" }}>
                     Name{" "}
                     <span style={{ color: "#FF0099" }} aria-hidden="true">
                       *
@@ -154,7 +154,7 @@ export default function ContactPage() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="email" className="block text-base font-medium text-neutral-200">
+                  <label htmlFor="email" className="block text-base font-medium" style={{ color: "#fffbeb" }}>
                     Email{" "}
                     <span style={{ color: "#FF0099" }} aria-hidden="true">
                       *
@@ -182,7 +182,7 @@ export default function ContactPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <label htmlFor="subject" className="block text-base font-medium text-neutral-200">
+                <label htmlFor="subject" className="block text-base font-medium" style={{ color: "#fffbeb" }}>
                   Subject{" "}
                   <span style={{ color: "#FF0099" }} aria-hidden="true">
                     *
@@ -207,7 +207,7 @@ export default function ContactPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <label htmlFor="message" className="block text-base font-medium text-neutral-200">
+                <label htmlFor="message" className="block text-base font-medium" style={{ color: "#fffbeb" }}>
                   Message{" "}
                   <span style={{ color: "#FF0099" }} aria-hidden="true">
                     *
@@ -246,7 +246,7 @@ export default function ContactPage() {
                   required
                   aria-required="true"
                 />
-                <Label htmlFor="terms" className="cursor-pointer text-base text-neutral-200" id="terms-desc">
+                <Label htmlFor="terms" className="cursor-pointer text-base" id="terms-desc" style={{ color: "#fffbeb" }}>
                   I accept the{" "}
                   <a
                     href="https://app.termly.io/policy-viewer/policy.html?policyUUID=3267dd16-a550-4879-8bf0-d03877fe1938"
