@@ -102,9 +102,9 @@ export default function ScrollButtons() {
         aria-label={isAtTop ? "Scroll to bottom" : "Scroll to top"}
       >
         {isAtTop ? (
-          <ArrowDown className="h-7 w-7" style={{ color: "#fffbeb" }} />
+          <ArrowDown className="h-7 w-7" style={{ color: "#fffbeb" }} strokeWidth={2.5} />
         ) : (
-          <ArrowUp className="h-7 w-7" style={{ color: "#fffbeb" }} />
+          <ArrowUp className="h-7 w-7" style={{ color: "#fffbeb" }} strokeWidth={2.5} />
         )}
       </Button>
     </div>

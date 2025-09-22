@@ -442,7 +442,6 @@ export default function NFTCard({
                         }
                         
                         try {
-                          console.log(`[Buy Now] Starting purchase for token ${tokenId}, auction ${auctionId}`);
                           const tx = buyoutAuction({
                             contract: marketplace,
                             auctionId: BigInt(auctionId),
@@ -451,7 +450,6 @@ export default function NFTCard({
                           await new Promise((resolve, reject) => {
                             sendBuyout(tx, {
                               onSuccess: () => {
-                                console.log(`[Buy Now] Transaction successful for token ${tokenId}`);
                                 // Track buy now action
                                 track('NFT Buy Now Clicked', {
                                   tokenId,
@@ -470,7 +468,6 @@ export default function NFTCard({
                             });
                           });
                           
-                          console.log(`[Buy Now] Purchase completed successfully for token ${tokenId}`);
                           alert(`NFT purchased successfully for ${buyNow.replace(' ETH', '')} ETH!`);
                         } catch (error) {
                           console.error(`[Buy Now] Error in buy now flow for token ${tokenId}:`, error);

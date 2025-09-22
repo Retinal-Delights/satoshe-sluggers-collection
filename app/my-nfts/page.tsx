@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -16,7 +16,8 @@ import { Insight } from "thirdweb"
 import { base } from "thirdweb/chains"
 import { nftCollection, marketplace } from "@/lib/contracts"
 import { getWinningBid, getAllAuctions, bidInAuction } from "thirdweb/extensions/marketplace"
-import { sendTransaction } from "thirdweb"
+import { sendTransaction, readContract } from "thirdweb"
+import { ownerOf } from "thirdweb/extensions/erc721"
 
 // Types for NFT data
 interface BidNFT {
@@ -36,6 +37,7 @@ export default function MyNFTsPage() {
 
   const [activeTab, setActiveTab] = useState(tabParam || "owned")
   const [isLoading, setIsLoading] = useState(true)
+  const [isLoadingOwned, setIsLoadingOwned] = useState(false)
   const [bidsPlacedNFTs, setBidsPlacedNFTs] = useState<BidNFT[]>([])
 
   const [ownedNFTs, setOwnedNFTs] = useState<any[]>([])
@@ -83,49 +85,71 @@ export default function MyNFTsPage() {
 
   useEffect(() => {
     const loadUserData = async () => {
-      setIsLoading(true);
+      if (!account?.address) {
+        setOwnedNFTs([]);
+        setBidsPlacedNFTs([]);
+        setIsLoading(false);
+        return;
+      }
+
+      // Wait for imageUrlMap to be loaded before processing owned NFTs
+      if (Object.keys(imageUrlMap).length === 0) {
+        return;
+      }
+
       try {
-        if (!account?.address) {
-          setOwnedNFTs([]);
-          setBidsPlacedNFTs([]);
-          return;
+        setIsLoading(true);
+        
+        // Fetch owned NFTs by checking ownership of each token in the collection
+        setIsLoadingOwned(true);
+        const ownedTokenIds: string[] = [];
+        const totalSupply = 7777; // Total number of NFTs in the collection
+        
+        // Check ownership for each token (in batches to avoid overwhelming the RPC)
+        const batchSize = 50;
+        for (let i = 0; i < totalSupply; i += batchSize) {
+          const batchPromises = [];
+          const endIndex = Math.min(i + batchSize, totalSupply);
+          
+          for (let tokenId = i; tokenId < endIndex; tokenId++) {
+            batchPromises.push(
+              readContract({
+                contract: nftCollection,
+                method: "function ownerOf(uint256 tokenId) view returns (address)",
+                params: [BigInt(tokenId)],
+              }).then((owner: string) => {
+                if (owner.toLowerCase() === account.address.toLowerCase()) {
+                  return tokenId.toString();
+                }
+                return null;
+              }).catch(() => null)
+            );
+          }
+          
+          const batchResults = await Promise.all(batchPromises);
+          const batchOwned = batchResults.filter(id => id !== null);
+          ownedTokenIds.push(...batchOwned);
         }
-
         
-        // Fetch owned NFTs from the specific collection
-        const ownedNFTsData = await Insight.getOwnedNFTs({
-          client,
-          chains: [base],
-          ownerAddress: account.address,
-        });
-
-        
-        // Filter NFTs to only include those from our collection
-        const filteredNFTs = ownedNFTsData.filter((nft: any) => 
-          nft.contractAddress?.toLowerCase() === nftCollection.address.toLowerCase()
-        );
-        
-        
-        // Process the NFT data to match our interface
-        const processedNFTs = filteredNFTs.map((nft: any) => {
-          const tokenId = nft.tokenId?.toString() || nft.id?.toString();
+        // Process the owned NFTs
+        const processedNFTs = ownedTokenIds.map((tokenId) => {
           const metadata = allMetadata[parseInt(tokenId)] || {};
           
           return {
             id: tokenId,
             tokenId: tokenId,
-            name: nft.name || metadata.name || `Satoshe Slugger #${parseInt(tokenId) + 1}`,
-            image: nft.image || imageUrlMap[tokenId] || "/placeholder-nft.webp",
-            rarity: metadata.rarity_tier || "common",
-            description: nft.description || metadata.description || "",
-            attributes: nft.attributes || metadata.attributes || [],
-            // Add auction/listing status if available
-            isListed: false, // TODO: Check if this NFT is currently listed
-            currentPrice: "0", // TODO: Get current price if listed
+            name: metadata.name || `Satoshe Slugger #${parseInt(tokenId) + 1}`,
+            image: imageUrlMap[tokenId] || "/placeholder-nft.webp",
+            rarity: metadata.rarity_tier || "Unknown",
+            description: metadata.description || "",
+            attributes: metadata.attributes || [],
+            isListed: false,
+            currentPrice: "0",
           };
         });
 
         setOwnedNFTs(processedNFTs);
+        setIsLoadingOwned(false);
         
         // DISABLED: Fetch user's active bids and listed NFTs (prevents RPC charges)
     // await fetchUserBids(account.address);
@@ -134,12 +158,13 @@ export default function MyNFTsPage() {
         console.error("Error loading user data:", error);
         setOwnedNFTs([]);
         setBidsPlacedNFTs([]);
+        setIsLoadingOwned(false);
       } finally {
         setIsLoading(false);
       }
     };
     loadUserData();
-  }, [account?.address, allMetadata, imageUrlMap])
+  }, [account?.address, imageUrlMap])
 
   // Listen for marketplace events and refresh data
   useEffect(() => {
@@ -151,7 +176,7 @@ export default function MyNFTsPage() {
     // }, 30000);
 
     // return () => clearInterval(refreshInterval);
-  }, [account?.address, allMetadata, imageUrlMap])
+  }, [account?.address])
 
   const handleListForSale = (nftId: string) => {
     router.push(`/list-nft/${nftId}`)
@@ -163,25 +188,45 @@ export default function MyNFTsPage() {
     if (!account?.address) return;
     
     
-    // Refresh owned NFTs
-    const ownedNFTsData = await Insight.getOwnedNFTs({
-      client,
-      chains: [base],
-      ownerAddress: account.address,
-    });
-
-    const processedNFTs = ownedNFTsData.map((nft: any) => {
-      const tokenId = nft.tokenId?.toString() || nft.id?.toString();
+    // Refresh owned NFTs using the same batch approach
+    const ownedTokenIds: string[] = [];
+    const totalSupply = 7777;
+    
+    const batchSize = 50;
+    for (let i = 0; i < totalSupply; i += batchSize) {
+      const batchPromises = [];
+      const endIndex = Math.min(i + batchSize, totalSupply);
+      
+      for (let tokenId = i; tokenId < endIndex; tokenId++) {
+        batchPromises.push(
+          readContract({
+            contract: nftCollection,
+            method: "function ownerOf(uint256 tokenId) view returns (address)",
+            params: [BigInt(tokenId)],
+          }).then((owner: string) => {
+            if (owner.toLowerCase() === account.address.toLowerCase()) {
+              return tokenId.toString();
+            }
+            return null;
+          }).catch(() => null)
+        );
+      }
+      
+      const batchResults = await Promise.all(batchPromises);
+      ownedTokenIds.push(...batchResults.filter(id => id !== null));
+    }
+    
+    const processedNFTs = ownedTokenIds.map((tokenId) => {
       const metadata = allMetadata[parseInt(tokenId)] || {};
       
       return {
         id: tokenId,
         tokenId: tokenId,
-        name: nft.name || metadata.name || `Satoshe Slugger #${parseInt(tokenId) + 1}`,
-        image: nft.image || imageUrlMap[tokenId] || "/placeholder-nft.webp",
-        rarity: metadata.rarity_tier || "common",
-        description: nft.description || metadata.description || "",
-        attributes: nft.attributes || metadata.attributes || [],
+        name: metadata.name || `Satoshe Slugger #${parseInt(tokenId) + 1}`,
+        image: imageUrlMap[tokenId] || "/placeholder-nft.webp",
+        rarity: metadata.rarity_tier || "Unknown",
+        description: metadata.description || "",
+        attributes: metadata.attributes || [],
         isListed: false,
         currentPrice: "0",
       };
@@ -224,8 +269,8 @@ export default function MyNFTsPage() {
                 id: auction.id.toString(),
                 name: metadata.name || `Satoshe Slugger #${parseInt(tokenId) + 1}`,
                 image: imageUrlMap[tokenId] || "/placeholder-nft.webp",
-                price: auction.buyoutBidAmount ? (Number(auction.buyoutBidAmount) / 1e18).toString() : "0",
-                yourBid: winningBid.bidAmountWei ? (Number(winningBid.bidAmountWei) / 1e18).toString() : "0",
+                price: auction.buyoutBidAmount ? (Number(auction.buyoutBidAmount) / 1e18).toFixed(6) : "0",
+                yourBid: winningBid.bidAmountWei ? (Number(winningBid.bidAmountWei) / 1e18).toFixed(6) : "0",
                 rarity: metadata.rarity_tier || "common",
                 auctionId: auction.id.toString(),
               });
@@ -392,15 +437,24 @@ export default function MyNFTsPage() {
         </div>
 
         {/* NFT Grid */}
-        {activeNFTs.length === 0 ? (
+        {activeTab === "owned" && isLoadingOwned ? (
+          <div className="text-center py-20">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4" style={{ borderColor: "#ff0099" }}></div>
+            <p className="text-neutral-400">Checking your NFTs...</p>
+          </div>
+        ) : activeNFTs.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-neutral-400 mb-4">
               {activeTab === "favorites"
-                ? "No favorite NFTs yet. Start favoriting NFTs by clicking the heart icon on any NFT card!"
+                ? "Favorite your first NFT! Click to Browse."
+                : activeTab === "owned"
+                ? "Mint A Slugger"
+                : activeTab === "bids"
+                ? "Make your first bid with the browse button"
                 : "No NFTs found in this category"
               }
             </p>
-            {(activeTab === "owned" || activeTab === "favorites") && (
+            {(activeTab === "owned" || activeTab === "favorites" || activeTab === "bids") && (
               <Button onClick={() => router.push("/nfts")} className="bg-brand-pink hover:bg-brand-pink-hover transition-colors" style={{ color: "#fffbeb" }}>
                 Browse NFTs
               </Button>
@@ -472,15 +526,6 @@ export default function MyNFTsPage() {
                   )}
 
                   {/* Action buttons based on tab */}
-                  {activeTab === "owned" && (
-                    <Button
-                      onClick={() => handleListForSale(nft.id)}
-                      className="w-full bg-brand-pink hover:bg-brand-pink-hover text-sm py-2 transition-colors"
-                      style={{ color: "#fffbeb" }}
-                    >
-                      List for Sale
-                    </Button>
-                  )}
 
                   {activeTab === "favorites" && (
                     <Button

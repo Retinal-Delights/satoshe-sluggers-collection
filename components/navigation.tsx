@@ -87,7 +87,9 @@ export default function Navigation({ activePage = "home" }: NavigationProps) {
             }`}
           >
             MY NFTS
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300 ease-out group-hover:w-full" style={{ backgroundColor: "#fffbeb" }}></span>
+            <span className={`absolute bottom-0 left-0 h-0.5 transition-all duration-300 ease-out ${
+              activePage === "my-nfts" ? "w-full" : "w-0 group-hover:w-full"
+            }`} style={{ backgroundColor: "#fffbeb" }}></span>
           </Link>
         )}
       </nav>

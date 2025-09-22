@@ -34,9 +34,9 @@ export default function Footer() {
             <Image
               src="/retinal_delights-horizontal-brand-offwhite.svg"
               alt="Retinal Delights"
-              width={240}
-              height={60}
-              className="h-10 sm:h-12 md:h-14 w-auto max-h-14"
+              width={200}
+              height={50}
+              className="w-auto h-10 sm:h-12 md:h-14 max-h-14"
             />
           </div>
 
