@@ -563,6 +563,16 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
           const allAuctionIds = mappedNFTs.map(nft => nft.auctionId).filter(id => id !== 0n).slice(0, 20);
           console.log(`[NFT Grid] Sample auction IDs from contract:`, allAuctionIds);
           
+          // Debug: Check for relisted NFTs specifically
+          const relistedTokenIds = [5366, 5372, 5373, 5374, 5375, 486, 1019, 0, 1515, 506, 2610, 3610, 59];
+          const relistedNFTs = mappedNFTs.filter(nft => relistedTokenIds.includes(Number(nft.tokenId)));
+          console.log(`[NFT Grid] Relisted NFTs:`, relistedNFTs.map(nft => ({ 
+            tokenId: nft.tokenId, 
+            auctionId: nft.auctionId, 
+            isForSale: nft.isForSale, 
+            isCancelled: nft.isCancelled 
+          })));
+          
           setNfts(mappedNFTs);
           // Set bid amounts (default to minimum bid, format as ETH)
           const initialBids: { [id: string]: string } = {};
