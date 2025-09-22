@@ -816,7 +816,7 @@ export default function NFTDetailPage() {
                     height={26}
                     className="w-6 h-6 mr-2"
                   />
-                  <p className="text-sm text-neutral-100">{metadata?.artist ?? "Kristen Woerdeman"}</p>
+                  <p className="text-sm" style={{ color: "#fffbeb" }}>{metadata?.artist ?? "Kristen Woerdeman"}</p>
                 </div>
               </div>
               <div className="bg-neutral-800 p-4 rounded border border-neutral-700">
@@ -829,7 +829,7 @@ export default function NFTDetailPage() {
                     height={26}
                     className="w-6 h-6 mr-2"
                   />
-                  <p className="text-sm text-neutral-100">{metadata?.platform ?? "Retinal Delights"}</p>
+                  <p className="text-sm" style={{ color: "#fffbeb" }}>{metadata?.platform ?? "Retinal Delights"}</p>
                 </div>
               </div>
             </div>
@@ -924,7 +924,7 @@ export default function NFTDetailPage() {
                     PLACE BID
                   </TransactionButton>
                 </div>
-                <p id="bid-help" className="text-sm text-neutral-400 mt-2">
+                <p id="bid-help" className="text-sm mt-2" style={{ color: "#fffbeb" }}>
                   Minimum bid: {tierPricing.start} ETH
                 </p>
               </div>
