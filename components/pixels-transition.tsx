@@ -7,8 +7,16 @@ export default function PixelsTransition() {
   const gridRef = useRef<HTMLDivElement | null>(null);
   const pathname = usePathname();
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  // Set client-side flag to prevent hydration mismatch
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
+    if (!isClient) return;
+    
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const grid = gridRef.current!;
     const mq = window.matchMedia("(max-width:768px)");
@@ -29,6 +37,12 @@ export default function PixelsTransition() {
 
     // Entrance animation on page load - solid squares
     if (!prefersReduced) {
+      // Hide page content initially
+      const mainContent = document.querySelector('main');
+      if (mainContent) {
+        mainContent.classList.add('page-content-hidden');
+      }
+      
       gsap.to(cells, {
         opacity: 0,
         duration: 0.001,
@@ -37,14 +51,23 @@ export default function PixelsTransition() {
           from: "random",
           grid: [COLS, ROWS],
         },
-        onComplete: () => { grid.style.display = "none"; },
+        onComplete: () => { 
+          grid.style.display = "none";
+          // Show page content after animation
+          if (mainContent) {
+            mainContent.classList.remove('page-content-hidden');
+            mainContent.classList.add('page-content-visible');
+          }
+        },
       });
     } else {
       grid.style.display = "none";
     }
-  }, [pathname]);
+  }, [pathname, isClient]);
 
   useEffect(() => {
+    if (!isClient) return;
+    
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const grid = gridRef.current!;
     const cells = grid?.querySelectorAll(".load-grid__item");
@@ -88,7 +111,7 @@ export default function PixelsTransition() {
     
     document.addEventListener("click", onClick, true);
     return () => document.removeEventListener("click", onClick, true);
-  }, [isTransitioning]);
+  }, [isTransitioning, isClient]);
 
   return (
     <>
@@ -112,6 +135,15 @@ export default function PixelsTransition() {
         .load-grid__item{ 
           background:#ff0099; 
           opacity:1;
+        }
+        .page-content-hidden {
+          opacity: 0;
+          visibility: hidden;
+        }
+        .page-content-visible {
+          opacity: 1;
+          visibility: visible;
+          transition: opacity 0.3s ease-in-out;
         }
       `}</style>
       <div ref={gridRef} className="load-grid" aria-hidden="true" />
