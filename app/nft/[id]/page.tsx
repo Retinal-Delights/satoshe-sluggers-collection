@@ -1091,7 +1091,8 @@ export default function NFTDetailPage() {
                       <span className="text-neutral-400 text-sm">Contract Address</span>
                       <button
                         onClick={handleCopyAddress}
-                        className="text-sm font-mono text-neutral-100 hover:text-blue-400 transition-colors cursor-pointer"
+                        className="text-sm font-mono hover:text-blue-400 transition-colors cursor-pointer"
+                        style={{ color: "#fffbeb" }}
                         title="Click to copy full address to clipboard"
                       >
                         {nftCollection.address.slice(0, 6)}...{nftCollection.address.slice(-4)}
@@ -1099,15 +1100,15 @@ export default function NFTDetailPage() {
                     </div>
                     <div className="flex justify-between py-2 border-b border-neutral-700">
                       <span className="text-neutral-400 text-sm">Token ID</span>
-                      <span className="text-sm text-neutral-100">{metadata?.token_id ?? tokenId}</span>
+                      <span className="text-sm" style={{ color: "#fffbeb" }}>{metadata?.token_id ?? tokenId}</span>
                     </div>
                     <div className="flex justify-between py-2 border-b border-neutral-700">
                       <span className="text-neutral-400 text-sm">Token Standard</span>
-                      <span className="text-sm text-neutral-100">ERC-721</span>
+                      <span className="text-sm" style={{ color: "#fffbeb" }}>ERC-721</span>
                     </div>
                     <div className="flex justify-between py-2">
                       <span className="text-neutral-400 text-sm">Blockchain</span>
-                      <span className="text-sm text-neutral-100">Base</span>
+                      <span className="text-sm" style={{ color: "#fffbeb" }}>Base</span>
                     </div>
                   </div>
                 </div>
@@ -1118,11 +1119,11 @@ export default function NFTDetailPage() {
                     {salesHistory.map((sale, index) => (
                       <div key={index} className="flex justify-between items-center py-3 border-b border-neutral-700 last:border-b-0">
                         <div>
-                          <p className="text-sm font-medium text-neutral-100">{sale.event}</p>
+                          <p className="text-sm font-medium" style={{ color: "#fffbeb" }}>{sale.event}</p>
                           <p className="text-xs text-neutral-400">{sale.price}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm text-neutral-100">{sale.from} → {sale.to}</p>
+                          <p className="text-sm" style={{ color: "#fffbeb" }}>{sale.from} → {sale.to}</p>
                           <p className="text-xs text-neutral-400">{sale.date}</p>
                         </div>
                       </div>
