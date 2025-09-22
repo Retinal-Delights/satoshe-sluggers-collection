@@ -643,7 +643,7 @@ export default function NFTDetailPage() {
 
             {/* Attributes */}
             <div>
-              <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-neutral-100">Attributes</h2>
+              <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4" style={{ color: "#fffbeb" }}>Attributes</h2>
               <div className="grid grid-cols-2 gap-4">
                 {/* Left Column - First 3 Attributes */}
                 <div className="space-y-3">
@@ -661,7 +661,7 @@ export default function NFTDetailPage() {
                             {attr.name}
                           </p>
                         </div>
-                        <p className="font-normal text-base text-neutral-100">{attr.value}</p>
+                        <p className="font-normal text-base" style={{ color: "#fffbeb" }}>{attr.value}</p>
                         <div className="text-sm text-neutral-400 mt-1">
                           <p>{attr.percentage}% have this trait</p>
                           {occurrence && <p>{occurrence} of 7777</p>}
@@ -688,7 +688,7 @@ export default function NFTDetailPage() {
                             {attr.name}
                           </p>
                         </div>
-                        <p className="font-normal text-base text-neutral-100">{attr.value}</p>
+                        <p className="font-normal text-base" style={{ color: "#fffbeb" }}>{attr.value}</p>
                         <div className="text-sm text-neutral-400 mt-1">
                           <p>{attr.percentage}% have this trait</p>
                           {occurrence && <p>{occurrence} of 7777</p>}
@@ -715,7 +715,7 @@ export default function NFTDetailPage() {
           <div className="space-y-6 -mt-12">
             {/* NFT Name with Heart Icon */}
             <div className="flex items-start justify-between gap-4">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-neutral-100 leading-tight">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold leading-tight" style={{ color: "#fffbeb" }}>
                 {metadata?.name || `Satoshe Slugger #${parseInt(tokenId) + 1}`}
               </h1>
               <button
@@ -740,8 +740,8 @@ export default function NFTDetailPage() {
             {/* Price Information */}
             <div className="grid grid-cols-3 gap-3 sm:gap-4">
               <div className="bg-neutral-800 p-3 sm:p-4 rounded border border-neutral-700">
-                <p className="text-neutral-400 text-xs sm:text-sm mb-1">Starting Price</p>
-                <p className="text-sm sm:text-base font-semibold text-neutral-100">
+                <p className="text-xs sm:text-sm mb-1" style={{ color: "#fffbeb" }}>Starting Price</p>
+                <p className="text-sm sm:text-base font-semibold" style={{ color: "#fffbeb" }}>
                   {tierPricing.start} ETH
                 </p>
               </div>
@@ -761,45 +761,45 @@ export default function NFTDetailPage() {
 
             {/* Additional Details */}
             <div className="bg-neutral-800 p-4 rounded border border-neutral-700">
-              <h3 className="text-lg font-semibold text-neutral-100 mb-4">Details</h3>
+              <h3 className="text-lg font-semibold mb-4" style={{ color: "#fffbeb" }}>Details</h3>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="text-neutral-400 mb-1">NFT Number</p>
-                  <p className="text-neutral-100 font-normal">{metadata?.card_number ?? parseInt(tokenId) + 1}</p>
+                  <p className="font-normal" style={{ color: "#fffbeb" }}>{metadata?.card_number ?? parseInt(tokenId) + 1}</p>
                 </div>
                 <div>
                   <p className="text-neutral-400 mb-1">Token ID</p>
-                  <p className="text-neutral-100 font-normal">{metadata?.token_id ?? tokenId}</p>
+                  <p className="font-normal" style={{ color: "#fffbeb" }}>{metadata?.token_id ?? tokenId}</p>
                 </div>
                 <div>
                   <p className="text-neutral-400 mb-1">Collection</p>
-                  <p className="text-neutral-100 font-normal">
+                  <p className="font-normal" style={{ color: "#fffbeb" }}>
                     {metadata?.collection_number ?? "—"}
                   </p>
                 </div>
                 <div>
                   <p className="text-neutral-400 mb-1">Edition</p>
-                  <p className="text-neutral-100 font-normal">{metadata?.edition ?? "—"}</p>
+                  <p className="font-normal" style={{ color: "#fffbeb" }}>{metadata?.edition ?? "—"}</p>
                 </div>
                 <div>
                   <p className="text-neutral-400 mb-1">Series</p>
-                  <p className="text-neutral-100 font-normal">{metadata?.series ?? "—"}</p>
+                  <p className="font-normal" style={{ color: "#fffbeb" }}>{metadata?.series ?? "—"}</p>
                 </div>
                 <div>
                   <p className="text-neutral-400 mb-1">Rarity Tier</p>
-                  <p className="text-neutral-100 font-normal">{metadata?.rarity_tier ?? "Unknown"}</p>
+                  <p className="font-normal" style={{ color: "#fffbeb" }}>{metadata?.rarity_tier ?? "Unknown"}</p>
                 </div>
                 <div>
                   <p className="text-neutral-400 mb-1">Rarity Score</p>
-                  <p className="text-neutral-100 font-normal">{metadata?.rarity_score ?? "—"}</p>
+                  <p className="font-normal" style={{ color: "#fffbeb" }}>{metadata?.rarity_score ?? "—"}</p>
                 </div>
                 <div>
                   <p className="text-neutral-400 mb-1">Rank</p>
-                  <p className="text-neutral-100 font-normal">{metadata?.rank ?? "—"} of 7777</p>
+                  <p className="font-normal" style={{ color: "#fffbeb" }}>{metadata?.rank ?? "—"} of 7777</p>
                 </div>
                 <div>
                   <p className="text-neutral-400 mb-1">Rarity Percentage</p>
-                  <p className="text-neutral-100 font-normal">{metadata?.rarity_percent ?? "—"}%</p>
+                  <p className="font-normal" style={{ color: "#fffbeb" }}>{metadata?.rarity_percent ?? "—"}%</p>
                 </div>
               </div>
             </div>
@@ -839,7 +839,7 @@ export default function NFTDetailPage() {
               <div className="grid grid-cols-2 gap-6">
                 <div>
                   <span className="text-neutral-400">Auction Ends:</span>
-                  <p className="text-neutral-100 font-semibold">
+                  <p className="font-semibold" style={{ color: "#fffbeb" }}>
                     {isLoadingAuction ? (
                       "Loading..."
                     ) : auctionData ? (
