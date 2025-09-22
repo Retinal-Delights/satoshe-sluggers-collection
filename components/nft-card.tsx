@@ -415,7 +415,7 @@ export default function NFTCard({
                     </TransactionButton>
                   </div>
                   
-                  <div className="text-xs md:text-sm text-neutral-400 whitespace-nowrap">Start: {formatBidAmount(minimumBidAmount)} ETH</div>
+                  <div className="text-xs text-neutral-400 whitespace-nowrap">Starting Price: {formatBidAmount(minimumBidAmount)} ETH</div>
                 </div>
 
                 {/* Buy Now Section */}
