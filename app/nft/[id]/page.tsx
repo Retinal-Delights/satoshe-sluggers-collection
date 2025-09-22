@@ -499,7 +499,7 @@ export default function NFTDetailPage() {
     if (auctionStatus === 'closed') {
       fetchAuctionData();
     }
-  }, [auctionData?.auctionId, getCurrentBid, getBidCount, getAuctionStatus, currentBidAmount, bidCount, tierPricing.bid]);
+  }, [auctionData?.auctionId, getCurrentBid, getBidCount, getAuctionStatus, tierPricing.bid]);
 
   // Helper to format auction prices
   const formatAuctionPrice = (priceWei: string | number | bigint) => {

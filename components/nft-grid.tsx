@@ -16,7 +16,6 @@ import { useCallback } from "react";
 import { safeRpcCall } from "@/lib/circuit-breaker";
 import { emergencySafeRpcCall } from "@/lib/emergency-stop";
 import { cacheManager, CACHE_KEYS, CACHE_TTL, getCachedDataFromStorage, setCachedDataToStorage } from "@/lib/cache-manager";
-import RefreshControls from "@/components/refresh-controls";
 import { format } from "date-fns";
 import { readContract } from "thirdweb";
 import { bidInAuction, buyoutAuction, auctionClosedEvent } from "thirdweb/extensions/marketplace";
@@ -219,7 +218,6 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
   const [soldNFTs, setSoldNFTs] = useState<Set<number>>(new Set());
   const [cancelledNFTs, setCancelledNFTs] = useState<Set<number>>(new Set());
   const [isLoadingAuctions, setIsLoadingAuctions] = useState(true);
-  const [lastRefresh, setLastRefresh] = useState<Date | undefined>();
 
         // Fetch real auction data from marketplace contract with batching
       useEffect(() => {
@@ -345,7 +343,6 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
             }
 
             setAuctionMap(auctionDataMap);
-            setLastRefresh(new Date());
           } catch (error) {
             
             // Try to extract meaningful information from the error
@@ -477,27 +474,14 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
     setCurrentPage(1);
   }, [itemsPerPage, searchTerm, selectedFilters]);
 
-    // Track session and page performance metrics
+    // Track session and page performance metrics (optimized - only track on significant changes)
   useEffect(() => {
-    // Track page view and session data
+    // Only track page views, not on every filter change
     setSessionMetrics(prev => ({ ...prev, pageViews: prev.pageViews + 1 }));
+  }, [activeView]); // Only track when view changes
 
-    // Track current view metrics
-    track('Page Performance', {
-      activeView,
-      totalNFTsLoaded: nfts.length,
-      currentPage,
-      itemsPerPage,
-      sortBy,
-      hasActiveFilters: Object.keys(selectedFilters).some(key =>
-        selectedFilters[key] && (Array.isArray(selectedFilters[key]) ?
-        selectedFilters[key].length > 0 : Object.keys(selectedFilters[key]).length > 0)
-      ),
-      searchTermLength: searchTerm.length,
-      sessionDuration: 0 // Simplified to avoid dependency issues
-    });
-
-    // Track marketplace performance metrics
+  // Track marketplace performance metrics (separate, less frequent)
+  useEffect(() => {
     if (nfts.length > 0) {
       const totalListings = nfts.length;
       const nftsWithBids = nfts.filter(nft => nft.numBids > 0).length;
@@ -523,7 +507,7 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
         commonCount: rarityDist['Common'] || 0
       });
     }
-  }, [activeView, currentPage, itemsPerPage, sortBy, nfts, selectedFilters, searchTerm]);
+  }, [nfts.length]); // Only track when NFT count changes significantly
 
   // Track session summary when component unmounts or user leaves
   useEffect(() => {
@@ -655,34 +639,8 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
     if (isMetadataLoaded && !isLoadingAuctions && imageUrlMap && Object.keys(imageUrlMap).length > 0) {
       loadNFTs();
     }
-  }, [loadNFTs]);
+  }, [isMetadataLoaded, isLoadingAuctions, imageUrlMap]);
 
-  // Manual refresh function for user-triggered updates
-  const handleManualRefresh = useCallback(async () => {
-    console.log('[NFTGrid] Manual refresh triggered');
-    
-    // Clear caches to force fresh data
-    const cacheKey = CACHE_KEYS.AUCTION_DATA(marketplace.address);
-    cacheManager.delete(cacheKey);
-    localStorage.removeItem(cacheKey);
-    localStorage.removeItem(`${cacheKey}-timestamp`);
-    
-    // Reset loading states
-    setIsLoadingAuctions(true);
-    setIsLoading(true);
-    
-    // Re-fetch auction data
-    try {
-      const fetchAuctionData = async () => {
-        // ... (same logic as the useEffect, but without cache check)
-        // This will be implemented in the next step
-      };
-      
-      await fetchAuctionData();
-    } catch (error) {
-      console.error('[NFTGrid] Manual refresh failed:', error);
-    }
-  }, [marketplace.address]);
 
 
   // Time formatting
@@ -1084,12 +1042,6 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
 
   // Debug logging removed to prevent errors
 
-  // Debug: Show all unique eyewear values that actually exist
-  if (nfts.length > 0) {
-    const uniqueEyewear = [...new Set(nfts.map(nft => nft.eyewear).filter(Boolean))].sort();
-    // Debug logging removed to prevent errors
-  }
-
 
 
   if (isLoading) {
@@ -1222,13 +1174,6 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
             </Select>
           </div>
           
-          {/* Refresh Controls */}
-          <RefreshControls
-            onRefresh={handleManualRefresh}
-            isLoading={isLoadingAuctions || isLoading}
-            lastRefresh={lastRefresh}
-            className="mt-2"
-          />
           
         </div>
       </div>

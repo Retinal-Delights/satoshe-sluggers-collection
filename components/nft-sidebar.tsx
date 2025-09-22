@@ -641,31 +641,10 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, searchMode, setS
 
       <div suppressHydrationWarning={true}>
         <h3 className="font-normal mb-2 text-base" style={{ color: "#fffbeb" }}>Search</h3>
-        <div className="relative mb-2" suppressHydrationWarning={true}>
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-500" />
-          <Input
-            placeholder="Search NFTs..."
-            className="pl-9 py-1.5 text-sm font-normal h-8 rounded text-brand-pink border-neutral-600 focus:outline-none focus:ring-0 focus:border-brand-pink transition-colors"
-            value={searchTerm}
-            onChange={(e: any) => {
-              const newValue = (e.target as HTMLInputElement).value;
-              setSearchTerm(newValue);
-              // Track search usage (debounce by only tracking when user pauses)
-              if (newValue.length > 2 || newValue.length === 0) {
-                track('NFT Search Used', {
-                  searchTerm: newValue,
-                  searchLength: newValue.length,
-                  searchMode
-                });
-              }
-            }}
-          />
-        </div>
         
         {/* Search Mode Toggle */}
         <div className="mb-3">
-          <div className="text-xs text-neutral-400 mb-2">Search Mode:</div>
-          <div className="flex bg-neutral-800 rounded p-1">
+          <div className="flex bg-neutral-700 rounded p-1">
             <button
               onClick={() => setSearchMode("contains")}
               className={`flex-1 px-3 py-1.5 text-xs rounded transition-colors ${
@@ -687,13 +666,29 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, searchMode, setS
               Exact
             </button>
           </div>
-          <div className="text-xs text-neutral-500 mt-1">
-            {searchMode === "exact" 
-              ? "Find exact token ID or name matches" 
-              : "Find NFTs containing your search term"
-            }
-          </div>
         </div>
+        
+        <div className="relative mb-2" suppressHydrationWarning={true}>
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-500" />
+          <Input
+            placeholder="Search NFTs..."
+            className="pl-9 py-1.5 text-sm font-normal h-8 rounded text-brand-pink border-neutral-600 focus:outline-none focus:ring-0 focus:border-brand-pink transition-colors"
+            value={searchTerm}
+            onChange={(e: any) => {
+              const newValue = (e.target as HTMLInputElement).value;
+              setSearchTerm(newValue);
+              // Track search usage (debounce by only tracking when user pauses)
+              if (newValue.length > 2 || newValue.length === 0) {
+                track('NFT Search Used', {
+                  searchTerm: newValue,
+                  searchLength: newValue.length,
+                  searchMode
+                });
+              }
+            }}
+          />
+        </div>
+        
         <Button
           variant="outline"
           size="sm"

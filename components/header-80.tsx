@@ -32,7 +32,8 @@ const useRelume = (): RelumeValues => {
 
   const { scrollYProgress } = useScroll({ 
     target: transformRef,
-    offset: ["start start", "end start"]
+    offset: ["start start", "end start"],
+    layoutEffect: false
   })
   const animatedScrollYProgress = useSpring(scrollYProgress, { bounce: 0 })
 

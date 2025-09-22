@@ -35,7 +35,7 @@ export default function MyNFTsPage() {
   const searchParams = useSearchParams()
   const tabParam = searchParams.get("tab")
 
-  const [activeTab, setActiveTab] = useState(tabParam || "bids")
+  const [activeTab, setActiveTab] = useState(tabParam || "favorites")
   const [allMetadata, setAllMetadata] = useState<any[]>([])
   const [imageUrlMap, setImageUrlMap] = useState<{ [tokenId: string]: string }>({})
   const [bidAmounts, setBidAmounts] = useState<{ [auctionId: string]: string }>({})
@@ -80,7 +80,8 @@ export default function MyNFTsPage() {
   }, []);
 
   // Set loading state based on hook and metadata loading
-  const isLoading = isLoadingBids || Object.keys(imageUrlMap).length === 0;
+  const isLoading = isLoadingBids;
+
 
   // Listen for marketplace events and refresh data
   useEffect(() => {
@@ -112,7 +113,7 @@ export default function MyNFTsPage() {
     const metadata = allMetadata[parseInt(tokenId)] || {};
     
     // Use auction data for buyout price if available
-    const buyoutPrice = bid.auctionData?.data.buyoutBid 
+    const buyoutPrice = bid.auctionData?.data?.buyoutBid 
       ? (Number(bid.auctionData.data.buyoutBid) / 1e18).toFixed(6)
       : "0";
     
