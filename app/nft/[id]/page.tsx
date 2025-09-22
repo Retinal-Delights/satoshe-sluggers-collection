@@ -1082,7 +1082,7 @@ export default function NFTDetailPage() {
               </TabsList>
               <TabsContent value="description" className="mt-4">
                 <div className="bg-neutral-800 p-4 rounded border border-neutral-700">
-                  <p className="text-neutral-300 text-sm mb-4">
+                  <p className="text-sm mb-4" style={{ color: "#fffbeb" }}>
                     {metadata?.description || "Women's Baseball Card from the Satoshe Sluggers collection."}
                   </p>
 
