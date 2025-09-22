@@ -662,6 +662,7 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, selectedFilters,
           variant="outline"
           size="sm"
           className="text-sm font-light flex items-center justify-center h-8 w-full mb-4 rounded border-neutral-600 focus:outline-none focus:ring-0 focus:border-neutral-500"
+          style={{ color: "#fffbeb" }}
           onClick={() => {
             // Search functionality can be implemented here if needed
             track('Search Button Clicked', {
