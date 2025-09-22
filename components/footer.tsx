@@ -36,7 +36,7 @@ export default function Footer() {
               alt="Retinal Delights"
               width={240}
               height={60}
-              className="h-12 sm:h-14 md:h-16 w-auto max-h-16"
+              className="h-10 sm:h-12 md:h-14 w-auto max-h-14"
             />
           </div>
 
