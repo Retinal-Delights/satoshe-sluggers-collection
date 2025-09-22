@@ -122,14 +122,16 @@ export default function AttributeRarityChart({ attributes, overallRarity }: Attr
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) - 8}
-                          className="fill-neutral-100 text-2xl font-bold"
+                          className="text-2xl font-bold"
+                          style={{ fill: "#fffbeb" }}
                         >
                           {overallRarity}%
                         </tspan>
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) + 18}
-                          className="fill-neutral-400 text-sm"
+                          className="text-sm"
+                          style={{ fill: "#fffbeb" }}
                         >
                           Rarity
                         </tspan>
