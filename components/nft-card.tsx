@@ -6,7 +6,7 @@ import { Heart, Clock } from "lucide-react";
 import { useFavorites } from "@/hooks/useFavorites";
 import { track } from '@vercel/analytics';
 import { validateNumericInput } from "@/lib/input-validation";
-import { TransactionButton, useContractEvents } from "thirdweb/react";
+import { TransactionButton, useContractEvents, useSendTransaction } from "thirdweb/react";
 import { bidInAuction, buyoutAuction, newBidEvent, auctionClosedEvent, getWinningBid } from "thirdweb/extensions/marketplace";
 import { toWei } from "thirdweb";
 import { marketplace } from "@/lib/contracts";
@@ -221,6 +221,9 @@ export default function NFTCard({
   // Favorites functionality
   const { isFavorited, toggleFavorite, isConnected } = useFavorites();
   const isFav = isFavorited(tokenId);
+  
+  // Transaction hooks
+  const { mutate: sendBuyout } = useSendTransaction();
 
   // Mobile tilt interaction
   const handleMobileTilt = () => {
@@ -431,23 +434,43 @@ export default function NFTCard({
                     <div className="text-xs md:text-sm mb-0.5" style={{ color: "#fffbeb" }}>Buy Now</div>
                     <div className="text-sm md:text-base font-medium leading-tight" style={{ color: "#3B82F6" }}>{buyNow.replace(' ETH', '')} ETH</div>
                     </div>
-                    <TransactionButton
-                      transaction={createBuyNowTransaction}
-                      onTransactionConfirmed={() => {
-                        // Track buy now action
-                        track('NFT Buy Now Clicked', {
-                          tokenId,
-                          buyNowPrice: buyNow.replace(' ETH', ''),
-                          currentBid: currentBid.replace(' ETH', ''),
-                          rarity,
-                          rank: String(rank),
-                          numBids: String(numBids)
-                        });
-                        onBuyNow();
-                      }}
-                      onError={(error) => {
-                        console.error("Buy now failed:", error);
-                        alert(error.message || "Failed to buy NFT. Please try again.");
+                    <button
+                      onClick={async () => {
+                        if (!auctionId) {
+                          alert("No auction ID available");
+                          return;
+                        }
+                        
+                        try {
+                          const tx = buyoutAuction({
+                            contract: marketplace,
+                            auctionId: BigInt(auctionId),
+                          });
+                          
+                          await new Promise((resolve, reject) => {
+                            sendBuyout(tx, {
+                              onSuccess: () => {
+                                // Track buy now action
+                                track('NFT Buy Now Clicked', {
+                                  tokenId,
+                                  buyNowPrice: buyNow.replace(' ETH', ''),
+                                  currentBid: currentBid.replace(' ETH', ''),
+                                  rarity,
+                                  rank: String(rank),
+                                  numBids: String(numBids)
+                                });
+                                onBuyNow();
+                                resolve(true);
+                              },
+                              onError: reject,
+                            });
+                          });
+                          
+                          alert(`NFT purchased successfully for ${buyNow.replace(' ETH', '')} ETH!`);
+                        } catch (error) {
+                          console.error("Buy now failed:", error);
+                          alert(error.message || "Failed to buy NFT. Please try again.");
+                        }
                       }}
                       className="px-3 text-xs md:text-sm font-black border rounded"
                       style={{ 
@@ -461,7 +484,7 @@ export default function NFTCard({
                       }}
                     >
                       BUY
-                    </TransactionButton>
+                    </button>
                   </div>
                 </div>
               </>
