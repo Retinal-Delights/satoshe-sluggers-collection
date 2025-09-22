@@ -235,10 +235,10 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
             
             // Fetch in batches to handle the entire collection
             const batchSize = 200; // Process 200 auctions at a time (increased for faster loading)
-            const maxPossibleAuctions = 7600; // Query up to 7600 first
+            const maxPossibleAuctions = 7796; // Query up to 7796 (last listing ID)
             const allAuctionData: any[] = [];
             
-            // First, query the main range (0-7600)
+            // Query the entire range (0-7796)
             for (let startId = 0; startId < maxPossibleAuctions; startId += batchSize) {
               const endId = Math.min(startId + batchSize - 1, maxPossibleAuctions - 1);
               
@@ -279,39 +279,6 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
               }
             }
             
-            // Now query the specific ranges for new listings (7777-7781 and 7789-7796)
-            const newListingRanges = [
-              { start: 7777, end: 7781 },  // First batch of new listings
-              { start: 7789, end: 7796 }   // Second batch of new listings
-            ];
-            
-            for (const range of newListingRanges) {
-              try {
-                const contractCallPromise = readContract({
-                  contract: marketplace,
-                  method: "function getAllValidAuctions(uint256 _startId, uint256 _endId) view returns ((uint256 auctionId, uint256 tokenId, uint256 quantity, uint256 minimumBidAmount, uint256 buyoutBidAmount, uint64 timeBufferInSeconds, uint64 bidBufferBps, uint64 startTimestamp, uint64 endTimestamp, address auctionCreator, address assetContract, address currency, uint8 tokenType, uint8 status)[] _validAuctions)",
-                  params: [range.start, range.end],
-                });
-
-                const timeoutPromise = new Promise((_, reject) =>
-                  setTimeout(() => reject(new Error(`New listings ${range.start}-${range.end} timeout after 10 seconds`)), 10000)
-                );
-                
-                const batchData = await Promise.race([contractCallPromise, timeoutPromise]) as any[];
-                
-                if (batchData && Array.isArray(batchData)) {
-                  allAuctionData.push(...batchData);
-                  console.log(`[fetchAuctionData] New listings ${range.start}-${range.end}: found ${batchData.length} auctions`);
-                }
-                
-                // Small delay between batches
-                await new Promise(resolve => setTimeout(resolve, 50));
-                
-              } catch (batchError) {
-                console.warn(`[fetchAuctionData] New listings ${range.start}-${range.end} failed:`, batchError);
-                // Continue with next range even if one fails
-              }
-            }
 
             // Create auction map from all batched data
             const auctionDataMap = new Map();
