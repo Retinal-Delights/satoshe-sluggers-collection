@@ -235,7 +235,7 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
             
             // Fetch in batches to handle the entire collection
             const batchSize = 200; // Process 200 auctions at a time (increased for faster loading)
-            const maxPossibleAuctions = 7600; // Stop before invalid range
+            const maxPossibleAuctions = 7800; // Include new listings 7777-7796
             const allAuctionData: any[] = [];
             
             for (let startId = 0; startId < maxPossibleAuctions; startId += batchSize) {
@@ -269,7 +269,12 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
                 
               } catch (batchError) {
                 console.warn(`[fetchAuctionData] Batch ${startId}-${endId} failed:`, batchError);
-                // Continue with next batch even if one fails
+                // If it's an "invalid range" error, we've likely reached the end of valid auctions
+                if (batchError.message && batchError.message.includes('invalid range')) {
+                  console.log(`[fetchAuctionData] Reached end of valid auctions at range ${startId}-${endId}`);
+                  break;
+                }
+                // Continue with next batch for other errors
               }
             }
             
