@@ -284,7 +284,7 @@ export default function NFTCard({
       <div className="p-3 bg-neutral-900 text-neutral-100 flex-1 flex flex-col">
         <div className="mb-2">
           <div className="flex items-center justify-between mb-1">
-                  <h4 className="text-sm md:text-base lg:text-lg font-medium leading-tight whitespace-nowrap pr-2">{name}</h4>
+                  <h4 className="text-sm md:text-base lg:text-lg font-medium leading-tight whitespace-nowrap pr-2" style={{ color: "#fffbeb" }}>{name}</h4>
             <button
               onClick={handleFavoriteClick}
               className="p-1 rounded-full hover:bg-neutral-800 transition-colors"
@@ -335,7 +335,7 @@ export default function NFTCard({
               <>
                 {/* Bidding Section */}
                 <div className="pt-2 mb-2 p-3 bg-card rounded">
-                  <div className="text-xs md:text-sm text-white mb-2 font-normal whitespace-nowrap">Min Bid: <span className="text-xs md:text-sm font-semibold">{formatBidAmount(minimumBidAmount)} ETH</span></div>
+                  <div className="text-xs md:text-sm mb-2 font-normal whitespace-nowrap" style={{ color: "#fffbeb" }}>Min Bid: <span className="text-xs md:text-sm font-semibold">{formatBidAmount(minimumBidAmount)} ETH</span></div>
                   
                   <div className="flex gap-2 mb-2">
                     <div className="relative flex-1">
@@ -422,7 +422,7 @@ export default function NFTCard({
                 <div className="pt-2 p-3 bg-card rounded">
                   <div className="flex items-end justify-between">
                     <div>
-                    <div className="text-xs md:text-sm text-white mb-0.5">Buy Now</div>
+                    <div className="text-xs md:text-sm mb-0.5" style={{ color: "#fffbeb" }}>Buy Now</div>
                     <div className="text-sm md:text-base font-semibold leading-tight" style={{ color: "#3B82F6" }}>{buyNow.replace(' ETH', '')} ETH</div>
                     </div>
                     <TransactionButton

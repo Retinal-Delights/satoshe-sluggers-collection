@@ -31,7 +31,7 @@ export default function Navigation({ activePage = "home" }: NavigationProps) {
         <Link
           href="/"
           className={`text-base font-medium relative group ${
-            activePage === "home" ? "text-neutral-100" : "text-neutral-400 hover:text-neutral-100"
+            activePage === "home" ? "text-[#fffbeb]" : "text-neutral-400 hover:text-[#fffbeb]"
           }`}
         >
           HOME
@@ -42,7 +42,7 @@ export default function Navigation({ activePage = "home" }: NavigationProps) {
         <Link
           href="/about"
           className={`text-base font-medium relative group ${
-            activePage === "about" ? "text-neutral-100" : "text-neutral-400 hover:text-neutral-100"
+            activePage === "about" ? "text-[#fffbeb]" : "text-neutral-400 hover:text-[#fffbeb]"
           }`}
         >
           ABOUT
@@ -53,7 +53,7 @@ export default function Navigation({ activePage = "home" }: NavigationProps) {
         <Link
           href="/nfts"
           className={`text-base font-medium relative group ${
-            activePage === "nfts" ? "text-neutral-100" : "text-neutral-400 hover:text-neutral-100"
+            activePage === "nfts" ? "text-[#fffbeb]" : "text-neutral-400 hover:text-[#fffbeb]"
           }`}
         >
           NFTS
@@ -64,7 +64,7 @@ export default function Navigation({ activePage = "home" }: NavigationProps) {
         <Link
           href="/sell"
           className={`text-base font-medium relative group ${
-            activePage === "sell" ? "text-neutral-100" : "text-neutral-400 hover:text-neutral-100"
+            activePage === "sell" ? "text-[#fffbeb]" : "text-neutral-400 hover:text-[#fffbeb]"
           }`}
         >
           SELL
@@ -73,7 +73,7 @@ export default function Navigation({ activePage = "home" }: NavigationProps) {
         <Link
           href="/contact"
           className={`text-base font-medium relative group ${
-            activePage === "contact" ? "text-neutral-100" : "text-neutral-400 hover:text-neutral-100"
+            activePage === "contact" ? "text-[#fffbeb]" : "text-neutral-400 hover:text-[#fffbeb]"
           }`}
         >
           CONTACT
@@ -83,7 +83,7 @@ export default function Navigation({ activePage = "home" }: NavigationProps) {
           <Link
             href="/my-nfts"
             className={`text-base font-medium relative group ${
-              activePage === "my-nfts" ? "text-neutral-100" : "text-neutral-400 hover:text-neutral-100"
+              activePage === "my-nfts" ? "text-[#fffbeb]" : "text-neutral-400 hover:text-[#fffbeb]"
             }`}
           >
             MY NFTS
