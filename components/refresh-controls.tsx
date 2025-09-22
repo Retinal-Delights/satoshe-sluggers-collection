@@ -91,15 +91,10 @@ export default function RefreshControls({
       {/* Status Indicators */}
       <div className="flex items-center gap-2 text-sm">
         {/* Circuit Breaker Status */}
-        {circuitBreakerState.isOpen ? (
+        {circuitBreakerState.isOpen && (
           <div className="flex items-center gap-1 text-red-500">
             <AlertTriangle className="h-4 w-4" />
             <span>Rate Limited</span>
-          </div>
-        ) : (
-          <div className="flex items-center gap-1 text-green-500">
-            <CheckCircle className="h-4 w-4" />
-            <span>Ready</span>
           </div>
         )}
 
@@ -111,43 +106,8 @@ export default function RefreshControls({
         )}
 
         {/* Last Refresh Time */}
-        {lastRefresh && (
-          <div className="text-neutral-400">
-            Updated {formatLastRefresh(lastRefresh)}
-          </div>
-        )}
       </div>
     </div>
   );
 }
 
-// Usage monitoring component
-export function UsageMonitor() {
-  const [stats, setStats] = useState({
-    totalCalls: 0,
-    failedCalls: 0,
-    circuitBreakerTrips: 0
-  });
-
-  useEffect(() => {
-    // This would be connected to your actual usage tracking
-    // For now, we'll just show the circuit breaker state
-    const interval = setInterval(() => {
-      const state = rpcCircuitBreaker.getState();
-      setStats(prev => ({
-        ...prev,
-        circuitBreakerTrips: state.failures
-      }));
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div className="text-xs text-neutral-500 space-y-1">
-      <div>API Calls: {stats.totalCalls}</div>
-      <div>Failures: {stats.failedCalls}</div>
-      <div>Circuit Breaker: {stats.circuitBreakerTrips} failures</div>
-    </div>
-  );
-}

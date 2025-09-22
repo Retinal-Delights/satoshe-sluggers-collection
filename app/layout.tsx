@@ -4,7 +4,6 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import ScrollButtons from "@/components/scroll-buttons"
-import PixelsTransition from "@/components/pixels-transition"
 import { ThirdwebProvider } from "thirdweb/react"
 // import { client } from "@/lib/thirdweb"
 // import { base } from "thirdweb/chains"
@@ -29,7 +28,6 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <PixelsTransition />
         <ThirdwebProvider>
           <ThemeProvider>
             <div className="text-[1.125rem]">

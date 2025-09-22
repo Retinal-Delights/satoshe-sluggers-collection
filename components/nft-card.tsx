@@ -25,7 +25,6 @@ interface NFTCardProps {
   auctionEnd?: string | number | bigint;
   numBids: number;
   activeView: string;
-  clientReady: boolean;
   bidAmount: string;
   isProcessingBid: boolean;
   isProcessingBuyNow: boolean;
@@ -82,7 +81,6 @@ export default function NFTCard({
   auctionEnd,
   numBids,
   activeView,
-  clientReady,
   bidAmount,
   isProcessingBid,
   isProcessingBuyNow,
@@ -307,7 +305,7 @@ export default function NFTCard({
               />
             </button>
           </div>
-          {clientReady && auctionEnd && (
+          {auctionEnd && (
                   <div className="text-xs md:text-sm text-neutral-400 mb-2">
                     Ends: {countdown}
                   </div>

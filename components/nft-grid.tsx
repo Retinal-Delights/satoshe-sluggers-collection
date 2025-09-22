@@ -17,7 +17,6 @@ import { safeRpcCall } from "@/lib/circuit-breaker";
 import { emergencySafeRpcCall } from "@/lib/emergency-stop";
 import { cacheManager, CACHE_KEYS, CACHE_TTL, getCachedDataFromStorage, setCachedDataToStorage } from "@/lib/cache-manager";
 import RefreshControls from "@/components/refresh-controls";
-import UsageMonitor from "@/components/usage-monitor";
 import { format } from "date-fns";
 import { readContract } from "thirdweb";
 import { bidInAuction, buyoutAuction, auctionClosedEvent } from "thirdweb/extensions/marketplace";
@@ -198,7 +197,6 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
   const [isProcessingBuyNow, setIsProcessingBuyNow] = useState<{
     [id: string]: boolean;
   }>({});
-    const [clientReady, setClientReady] = useState(false);
   const [allMetadata, setAllMetadata] = useState<any[]>([]);
   const [imageUrlMap, setImageUrlMap] = useState<{ [tokenId: string]: string }>({});
   const [isMetadataLoaded, setIsMetadataLoaded] = useState(false);
@@ -686,7 +684,6 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
     }
   }, [marketplace.address]);
 
-  useEffect(() => { setClientReady(true); }, []);
 
   // Time formatting
   const formatAuctionDate = (
@@ -1233,11 +1230,6 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
             className="mt-2"
           />
           
-          {/* Usage Monitor */}
-          <UsageMonitor
-            className="mt-2"
-            showEmergencyControls={true}
-          />
         </div>
       </div>
       {/* Only render the grid if there are NFTs, otherwise show empty state */}
@@ -1263,7 +1255,6 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
                   auctionEnd={nft.auctionEnd}
                   numBids={nft.numBids ?? 0}
                   activeView="forSale"
-                  clientReady={true}
                   bidAmount={bidAmounts[nft.id]}
                   isProcessingBid={isProcessingBid[nft.id]}
                   isProcessingBuyNow={isProcessingBuyNow[nft.id]}
