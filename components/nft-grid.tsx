@@ -555,7 +555,9 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
           // Debug: Count cancelled listings
           const cancelledCount = mappedNFTs.filter(nft => isCancelledListing(nft.auctionId)).length;
           const forSaleCount = mappedNFTs.filter(nft => nft.isForSale).length;
+          const cancelledNFTs = mappedNFTs.filter(nft => nft.isCancelled);
           console.log(`[NFT Grid] Total NFTs: ${mappedNFTs.length}, For Sale: ${forSaleCount}, Cancelled: ${cancelledCount}`);
+          console.log(`[NFT Grid] Cancelled NFTs:`, cancelledNFTs.map(nft => ({ tokenId: nft.tokenId, auctionId: nft.auctionId, isCancelled: nft.isCancelled, isForSale: nft.isForSale })));
           
           setNfts(mappedNFTs);
           // Set bid amounts (default to minimum bid, format as ETH)
@@ -826,6 +828,11 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
   const matchesView = activeView === "forSale" 
     ? nft.isForSale 
     : !nft.isForSale && !nft.isCancelled;
+    
+  // Debug logging for sold tab
+  if (activeView === "sold" && !nft.isForSale) {
+    console.log(`[Sold Tab Debug] Token ${nft.tokenId}: isForSale=${nft.isForSale}, isCancelled=${nft.isCancelled}, auctionId=${nft.auctionId}, matchesView=${matchesView}`);
+  }
 
     // Rarity filter
     const matchesRarity =
