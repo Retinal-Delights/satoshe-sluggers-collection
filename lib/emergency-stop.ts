@@ -97,20 +97,24 @@ class EmergencyStopManager {
     // Notify listeners
     this.listeners.forEach(listener => listener(true));
     
-    // Save emergency state
-    localStorage.setItem('emergency-stop', JSON.stringify({
-      isStopped: true,
-      reason,
-      timestamp: Date.now()
-    }));
+    // Save emergency state (client side only)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('emergency-stop', JSON.stringify({
+        isStopped: true,
+        reason,
+        timestamp: Date.now()
+      }));
+    }
   }
 
   resetEmergencyStop() {
     this.isEmergencyStopped = false;
     this.resetHourlyStats();
     
-    // Clear emergency state
-    localStorage.removeItem('emergency-stop');
+    // Clear emergency state (client side only)
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('emergency-stop');
+    }
     
     // Reset circuit breaker
     rpcCircuitBreaker.reset();
@@ -133,6 +137,9 @@ class EmergencyStopManager {
   }
 
   private loadStats() {
+    // Only run on client side
+    if (typeof window === 'undefined') return;
+    
     try {
       const saved = localStorage.getItem('usage-stats');
       if (saved) {
@@ -156,6 +163,9 @@ class EmergencyStopManager {
   }
 
   private saveStats() {
+    // Only run on client side
+    if (typeof window === 'undefined') return;
+    
     try {
       localStorage.setItem('usage-stats', JSON.stringify(this.stats));
     } catch (error) {

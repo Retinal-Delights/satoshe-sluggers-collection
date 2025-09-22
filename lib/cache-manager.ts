@@ -134,6 +134,9 @@ export function isCached(key: string): boolean {
 
 // LocalStorage integration for persistence
 export function getCachedDataFromStorage<T>(key: string): T | null {
+  // Only run on client side
+  if (typeof window === 'undefined') return null;
+  
   try {
     const cached = localStorage.getItem(key);
     if (!cached) return null;
@@ -154,6 +157,9 @@ export function getCachedDataFromStorage<T>(key: string): T | null {
 }
 
 export function setCachedDataToStorage<T>(key: string, data: T, ttl: number): void {
+  // Only run on client side
+  if (typeof window === 'undefined') return;
+  
   try {
     const cacheEntry = {
       data,
