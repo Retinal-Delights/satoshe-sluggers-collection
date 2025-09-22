@@ -99,6 +99,7 @@ type NFTGridItem = {
   auctionId: bigint;
   numBids: number;
   isForSale: boolean;
+  isCancelled: boolean;
   background?: string;
   skinTone?: string;
   shirt?: string;
@@ -532,6 +533,8 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
                     : "0",
                 // Add flag to indicate if NFT is for sale (exclude cancelled listings)
                 isForSale: !!auction && !isCancelledListing(auction?.auctionId),
+                // Add flag to indicate if NFT listing was cancelled
+                isCancelled: !!auction && isCancelledListing(auction?.auctionId),
                 auctionEnd: auction?.endTimeInSeconds ?? "",
                 auctionStart,
                 rank,
@@ -819,8 +822,10 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
       nft.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       nft.tokenId.toString().includes(searchTerm);
 
-  // View filter (Live vs Sold)
-  const matchesView = activeView === "forSale" ? nft.isForSale : !nft.isForSale;
+  // View filter (Live vs Sold) - exclude cancelled listings from both tabs
+  const matchesView = activeView === "forSale" 
+    ? nft.isForSale 
+    : !nft.isForSale && !nft.isCancelled;
 
     // Rarity filter
     const matchesRarity =
