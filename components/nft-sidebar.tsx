@@ -123,12 +123,13 @@ function FilterCategory({ title, color, options, twoColumns = false, icon, selec
     <div className={`${isOpen ? 'pt-3 pb-3' : 'pt-1'}`}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between text-neutral-100 py-2 focus:outline-none ${isOpen ? `border-b-4 ${borderColorClasses[color]} pb-2` : ''}`}
+        className={`w-full flex items-center justify-between py-2 focus:outline-none ${isOpen ? `border-b-4 ${borderColorClasses[color]} pb-2` : ''}`}
+        style={{ color: "#fffbeb" }}
         aria-expanded={isOpen}
       >
         <div className="flex items-center gap-2">
           {icon && <span className={`${colorClasses[color]}`}>{icon}</span>}
-          <h3 className={`font-normal text-base ${isOpen ? colorClasses[color] : 'text-neutral-100'}`}>{title}</h3>
+          <h3 className={`font-normal text-base ${isOpen ? colorClasses[color] : ''}`} style={!isOpen ? { color: "#fffbeb" } : {}}>{title}</h3>
       </div>
         {isOpen ? (
           <ChevronDown className={`h-5 w-5 ${colorClasses[color]}`} />
@@ -276,7 +277,7 @@ function RarityTiersCategory({ title, color, icon, selected = [], onChange, trai
       >
         <div className="flex items-center gap-2">
           {icon && <span className={`${colorClasses[color]}`}>{icon}</span>}
-          <h3 className={`font-normal text-base ${isOpen ? colorClasses[color] : 'text-neutral-100'}`}>{title}</h3>
+          <h3 className={`font-normal text-base ${isOpen ? colorClasses[color] : ''}`} style={!isOpen ? { color: "#fffbeb" } : {}}>{title}</h3>
       </div>
         {isOpen ? (
           <ChevronDown className={`h-5 w-5 ${colorClasses[color]}`} />
@@ -291,7 +292,8 @@ function RarityTiersCategory({ title, color, icon, selected = [], onChange, trai
             <span className="text-sm text-neutral-400 block mb-1">Sort by:</span>
             <button
               onClick={toggleSortOrder}
-              className="flex items-center gap-1 text-sm px-3 py-1.5 rounded bg-neutral-800 hover:bg-neutral-700 text-neutral-100 border border-neutral-700 transition-colors w-full justify-between"
+              className="flex items-center gap-1 text-sm px-3 py-1.5 rounded bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 transition-colors w-full justify-between"
+              style={{ color: "#fffbeb" }}
             >
               <span className={colorClasses[color]}>
                 {sortOrder === "commonToRare" ? "Common to Rare" : "Rare to Common"}
@@ -422,12 +424,13 @@ function FilterCategoryWithSubcategories({ title, color, subcategories, twoColum
     <div className={`${isOpen ? 'pt-3 pb-3' : 'pt-1'}`}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between text-neutral-100 py-2 focus:outline-none ${isOpen ? `border-b-4 ${borderColorClasses[color]} pb-2` : ''}`}
+        className={`w-full flex items-center justify-between py-2 focus:outline-none ${isOpen ? `border-b-4 ${borderColorClasses[color]} pb-2` : ''}`}
+        style={{ color: "#fffbeb" }}
         aria-expanded={isOpen}
       >
         <div className="flex items-center gap-2">
           {icon && <span className={`${colorClasses[color]}`}>{icon}</span>}
-          <h3 className={`font-normal text-base ${isOpen ? colorClasses[color] : 'text-neutral-100'}`}>{title}</h3>
+          <h3 className={`font-normal text-base ${isOpen ? colorClasses[color] : ''}`} style={!isOpen ? { color: "#fffbeb" } : {}}>{title}</h3>
         </div>
         {isOpen ? (
           <ChevronDown className={`h-5 w-5 ${colorClasses[color]}`} />
@@ -590,14 +593,16 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, selectedFilters,
             <div className="flex gap-2">
               <button
                 onClick={() => window.open('https://basescan.org/address/0xF0f26455b9869d4A788191f6AEdc78410731072C', '_blank')}
-                className="flex-1 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-[11px] px-2 py-1.5 rounded transition-colors border border-neutral-600 flex items-center justify-center gap-1"
+                className="flex-1 bg-neutral-800 hover:bg-neutral-700 text-[11px] px-2 py-1.5 rounded transition-colors border border-neutral-600 flex items-center justify-center gap-1"
+                style={{ color: "#fffbeb" }}
               >
                 BaseScan
                 <ExternalLink className="h-3 w-3" />
               </button>
               <button
                 onClick={() => window.open('https://base.blockscout.com/address/0xF0f26455b9869d4A788191f6AEdc78410731072C', '_blank')}
-                className="flex-1 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-[11px] px-2 py-1.5 rounded transition-colors border border-neutral-600 flex items-center justify-center gap-1"
+                className="flex-1 bg-neutral-800 hover:bg-neutral-700 text-[11px] px-2 py-1.5 rounded transition-colors border border-neutral-600 flex items-center justify-center gap-1"
+                style={{ color: "#fffbeb" }}
               >
                 Blockscout
                 <ExternalLink className="h-3 w-3" />
@@ -610,14 +615,16 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, selectedFilters,
             <div className="flex gap-2">
               <button
                 onClick={() => window.open('https://basescan.org/address/0xE3f1694adCe46ffcF82D15dd88859147c72f7C5a', '_blank')}
-                className="flex-1 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-[11px] px-2 py-1.5 rounded transition-colors border border-neutral-600 flex items-center justify-center gap-1"
+                className="flex-1 bg-neutral-800 hover:bg-neutral-700 text-[11px] px-2 py-1.5 rounded transition-colors border border-neutral-600 flex items-center justify-center gap-1"
+                style={{ color: "#fffbeb" }}
               >
                 BaseScan
                 <ExternalLink className="h-3 w-3" />
               </button>
               <button
                 onClick={() => window.open('https://base.blockscout.com/address/0xE3f1694adCe46ffcF82D15dd88859147c72f7C5a', '_blank')}
-                className="flex-1 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-[11px] px-2 py-1.5 rounded transition-colors border border-neutral-600 flex items-center justify-center gap-1"
+                className="flex-1 bg-neutral-800 hover:bg-neutral-700 text-[11px] px-2 py-1.5 rounded transition-colors border border-neutral-600 flex items-center justify-center gap-1"
+                style={{ color: "#fffbeb" }}
               >
                 Blockscout
                 <ExternalLink className="h-3 w-3" />
@@ -630,7 +637,7 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, selectedFilters,
       <div className="border-b border-neutral-700 mb-4"></div>
 
       <div suppressHydrationWarning={true}>
-        <h3 className="font-normal mb-2 text-neutral-100 text-base">Search</h3>
+        <h3 className="font-normal mb-2 text-base" style={{ color: "#fffbeb" }}>Search</h3>
         <div className="relative mb-2" suppressHydrationWarning={true}>
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-500" />
           <Input
@@ -676,7 +683,7 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, selectedFilters,
             hasSearchTerm: searchTerm.length > 0
           });
           clearAllFilters();
-        }} className="text-sm font-light flex items-center justify-center gap-1 h-9 w-full rounded border-neutral-600 focus:outline-none focus:ring-0 focus:border-neutral-500">
+        }} className="text-sm font-light flex items-center justify-center gap-1 h-9 w-full rounded border-neutral-600 focus:outline-none focus:ring-0 focus:border-neutral-500" style={{ color: "#fffbeb" }}>
           <X className="h-4 w-4" /> Clear All Filters
         </Button>
       </div>
