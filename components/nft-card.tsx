@@ -474,7 +474,7 @@ export default function NFTCard({
                           alert(error instanceof Error ? error.message : "Failed to buy NFT. Please try again.");
                         }
                       }}
-                      className="px-3 text-xs md:text-sm font-black border rounded"
+                      className="px-3 text-xs md:text-sm font-normal border rounded"
                       style={{ 
                         color: "#fffbeb",
                         height: "32px",

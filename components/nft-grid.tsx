@@ -127,6 +127,7 @@ const isWei = (val: any) => typeof val === "string" && /^[0-9]+$/.test(val) && v
 
 interface NFTGridProps {
   searchTerm: string;
+  searchMode: "exact" | "contains";
   selectedFilters: any;
   onFilteredCountChange?: (count: number) => void;
   onTraitCountsChange?: (counts: Record<string, Record<string, number>>) => void;
@@ -174,7 +175,7 @@ function computeTraitCounts(nfts: NFTGridItem[], categories: string[]) {
   return counts;
 }
 
-export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountChange, onTraitCountsChange }: NFTGridProps) {
+export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFilteredCountChange, onTraitCountsChange }: NFTGridProps) {
   const [activeView, setActiveView] = useState("forSale");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(12);
@@ -820,10 +821,20 @@ export default function NFTGrid({ searchTerm, selectedFilters, onFilteredCountCh
 
   // Before sorting and paginating, filter nfts:
   const filteredNFTs = nfts.filter(nft => {
-    // Search by name or tokenId
-    const matchesSearch =
-      nft.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      nft.tokenId.toString().includes(searchTerm);
+    // Search by name or tokenId based on search mode
+    let matchesSearch = false;
+    
+    if (searchMode === "exact") {
+      // Exact mode: match exact token ID or exact name
+      matchesSearch = 
+        nft.tokenId.toString() === searchTerm ||
+        nft.name.toLowerCase() === searchTerm.toLowerCase();
+    } else {
+      // Contains mode: match partial token ID or name (original behavior)
+      matchesSearch =
+        nft.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        nft.tokenId.toString().includes(searchTerm);
+    }
 
   // View filter (Live vs Sold) - exclude cancelled listings and NFTs without auctions from both tabs
   const matchesView = activeView === "forSale" 

@@ -530,12 +530,14 @@ function FilterCategoryWithSubcategories({ title, color, subcategories, twoColum
 interface NFTSidebarProps {
   searchTerm: string;
   setSearchTerm: (val: string) => void;
+  searchMode: "exact" | "contains";
+  setSearchMode: (mode: "exact" | "contains") => void;
   selectedFilters: any;
   setSelectedFilters: (val: any) => void;
   traitCounts?: Record<string, Record<string, number>>;
 }
 
-export default function NFTSidebar({ searchTerm, setSearchTerm, selectedFilters, setSelectedFilters, traitCounts = {} }: NFTSidebarProps) {
+export default function NFTSidebar({ searchTerm, setSearchTerm, searchMode, setSearchMode, selectedFilters, setSelectedFilters, traitCounts = {} }: NFTSidebarProps) {
   // Array to store reset functions
   const resetFunctions = useRef<(() => void)[]>([])
   // Array to store close functions
@@ -652,11 +654,45 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, selectedFilters,
               if (newValue.length > 2 || newValue.length === 0) {
                 track('NFT Search Used', {
                   searchTerm: newValue,
-                  searchLength: newValue.length
+                  searchLength: newValue.length,
+                  searchMode
                 });
               }
             }}
           />
+        </div>
+        
+        {/* Search Mode Toggle */}
+        <div className="mb-3">
+          <div className="text-xs text-neutral-400 mb-2">Search Mode:</div>
+          <div className="flex bg-neutral-800 rounded p-1">
+            <button
+              onClick={() => setSearchMode("exact")}
+              className={`flex-1 px-3 py-1.5 text-xs rounded transition-colors ${
+                searchMode === "exact"
+                  ? "bg-brand-pink text-white"
+                  : "text-neutral-400 hover:text-white"
+              }`}
+            >
+              Exact
+            </button>
+            <button
+              onClick={() => setSearchMode("contains")}
+              className={`flex-1 px-3 py-1.5 text-xs rounded transition-colors ${
+                searchMode === "contains"
+                  ? "bg-brand-pink text-white"
+                  : "text-neutral-400 hover:text-white"
+              }`}
+            >
+              Contains
+            </button>
+          </div>
+          <div className="text-xs text-neutral-500 mt-1">
+            {searchMode === "exact" 
+              ? "Find exact token ID or name matches" 
+              : "Find NFTs containing your search term"
+            }
+          </div>
         </div>
         <Button
           variant="outline"

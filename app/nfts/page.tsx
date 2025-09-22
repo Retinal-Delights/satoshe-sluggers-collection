@@ -8,6 +8,7 @@ import { useState, useCallback } from "react"
 
 export default function NFTsPage() {
   const [searchTerm, setSearchTerm] = useState("")
+  const [searchMode, setSearchMode] = useState<"exact" | "contains">("contains")
   const [selectedFilters, setSelectedFilters] = useState({})
   const [filteredCount, setFilteredCount] = useState(0)
   const [traitCounts, setTraitCounts] = useState<Record<string, Record<string, number>>>({})
@@ -41,6 +42,8 @@ export default function NFTsPage() {
             <NFTSidebar
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
+              searchMode={searchMode}
+              setSearchMode={setSearchMode}
               selectedFilters={selectedFilters}
               setSelectedFilters={setSelectedFilters}
               traitCounts={traitCounts}
@@ -49,6 +52,7 @@ export default function NFTsPage() {
           <div className="flex-1 min-w-0">
             <NFTGrid
               searchTerm={searchTerm}
+              searchMode={searchMode}
               selectedFilters={selectedFilters}
               onFilteredCountChange={handleFilteredCountChange}
               onTraitCountsChange={handleTraitCountsChange}
