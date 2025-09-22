@@ -126,7 +126,7 @@ const Header80: React.FC = () => {
           <div className="relative z-20 text-center">
             <div className="mb-5 md:mb-6">
               <Image
-                src="/satoshe-sluggers-home-white.svg"
+                src="/satoshe-sluggers-hero-off-white.svg"
                 alt="Satoshe Sluggers"
                 width={600}
                 height={300}
