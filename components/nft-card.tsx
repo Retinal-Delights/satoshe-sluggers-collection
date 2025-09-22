@@ -335,7 +335,7 @@ export default function NFTCard({
               <>
                 {/* Bidding Section */}
                 <div className="pt-2 mb-2 p-3 bg-card rounded">
-                  <div className="text-xs md:text-sm mb-2 font-normal whitespace-nowrap" style={{ color: "#fffbeb" }}>Min Bid: <span className="text-xs md:text-sm font-semibold">{formatBidAmount(minimumBidAmount)} ETH</span></div>
+                  <div className="text-xs md:text-sm mb-2 font-normal" style={{ color: "#fffbeb" }}>Enter your max bid</div>
                   
                   <div className="flex gap-2 mb-2">
                     <div className="relative flex-1">
@@ -415,7 +415,7 @@ export default function NFTCard({
                     </TransactionButton>
                   </div>
                   
-                  <div className="text-xs text-neutral-400 whitespace-nowrap">Starting Price: {formatBidAmount(minimumBidAmount)} ETH</div>
+                  <div className="text-xs text-neutral-400 whitespace-nowrap">Min: {formatBidAmount(minimumBidAmount)} ETH</div>
                 </div>
 
                 {/* Buy Now Section */}
@@ -423,7 +423,7 @@ export default function NFTCard({
                   <div className="flex items-end justify-between">
                     <div>
                     <div className="text-xs md:text-sm mb-0.5" style={{ color: "#fffbeb" }}>Buy Now</div>
-                    <div className="text-sm md:text-base font-semibold leading-tight" style={{ color: "#3B82F6" }}>{buyNow.replace(' ETH', '')} ETH</div>
+                    <div className="text-sm md:text-base font-medium leading-tight" style={{ color: "#3B82F6" }}>{buyNow.replace(' ETH', '')} ETH</div>
                     </div>
                     <TransactionButton
                       transaction={createBuyNowTransaction}
