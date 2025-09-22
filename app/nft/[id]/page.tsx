@@ -712,7 +712,7 @@ export default function NFTDetailPage() {
           </div>
 
           {/* Right Column - NFT Details */}
-          <div className="space-y-6 -mt-6">
+          <div className="space-y-6 -mt-2">
             {/* NFT Name with Heart Icon */}
             <div className="flex items-start justify-between gap-4">
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold leading-tight" style={{ color: "#fffbeb" }}>
