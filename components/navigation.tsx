@@ -35,9 +35,9 @@ export default function Navigation({ activePage = "home" }: NavigationProps) {
           }`}
         >
           HOME
-          <span className={`absolute bottom-0 left-0 h-0.5 bg-neutral-100 transition-all duration-300 ease-out ${
+          <span className={`absolute bottom-0 left-0 h-0.5 transition-all duration-300 ease-out ${
             activePage === "home" ? "w-full" : "w-0 group-hover:w-full"
-          }`}></span>
+          }`} style={{ backgroundColor: "#fffbeb" }}></span>
         </Link>
         <Link
           href="/about"
@@ -46,9 +46,9 @@ export default function Navigation({ activePage = "home" }: NavigationProps) {
           }`}
         >
           ABOUT
-          <span className={`absolute bottom-0 left-0 h-0.5 bg-neutral-100 transition-all duration-300 ease-out ${
+          <span className={`absolute bottom-0 left-0 h-0.5 transition-all duration-300 ease-out ${
             activePage === "about" ? "w-full" : "w-0 group-hover:w-full"
-          }`}></span>
+          }`} style={{ backgroundColor: "#fffbeb" }}></span>
         </Link>
         <Link
           href="/nfts"
@@ -57,9 +57,9 @@ export default function Navigation({ activePage = "home" }: NavigationProps) {
           }`}
         >
           NFTS
-          <span className={`absolute bottom-0 left-0 h-0.5 bg-neutral-100 transition-all duration-300 ease-out ${
+          <span className={`absolute bottom-0 left-0 h-0.5 transition-all duration-300 ease-out ${
             activePage === "nfts" ? "w-full" : "w-0 group-hover:w-full"
-          }`}></span>
+          }`} style={{ backgroundColor: "#fffbeb" }}></span>
         </Link>
         <Link
           href="/sell"
@@ -68,7 +68,7 @@ export default function Navigation({ activePage = "home" }: NavigationProps) {
           }`}
         >
           SELL
-          <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-neutral-100 transition-all duration-300 ease-out group-hover:w-full"></span>
+          <span className="absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300 ease-out group-hover:w-full" style={{ backgroundColor: "#fffbeb" }}></span>
         </Link>
         <Link
           href="/contact"
@@ -77,7 +77,7 @@ export default function Navigation({ activePage = "home" }: NavigationProps) {
           }`}
         >
           CONTACT
-          <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-neutral-100 transition-all duration-300 ease-out group-hover:w-full"></span>
+          <span className="absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300 ease-out group-hover:w-full" style={{ backgroundColor: "#fffbeb" }}></span>
         </Link>
         {account && (
           <Link
@@ -87,7 +87,7 @@ export default function Navigation({ activePage = "home" }: NavigationProps) {
             }`}
           >
             MY NFTS
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-neutral-100 transition-all duration-300 ease-out group-hover:w-full"></span>
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300 ease-out group-hover:w-full" style={{ backgroundColor: "#fffbeb" }}></span>
           </Link>
         )}
       </nav>
