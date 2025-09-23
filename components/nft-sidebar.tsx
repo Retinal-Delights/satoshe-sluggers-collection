@@ -557,6 +557,8 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, searchMode, setS
   const clearAllFilters = () => {
     // Clear the search term
     setSearchTerm("")
+    // Reset search mode to "contains" to prevent "no NFTs found" when exact is enabled
+    setSearchMode("contains")
     // Call all registered reset functions
     resetFunctions.current.forEach((resetFn) => resetFn())
     // Close all dropdowns

@@ -156,13 +156,39 @@ export function getCachedDataFromStorage<T>(key: string): T | null {
   }
 }
 
+// Helper function to convert BigInt values to strings for JSON serialization
+function convertBigIntToStrings(obj: any): any {
+  if (obj === null || obj === undefined) return obj;
+  
+  if (typeof obj === 'bigint') {
+    return obj.toString();
+  }
+  
+  if (Array.isArray(obj)) {
+    return obj.map(convertBigIntToStrings);
+  }
+  
+  if (typeof obj === 'object') {
+    const converted: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      converted[key] = convertBigIntToStrings(value);
+    }
+    return converted;
+  }
+  
+  return obj;
+}
+
 export function setCachedDataToStorage<T>(key: string, data: T, ttl: number): void {
   // Only run on client side
   if (typeof window === 'undefined') return;
   
   try {
+    // Convert BigInt values to strings before caching
+    const serializableData = convertBigIntToStrings(data);
+    
     const cacheEntry = {
-      data,
+      data: serializableData,
       timestamp: Date.now(),
       ttl
     };

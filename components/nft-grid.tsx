@@ -142,7 +142,7 @@ interface NFTGridProps {
 const TOTAL_NFTS = 7777;
 
 // Cancelled/Expired Listings - DO NOT USE THESE LISTING IDS
-const CANCELLED_LISTING_IDS = [0, 1, 2, 3, 4, 5, 6, 7782, 7783, 7784, 7785, 7786, 7787, 7788];
+const CANCELLED_LISTING_IDS = [0, 1, 2, 3, 4, 5, 6, 7782, 7783, 7784, 7785, 7786, 7787, 7788, 7796, 7797, 7798, 7799, 7800, 7801, 7802];
 
 // Helper function to check if a listing ID is cancelled
 const isCancelledListing = (listingId: string | number | bigint) => {
@@ -236,23 +236,29 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
               cachedData = getCachedDataFromStorage<[number, any][]>(cacheKey);
             }
             
-            if (cachedData) {
-              console.log('[fetchAuctionData] Using cached auction data');
-              const auctionDataMap = new Map(cachedData);
-              setAuctionMap(auctionDataMap);
-              setIsLoadingAuctions(false);
-              return;
-            }
+            // TEMPORARILY DISABLED - Force fresh load to debug Token ID 59
+            // if (cachedData) {
+            //   console.log('[fetchAuctionData] Using cached auction data');
+            //   const auctionDataMap = new Map(cachedData);
+            //   setAuctionMap(auctionDataMap);
+            //   setIsLoadingAuctions(false);
+            //   return;
+            // }
 
             
             // Fetch in larger batches to reduce API calls and respect rate limits
             const batchSize = 1000; // Increased batch size to reduce API calls (was 200)
-            const maxPossibleAuctions = 7798; // Query up to 7798 (last listing ID)
+            const maxPossibleAuctions = 7806; // Query up to 7806 to include 7805 (last listing ID)
             const allAuctionData: any[] = [];
             
-            // Query the entire range (0-7798) in fewer, larger batches with circuit breaker protection
+            // Query the entire range (0-7805) in fewer, larger batches with circuit breaker protection
             for (let startId = 0; startId < maxPossibleAuctions; startId += batchSize) {
               const endId = Math.min(startId + batchSize - 1, maxPossibleAuctions - 1);
+              
+              // Debug: Log the range we're querying for high auction IDs
+              if (startId >= 7000) {
+                console.log(`[DEBUG] Querying range ${startId}-${endId}`);
+              }
               
               try {
                 const batchData = await emergencySafeRpcCall(
@@ -274,6 +280,7 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
                 
                 if (batchData && Array.isArray(batchData)) {
                   allAuctionData.push(...batchData);
+                  
                   
                   // If we get an empty batch, we've likely reached the end of active auctions
                   if (batchData.length === 0) {
@@ -306,9 +313,33 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
             // Create auction map from all batched data
             const auctionDataMap = new Map();
             
+            // Debug: Track Token ID 59 specifically
+            let token59Found = false;
+            let token59Auction = null;
+            
             if (allAuctionData && Array.isArray(allAuctionData) && allAuctionData.length > 0) {
+            // Debug: Log status distribution and specific auction IDs
+            const statusCounts = allAuctionData.reduce((acc: any, auction: any) => {
+              acc[auction.status] = (acc[auction.status] || 0) + 1;
+              return acc;
+            }, {});
+            console.log('[DEBUG] Auction status distribution:', statusCounts);
+            console.log('[DEBUG] Total auctions found:', allAuctionData.length);
+            
+            // Check for specific auction IDs we know exist
+            const auctionIds = allAuctionData.map(a => Number(a.auctionId)).sort((a, b) => a - b);
+            console.log('[DEBUG] All auction IDs found:', auctionIds.slice(-10)); // Show last 10
+              
               allAuctionData.forEach((auction: any) => {
                 const tokenId = Number(auction.tokenId);
+                
+                // Debug: Check for Token ID 59
+                if (tokenId === 59) {
+                  token59Found = true;
+                  token59Auction = auction;
+                  console.log('[DEBUG] Token ID 59 found in auction data:', auction);
+                }
+                
                 auctionDataMap.set(tokenId, {
                   id: auction.auctionId,
                   tokenId: auction.tokenId,
@@ -326,6 +357,14 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
                 });
               });
             }
+            
+            // Debug: Log Token ID 59 status
+            console.log('[DEBUG] Token ID 59 status:', {
+              found: token59Found,
+              auction: token59Auction,
+              totalAuctions: allAuctionData.length,
+              auctionMapSize: auctionDataMap.size
+            });
 
             // Cache the auction data for future use (both in-memory and localStorage)
             const auctionDataArray = Array.from(auctionDataMap.entries());
@@ -538,8 +577,8 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
     };
   }, []); // Empty dependency array since we only want this to run once
 
-  // Memoize the NFT loading function to prevent excessive re-renders
-  const loadNFTs = useCallback(async () => {
+  // Load NFTs when essential data changes - moved logic directly into useEffect to prevent re-renders
+  useEffect(() => {
     // Only load if we have all required data
     if (!isMetadataLoaded || isLoadingAuctions || !imageUrlMap || Object.keys(imageUrlMap).length === 0) {
       return;
@@ -555,6 +594,20 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
         .map((meta: any) => {
           const tokenId = meta.token_id?.toString() || "";
           const auction = auctionMap.get(Number(tokenId));
+          
+          // Debug: Track Token ID 59 in mapping
+          if (tokenId === "59") {
+            console.log('[DEBUG] Token ID 59 mapping:', {
+              tokenId,
+              meta,
+              auction,
+              auctionStatus: auction?.status,
+              isCancelled: auction ? isCancelledListing(auction?.auctionId) : false,
+              isSold: soldNFTs.has(Number(tokenId)),
+              isForSale: !!auction && auction.status === 1 && !isCancelledListing(auction?.auctionId) && !soldNFTs.has(Number(tokenId))
+            });
+          }
+          
           // Use image URL from nft_urls.json, fallback to placeholder
           const imageUrl = imageUrlMap[tokenId] || FALLBACK_IMAGE;
 
@@ -594,7 +647,7 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
                 ? auction.price
                 : "0",
              // Add flag to indicate if NFT is for sale (exclude cancelled and sold listings)
-             isForSale: !!auction && !isCancelledListing(auction?.auctionId) && !soldNFTs.has(Number(tokenId)),
+             isForSale: !!auction && auction.status === 1 && !isCancelledListing(auction?.auctionId) && !soldNFTs.has(Number(tokenId)),
              // Add flag to indicate if NFT listing was cancelled
              isCancelled: !!auction && isCancelledListing(auction?.auctionId),
              // Add flag to indicate if NFT was sold
@@ -615,6 +668,14 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
             headwear: getAttribute(meta, "Headwear"),
           };
         });
+        
+      // Debug: Check if Token ID 59 is in final mapped NFTs
+      const token59InMapped = mappedNFTs.find(nft => nft.tokenId === "59");
+      console.log('[DEBUG] Token ID 59 in final mapped NFTs:', {
+        found: !!token59InMapped,
+        nft: token59InMapped,
+        totalMapped: mappedNFTs.length
+      });
 
       
       setNfts(mappedNFTs);
@@ -633,13 +694,6 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
       setIsLoading(false);
     }
   }, [isMetadataLoaded, isLoadingAuctions, imageUrlMap, allMetadata, auctionMap, soldNFTs]);
-
-  // Only call loadNFTs when essential data changes, not on every render
-  useEffect(() => {
-    if (isMetadataLoaded && !isLoadingAuctions && imageUrlMap && Object.keys(imageUrlMap).length > 0) {
-      loadNFTs();
-    }
-  }, [isMetadataLoaded, isLoadingAuctions, imageUrlMap]);
 
 
 
@@ -893,9 +947,12 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
     }
 
   // View filter (Live vs Sold) - proper handling of different NFT states
-  const matchesView = activeView === "forSale" 
-    ? nft.isForSale 
-    : nft.isSold;
+  // In exact search mode, show matching NFTs regardless of sale status for better UX
+  const matchesView = searchMode === "exact" && searchTerm 
+    ? (nft.isForSale || nft.isSold) // Show both live and sold when searching exactly
+    : activeView === "forSale" 
+      ? nft.isForSale 
+      : nft.isSold;
     
 
     // Rarity filter
@@ -1075,6 +1132,10 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
     );
   }
 
+  // Calculate counts for active and sold NFTs
+  const activeCount = nfts.filter(nft => nft.isForSale).length;
+  const soldCount = nfts.filter(nft => nft.isSold).length;
+
   return (
     <div className="w-full max-w-full">
       <div className="mb-6">
@@ -1082,14 +1143,14 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
           <h2 className="text-lg font-medium" style={{ color: "#fffbeb" }}>
             NFT Collection
           </h2>
-          {filteredNFTs.length > 0 && (
-            <div className="text-sm font-medium text-brand-pink mt-1">
-              {activeView === "forSale" 
-                ? `${filteredNFTs.length} active listing${filteredNFTs.length !== 1 ? 's' : ''} found`
-                : `${filteredNFTs.length} NFT${filteredNFTs.length !== 1 ? 's' : ''} found`
-              }
+          <div className="mt-1">
+            <div className="text-xs font-medium" style={{ color: "#10b981" }}>
+              {activeCount} Active
             </div>
-          )}
+            <div className="text-xs font-medium" style={{ color: "#3b82f6" }}>
+              {soldCount} Sold
+            </div>
+          </div>
         </div>
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <div className="flex bg-neutral-800 rounded p-1">
@@ -1136,10 +1197,10 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
               </SelectTrigger>
               <SelectContent className="text-sm rounded">
                 <SelectItem value="default">Default</SelectItem>
-                <SelectItem value="rank-asc">Rank: Low to High</SelectItem>
-                <SelectItem value="rank-desc">Rank: High to Low</SelectItem>
                 <SelectItem value="price-asc">Price: Low to High</SelectItem>
                 <SelectItem value="price-desc">Price: High to Low</SelectItem>
+                <SelectItem value="rank-asc">Rank: Low to High</SelectItem>
+                <SelectItem value="rank-desc">Rank: High to Low</SelectItem>
                 <SelectItem value="ending-soonest">Ending Soonest</SelectItem>
               </SelectContent>
             </Select>

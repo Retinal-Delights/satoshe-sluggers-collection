@@ -7,7 +7,7 @@ import { emergencySafeRpcCall } from "@/lib/emergency-stop";
 import { cacheManager, CACHE_KEYS, CACHE_TTL, getCachedDataFromStorage, setCachedDataToStorage } from "@/lib/cache-manager";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Heart } from "lucide-react";
+import { ArrowLeft, Heart, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -192,9 +192,22 @@ export default function NFTDetailPage() {
   const [timeRemaining, setTimeRemaining] = useState("");
   const [bidCount, setBidCount] = useState(0);
   const [currentBidAmount, setCurrentBidAmount] = useState<string>("0");
+  const [navigationTokens, setNavigationTokens] = useState<{prev: number | null, next: number | null}>({prev: null, next: null});
   
   // Use global marketplace events
   const { getCurrentBid, getBidCount, getAuctionStatus, refreshAuctionBid } = useMarketplaceEvents();
+
+  // Calculate navigation tokens (previous and next)
+  useEffect(() => {
+    const currentTokenId = parseInt(tokenId);
+    const prevToken = currentTokenId > 0 ? currentTokenId - 1 : null;
+    const nextToken = currentTokenId < 7776 ? currentTokenId + 1 : null; // 7777 total NFTs (0-7776)
+    
+    setNavigationTokens({
+      prev: prevToken,
+      next: nextToken
+    });
+  }, [tokenId]);
 
   // Bid counter management functions
   const incrementBidCount = () => {
@@ -260,29 +273,24 @@ export default function NFTDetailPage() {
       try {
         setIsLoadingAuction(true);
 
-        // Check for cached auction data first (both in-memory and localStorage)
-        const cacheKey = CACHE_KEYS.AUCTION_DETAIL(marketplace.address, tokenId);
-        
-        // Try in-memory cache first
-        let cachedData = cacheManager.get<any>(cacheKey);
-        
-        // Fallback to localStorage cache
-        if (!cachedData) {
-          cachedData = getCachedDataFromStorage<any>(cacheKey);
-        }
-        
-        if (cachedData) {
-          console.log('[NFT Detail] Using cached auction data');
-          setAuctionData(cachedData);
-          setIsLoadingAuction(false);
-          return;
-        }
+        // DISABLED CACHE - Force fresh data for real-time updates
+        // const cacheKey = CACHE_KEYS.AUCTION_DETAIL(marketplace.address, tokenId);
+        // let cachedData = cacheManager.get<any>(cacheKey);
+        // if (!cachedData) {
+        //   cachedData = getCachedDataFromStorage<any>(cacheKey);
+        // }
+        // if (cachedData) {
+        //   console.log('[NFT Detail] Using cached auction data');
+        //   setAuctionData(cachedData);
+        //   setIsLoadingAuction(false);
+        //   return;
+        // }
 
         // Use direct contract call to get all auctions and find this token's auction
 
         // Use larger batches to reduce API calls and respect rate limits
         const batchSize = 1000; // Increased from 100 to reduce API calls
-        const maxPossibleAuctions = 7798;
+        const maxPossibleAuctions = 7805;
         let tokenAuction = null;
         
         for (let startId = 0; startId < maxPossibleAuctions && !tokenAuction; startId += batchSize) {
@@ -348,7 +356,7 @@ export default function NFTDetailPage() {
             type: tokenAuction.tokenType,
             startingPrice: tokenAuction.minimumBidAmount,
             minimumBidAmount: tokenAuction.minimumBidAmount,
-            currentBidAmount: tokenAuction.minimumBidAmount,
+            currentBidAmount: tokenAuction.minimumBidAmount, // Will be updated with actual current bid
             buyoutAmount: tokenAuction.buyoutBidAmount,
             endTimeInSeconds: tokenAuction.endTimestamp,
             startTimeInSeconds: tokenAuction.startTimestamp,
@@ -357,8 +365,35 @@ export default function NFTDetailPage() {
           setAuctionData(processedAuctionData);
           setBidCount(processedAuctionData.totalBids || 0);
           
+          // Fetch the actual current winning bid for this auction
+          try {
+            const winningBid = await readContract({
+              contract: marketplace,
+              method: "function getWinningBid(uint256 _auctionId) view returns (address bidder, address currency, uint256 bidAmount, uint256 bidTime)",
+              params: [BigInt(processedAuctionData.auctionId)],
+            });
+            
+            if (winningBid && winningBid[2] && winningBid[2] !== 0n) {
+              const currentBidEth = Number(winningBid[2]) / 1e18;
+              setCurrentBidAmount(currentBidEth.toString());
+              console.log(`[NFT Detail] Current winning bid: ${currentBidEth} ETH`);
+            } else {
+              // No winning bid yet, use minimum bid
+              const minBidEth = Number(processedAuctionData.minimumBidAmount) / 1e18;
+              setCurrentBidAmount(minBidEth.toString());
+              console.log(`[NFT Detail] No winning bid, using minimum: ${minBidEth} ETH`);
+            }
+          } catch (bidError) {
+            console.warn('[NFT Detail] Failed to fetch winning bid:', bidError);
+            // Fallback to minimum bid
+            const minBidEth = Number(processedAuctionData.minimumBidAmount) / 1e18;
+            setCurrentBidAmount(minBidEth.toString());
+          }
+          
           // Cache the auction data for future use (both in-memory and localStorage)
           try {
+            const cacheKey = CACHE_KEYS.AUCTION_DETAIL(marketplace.address, tokenId);
+            
             // Cache in memory
             cacheManager.set(cacheKey, processedAuctionData, CACHE_TTL.AUCTION_DETAIL);
             
@@ -427,6 +462,17 @@ export default function NFTDetailPage() {
   useEffect(() => {
     fetchAuctionData();
   }, [tokenId]);
+
+  // Auto-refresh auction data every 30 seconds for real-time updates
+  useEffect(() => {
+    if (!auctionData?.auctionId) return;
+    
+    const interval = setInterval(() => {
+      fetchAuctionData();
+    }, 30000); // Refresh every 30 seconds
+    
+    return () => clearInterval(interval);
+  }, [auctionData?.auctionId]);
 
   // Update countdown every second (following Thirdweb AI recommendation)
   useEffect(() => {
@@ -667,13 +713,42 @@ export default function NFTDetailPage() {
     <main className="min-h-screen bg-background text-foreground flex flex-col">
       <Navigation activePage="nfts" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex-grow pt-24 sm:pt-28">
-        <Link
-          href="/nfts"
-          className="inline-flex items-center text-neutral-400 hover:text-[#ff0099] mb-4 sm:mb-6 text-sm transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to collection
-        </Link>
+        <div className="flex items-center justify-between mb-4 sm:mb-6 px-2 sm:px-4">
+          <Link
+            href="/nfts"
+            className="inline-flex items-center text-neutral-400 hover:text-[#ff0099] text-sm transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to collection
+          </Link>
+
+          {/* Navigation Arrows */}
+          <div className="flex items-center gap-3">
+            {navigationTokens.prev !== null && (
+              <Link
+                href={`/nft/${navigationTokens.prev}`}
+                className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-neutral-800 hover:bg-neutral-700 text-neutral-400 hover:text-[#ff0099] transition-colors border border-neutral-700 hover:border-[#ff0099]"
+                title={`Previous NFT #${navigationTokens.prev + 1}`}
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </Link>
+            )}
+            
+            <span className="text-sm text-neutral-500 px-2">
+              {parseInt(tokenId) + 1} of 7777
+            </span>
+            
+            {navigationTokens.next !== null && (
+              <Link
+                href={`/nft/${navigationTokens.next}`}
+                className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-neutral-800 hover:bg-neutral-700 text-neutral-400 hover:text-[#ff0099] transition-colors border border-neutral-700 hover:border-[#ff0099]"
+                title={`Next NFT #${navigationTokens.next + 1}`}
+              >
+                <ChevronRight className="h-5 w-5" />
+              </Link>
+            )}
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 xl:gap-12">
           {/* Left Column - Image, Attributes, and Rarity Chart */}
@@ -957,6 +1032,8 @@ export default function NFTDetailPage() {
                       if (auctionData?.auctionId) {
                         await refreshAuctionBid(auctionData.auctionId.toString());
                       }
+                      // Also refresh full auction data for complete real-time update
+                      await fetchAuctionData();
                       alert(`Bid of ${bidAmount} ETH placed successfully!`);
                     }}
                     onError={(error) => {

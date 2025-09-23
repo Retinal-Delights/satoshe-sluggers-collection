@@ -141,12 +141,31 @@ export default function NFTCard({
 
     const amount = bidAmount || formatBidAmount(minimumBidAmount);
     
-    if (!amount || Number(amount) < minimumBidAmount) {
-      throw new Error(`Bid must be at least ${formatBidAmount(minimumBidAmount)} ETH`);
+    // Parse current bid amount from the currentBid prop (in ETH)
+    const currentBidEth = parseFloat(currentBid.replace(/[^\d.-]/g, '')) || 0;
+    
+    // Calculate minimum required bid
+    // If no bids have been placed (numBids === 0), use minimum bid amount
+    // If bids exist, use current bid + 5% buffer
+    const bidBufferBps = 500; // 5% buffer (500 basis points)
+    const minRequiredBid = numBids === 0 
+      ? minimumBidAmount 
+      : currentBidEth + (currentBidEth * bidBufferBps / 10000);
+    
+    if (!amount || Number(amount) < minRequiredBid) {
+      const requiredBid = formatBidAmount(minRequiredBid);
+      const currentBidText = numBids === 0 ? 'minimum bid' : 'current highest bid + 5% buffer';
+      throw new Error(`Bid must be at least ${requiredBid} ETH (${currentBidText})`);
     }
 
     // Check if bid is above buyout amount
-    if (typeof buyNowValue === 'number' && Number(amount) >= buyNowValue) {
+    if (typeof buyNowValue === 'number' && Number(amount) > buyNowValue) {
+      console.log(`[DEBUG] Bid validation failed:`, {
+        bidAmount: amount,
+        bidAmountNumber: Number(amount),
+        buyNowValue,
+        comparison: Number(amount) > buyNowValue
+      });
       throw new Error(`Bid amount is above the buyout amount of ${buyNowValue} ETH`);
     }
 
@@ -156,6 +175,14 @@ export default function NFTCard({
       throw new Error(validation.error);
     }
 
+    console.log(`[DEBUG] bidInAuction call:`, {
+      auctionId,
+      bidAmount: amount,
+      bidAmountWei: toWei(amount).toString(),
+      buyNowValue,
+      buyNowValueWei: buyNowValue ? toWei(buyNowValue.toString()).toString() : 'undefined'
+    });
+    
     return bidInAuction({
       contract: marketplace,
       auctionId: BigInt(auctionId),
@@ -213,7 +240,7 @@ export default function NFTCard({
     bidAmount !== "" && (
       !isFinite(Number(bidAmount)) ||
       Number(bidAmount) < minimumBidAmount ||
-      (typeof buyNowValue === 'number' && Number(bidAmount) >= buyNowValue)
+      (typeof buyNowValue === 'number' && Number(bidAmount) > buyNowValue)
     );
 
   // Favorites functionality
