@@ -490,7 +490,7 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
       setAuctionMap(newAuctionMap);
       setSoldNFTs(newSoldNFTs);
     }
-  }, [auctionEvents, auctionMap, soldNFTs]);
+  }, [auctionEvents]);
 
     useEffect(() => {
     // Load all static metadata and image URLs from local JSON files
