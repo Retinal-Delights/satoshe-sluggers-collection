@@ -236,11 +236,11 @@ export default function NFTCard({
   // Auto-populate bid amount with minimum bid amount
   const defaultBidAmount = bidAmount || formatBidAmount(minimumBidAmount);
   const displayBidAmount = bidAmount === "" ? formatBidAmount(minimumBidAmount) : bidAmount;
-  const isInvalidBid =
+  const isInvalidBid = 
     bidAmount !== "" && (
       !isFinite(Number(bidAmount)) ||
       Number(bidAmount) < minimumBidAmount ||
-      (typeof buyNowValue === 'number' && Number(bidAmount) > buyNowValue)
+      (typeof buyNowValue === 'number' && BigInt(Math.floor(Number(bidAmount) * 1e18)) >= BigInt(Math.floor(buyNowValue * 1e18)))
     );
 
   // Favorites functionality

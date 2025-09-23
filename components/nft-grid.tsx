@@ -762,10 +762,20 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
         return;
       }
 
+      // Debug: Log the values being sent
+      const bidAmountWei = toWei(amount);
+      const buyoutWei = auction.buyoutAmount;
+      console.log('[DEBUG] Bid validation:', {
+        bidAmountETH: amount,
+        bidAmountWei: bidAmountWei.toString(),
+        buyoutWei: buyoutWei.toString(),
+        isBidValid: bidAmountWei < buyoutWei
+      });
+
       const tx = bidInAuction({
         contract: marketplace,
         auctionId: auction.auctionId,
-        bidAmount: toWei(amount).toString(),
+        bidAmount: bidAmountWei.toString(),
       });
       await new Promise((resolve, reject) => {
         sendBid(tx, {
