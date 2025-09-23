@@ -247,10 +247,10 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
             
             // Fetch in larger batches to reduce API calls and respect rate limits
             const batchSize = 1000; // Increased batch size to reduce API calls (was 200)
-            const maxPossibleAuctions = 7804; // Query up to 7804 (last listing ID)
+            const maxPossibleAuctions = 7805; // Query up to 7805 (last listing ID)
             const allAuctionData: any[] = [];
             
-            // Query the entire range (0-7804) in fewer, larger batches with circuit breaker protection
+            // Query the entire range (0-7805) in fewer, larger batches with circuit breaker protection
             for (let startId = 0; startId < maxPossibleAuctions; startId += batchSize) {
               const endId = Math.min(startId + batchSize - 1, maxPossibleAuctions - 1);
               
@@ -274,6 +274,7 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
                 
                 if (batchData && Array.isArray(batchData)) {
                   allAuctionData.push(...batchData);
+                  
                   
                   // If we get an empty batch, we've likely reached the end of active auctions
                   if (batchData.length === 0) {
@@ -538,8 +539,8 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
     };
   }, []); // Empty dependency array since we only want this to run once
 
-  // Memoize the NFT loading function to prevent excessive re-renders
-  const loadNFTs = useCallback(async () => {
+  // Load NFTs when essential data changes - moved logic directly into useEffect to prevent re-renders
+  useEffect(() => {
     // Only load if we have all required data
     if (!isMetadataLoaded || isLoadingAuctions || !imageUrlMap || Object.keys(imageUrlMap).length === 0) {
       return;
@@ -555,6 +556,7 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
         .map((meta: any) => {
           const tokenId = meta.token_id?.toString() || "";
           const auction = auctionMap.get(Number(tokenId));
+          
           // Use image URL from nft_urls.json, fallback to placeholder
           const imageUrl = imageUrlMap[tokenId] || FALLBACK_IMAGE;
 
@@ -633,13 +635,6 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
       setIsLoading(false);
     }
   }, [isMetadataLoaded, isLoadingAuctions, imageUrlMap, allMetadata, auctionMap, soldNFTs]);
-
-  // Only call loadNFTs when essential data changes, not on every render
-  useEffect(() => {
-    if (isMetadataLoaded && !isLoadingAuctions && imageUrlMap && Object.keys(imageUrlMap).length > 0) {
-      loadNFTs();
-    }
-  }, [isMetadataLoaded, isLoadingAuctions, imageUrlMap]);
 
 
 

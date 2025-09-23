@@ -282,7 +282,7 @@ export default function NFTDetailPage() {
 
         // Use larger batches to reduce API calls and respect rate limits
         const batchSize = 1000; // Increased from 100 to reduce API calls
-        const maxPossibleAuctions = 7804;
+        const maxPossibleAuctions = 7805;
         let tokenAuction = null;
         
         for (let startId = 0; startId < maxPossibleAuctions && !tokenAuction; startId += batchSize) {
