@@ -240,7 +240,7 @@ export default function NFTCard({
     bidAmount !== "" && (
       !isFinite(Number(bidAmount)) ||
       Number(bidAmount) < minimumBidAmount ||
-      (typeof buyNowValue === 'number' && BigInt(Math.floor(Number(bidAmount) * 1e18)) >= BigInt(Math.floor(buyNowValue * 1e18)))
+      (typeof buyNowValue === 'number' && Number(bidAmount) > buyNowValue)
     );
 
   // Favorites functionality

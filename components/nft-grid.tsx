@@ -765,11 +765,15 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
       // Debug: Log the values being sent
       const bidAmountWei = toWei(amount);
       const buyoutWei = auction.buyoutAmount;
+      const minimumBidWei = auction.minimumBidAmount;
       console.log('[DEBUG] Bid validation:', {
         bidAmountETH: amount,
         bidAmountWei: bidAmountWei.toString(),
+        minimumBidWei: minimumBidWei.toString(),
         buyoutWei: buyoutWei.toString(),
-        isBidValid: bidAmountWei < buyoutWei
+        isBidAboveMinimum: bidAmountWei >= minimumBidWei,
+        isBidBelowBuyout: bidAmountWei < buyoutWei,
+        auctionId: auction.auctionId.toString()
       });
 
       const tx = bidInAuction({
