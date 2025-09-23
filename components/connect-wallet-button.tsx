@@ -27,11 +27,9 @@ export default function ConnectWalletButton() {
       }}
       auth={{
         async doLogin(params) {
-          console.log('[Auth] User authenticated successfully');
         },
         
         async doLogout() {
-          console.log('[Auth] User logged out');
         },
         
         async getLoginPayload(params) {

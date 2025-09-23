@@ -237,7 +237,6 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
             }
             
             if (cachedData) {
-              console.log('[fetchAuctionData] Using cached auction data');
               const auctionDataMap = new Map(cachedData);
               setAuctionMap(auctionDataMap);
               setIsLoadingAuctions(false);
@@ -254,10 +253,6 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
             for (let startId = 0; startId < maxPossibleAuctions; startId += batchSize) {
               const endId = Math.min(startId + batchSize - 1, maxPossibleAuctions - 1);
               
-              // Debug: Log the range we're querying for high auction IDs
-              if (startId >= 7000) {
-                console.log(`[DEBUG] Querying range ${startId}-${endId}`);
-              }
               
               try {
                 const batchData = await emergencySafeRpcCall(
@@ -312,32 +307,12 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
             // Create auction map from all batched data
             const auctionDataMap = new Map();
             
-            // Debug: Track Token ID 59 specifically
-            let token59Found = false;
-            let token59Auction = null;
             
             if (allAuctionData && Array.isArray(allAuctionData) && allAuctionData.length > 0) {
-            // Debug: Log status distribution and specific auction IDs
-            const statusCounts = allAuctionData.reduce((acc: any, auction: any) => {
-              acc[auction.status] = (acc[auction.status] || 0) + 1;
-              return acc;
-            }, {});
-            console.log('[DEBUG] Auction status distribution:', statusCounts);
-            console.log('[DEBUG] Total auctions found:', allAuctionData.length);
-            
-            // Check for specific auction IDs we know exist
-            const auctionIds = allAuctionData.map(a => Number(a.auctionId)).sort((a, b) => a - b);
-            console.log('[DEBUG] All auction IDs found:', auctionIds.slice(-10)); // Show last 10
               
               allAuctionData.forEach((auction: any) => {
                 const tokenId = Number(auction.tokenId);
                 
-                // Debug: Check for Token ID 59
-                if (tokenId === 59) {
-                  token59Found = true;
-                  token59Auction = auction;
-                  console.log('[DEBUG] Token ID 59 found in auction data:', auction);
-                }
                 
                 auctionDataMap.set(tokenId, {
                   id: auction.auctionId,
@@ -357,13 +332,6 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
               });
             }
             
-            // Debug: Log Token ID 59 status
-            console.log('[DEBUG] Token ID 59 status:', {
-              found: token59Found,
-              auction: token59Auction,
-              totalAuctions: allAuctionData.length,
-              auctionMapSize: auctionDataMap.size
-            });
 
             // Cache the auction data for future use (both in-memory and localStorage)
             const auctionDataArray = Array.from(auctionDataMap.entries());
@@ -375,7 +343,6 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
               // Cache in localStorage
               setCachedDataToStorage(cacheKey, auctionDataArray, CACHE_TTL.AUCTION_DATA);
               
-              console.log('[fetchAuctionData] Cached auction data successfully');
             } catch (cacheError) {
               console.warn('[fetchAuctionData] Failed to cache data:', cacheError);
             }
@@ -479,7 +446,6 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
           newAuctionMap.set(tokenId, { ...auction, status: 0 }); // 0 = closed
         }
         updated = true;
-        console.log(`[Real-time] NFT #${tokenId} sold`);
       }
       
       
@@ -616,18 +582,24 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
           const tokenId = meta.token_id?.toString() || "";
           const auction = auctionMap.get(Number(tokenId));
           
-          // Debug: Track Token ID 59 in mapping
-          if (tokenId === "59") {
-            console.log('[DEBUG] Token ID 59 mapping:', {
-              tokenId,
-              meta,
-              auction,
-              auctionStatus: auction?.status,
-              isCancelled: auction ? isCancelledListing(auction?.auctionId) : false,
-              isSold: soldNFTs.has(Number(tokenId)),
-              isForSale: !!auction && auction.status === 1 && !isCancelledListing(auction?.auctionId) && !soldNFTs.has(Number(tokenId))
+          if (tokenId === "59" || tokenId === "0") {
+            console.log("[NFTGrid DEBUG]", {
+              nftDisplayTokenId: tokenId,
+              auctionId: auction?.auctionId,
+              priceWei: auction?.buyoutAmount,
+              minimumBidWei: auction?.minimumBidAmount,
+              nftCardProps: {
+                buyNowWei: auction?.buyoutAmount
+                  ? auction.buyoutAmount.toString()
+                  : undefined,
+                minimumBidWei: auction?.minimumBidAmount
+                  ? auction.minimumBidAmount.toString()
+                  : undefined,
+                auctionId: auction?.auctionId,
+              },
             });
           }
+          
           
           // Use image URL from nft_urls.json, fallback to placeholder
           const imageUrl = imageUrlMap[tokenId] || FALLBACK_IMAGE;
@@ -688,15 +660,57 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
             hair: getAttribute(meta, "Hair"),
             headwear: getAttribute(meta, "Headwear"),
           };
+          
+          return {
+            id: tokenId,
+            tokenId,
+            name,
+            image: imageUrl,
+            bidPriceWei:
+              auction?.startingPrice && auction.startingPrice !== "0"
+                ? auction.startingPrice
+                : auction?.minimumBidAmount && auction.minimumBidAmount !== "0"
+                ? auction.minimumBidAmount
+                : "0",
+            currentBidWei:
+              auction?.currentBidAmount && auction.currentBidAmount !== "0"
+                ? auction.currentBidAmount
+                : auction?.minimumBidAmount && auction.minimumBidAmount !== "0"
+                ? auction.minimumBidAmount
+                : auction?.startingPrice && auction.startingPrice !== "0"
+                ? auction.startingPrice
+                : "0",
+            priceWei:
+              auction?.buyoutAmount && auction.buyoutAmount !== "0"
+                ? auction.buyoutAmount
+                : auction?.buyNowPrice && auction.buyNowPrice !== "0"
+                ? auction.buyNowPrice
+                : auction?.price && auction.price !== "0"
+                ? auction.price
+                : "0",
+             // Add flag to indicate if NFT is for sale (exclude cancelled and sold listings)
+             isForSale: !!auction && auction.status === 1 && !isCancelledListing(auction?.auctionId) && !soldNFTs.has(Number(tokenId)),
+             // Add flag to indicate if NFT listing was cancelled
+             isCancelled: !!auction && isCancelledListing(auction?.auctionId),
+             // Add flag to indicate if NFT was sold
+             isSold: soldNFTs.has(Number(tokenId)),
+            auctionEnd: auction?.endTimeInSeconds ?? "",
+            auctionStart,
+            rank,
+            rarity,
+            rarityPercent,
+            auctionId: auction?.auctionId ? (typeof auction.auctionId === 'bigint' ? auction.auctionId : BigInt(auction.auctionId)) : 0n,
+            numBids,
+            // Extract attribute values from metadata for filtering
+            background: getAttribute(meta, "Background"),
+            skinTone: getAttribute(meta, "Skin Tone"),
+            shirt: getAttribute(meta, "Shirt"),
+            eyewear: getAttribute(meta, "Eyewear"),
+            hair: getAttribute(meta, "Hair"),
+            headwear: getAttribute(meta, "Headwear"),
+          };
         });
         
-      // Debug: Check if Token ID 59 is in final mapped NFTs
-      const token59InMapped = mappedNFTs.find(nft => nft.tokenId === "59");
-      console.log('[DEBUG] Token ID 59 in final mapped NFTs:', {
-        found: !!token59InMapped,
-        nft: token59InMapped,
-        totalMapped: mappedNFTs.length
-      });
 
       
       setNfts(mappedNFTs);
@@ -762,19 +776,9 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
         return;
       }
 
-      // Debug: Log the values being sent
       const bidAmountWei = toWei(amount);
       const buyoutWei = auction.buyoutAmount;
       const minimumBidWei = auction.minimumBidAmount;
-      console.log('[DEBUG] Bid validation:', {
-        bidAmountETH: amount,
-        bidAmountWei: bidAmountWei.toString(),
-        minimumBidWei: minimumBidWei.toString(),
-        buyoutWei: buyoutWei.toString(),
-        isBidAboveMinimum: bidAmountWei >= minimumBidWei,
-        isBidBelowBuyout: bidAmountWei < buyoutWei,
-        auctionId: auction.auctionId.toString()
-      });
 
       const tx = bidInAuction({
         contract: marketplace,
@@ -1297,7 +1301,6 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
                   numBids={nft.numBids ?? 0}
                   activeView="forSale"
                   bidAmount={bidAmounts[nft.id]}
-                  isProcessingBid={isProcessingBid[nft.id]}
                   isProcessingBuyNow={isProcessingBuyNow[nft.id]}
                   isForSale={nft.isForSale}
                   auctionId={nft.auctionId.toString()}
@@ -1305,6 +1308,8 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
                   onPlaceBid={() => handlePlaceBid(nft)}
                   onBuyNow={() => handleBuyNow(nft)}
                   buyNowValue={Number(nft.priceWei) / 1e18}
+                  buyNowWei={nft.priceWei?.toString()}
+                  minimumBidWei={nft.bidPriceWei?.toString()}
                 />
               </div>
             );
