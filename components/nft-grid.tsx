@@ -142,7 +142,7 @@ interface NFTGridProps {
 const TOTAL_NFTS = 7777;
 
 // Cancelled/Expired Listings - DO NOT USE THESE LISTING IDS
-const CANCELLED_LISTING_IDS = [0, 1, 2, 3, 4, 5, 6, 7782, 7783, 7784, 7785, 7786, 7787, 7788];
+const CANCELLED_LISTING_IDS = [0, 1, 2, 3, 4, 5, 6, 7782, 7783, 7784, 7785, 7786, 7787, 7788, 7796, 7797, 7798, 7799, 7800, 7801, 7802];
 
 // Helper function to check if a listing ID is cancelled
 const isCancelledListing = (listingId: string | number | bigint) => {
@@ -247,10 +247,10 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
             
             // Fetch in larger batches to reduce API calls and respect rate limits
             const batchSize = 1000; // Increased batch size to reduce API calls (was 200)
-            const maxPossibleAuctions = 7798; // Query up to 7798 (last listing ID)
+            const maxPossibleAuctions = 7804; // Query up to 7804 (last listing ID)
             const allAuctionData: any[] = [];
             
-            // Query the entire range (0-7798) in fewer, larger batches with circuit breaker protection
+            // Query the entire range (0-7804) in fewer, larger batches with circuit breaker protection
             for (let startId = 0; startId < maxPossibleAuctions; startId += batchSize) {
               const endId = Math.min(startId + batchSize - 1, maxPossibleAuctions - 1);
               
@@ -893,9 +893,12 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
     }
 
   // View filter (Live vs Sold) - proper handling of different NFT states
-  const matchesView = activeView === "forSale" 
-    ? nft.isForSale 
-    : nft.isSold;
+  // In exact search mode, show matching NFTs regardless of sale status for better UX
+  const matchesView = searchMode === "exact" && searchTerm 
+    ? (nft.isForSale || nft.isSold) // Show both live and sold when searching exactly
+    : activeView === "forSale" 
+      ? nft.isForSale 
+      : nft.isSold;
     
 
     // Rarity filter
@@ -1075,6 +1078,10 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
     );
   }
 
+  // Calculate counts for active and sold NFTs
+  const activeCount = nfts.filter(nft => nft.isForSale).length;
+  const soldCount = nfts.filter(nft => nft.isSold).length;
+
   return (
     <div className="w-full max-w-full">
       <div className="mb-6">
@@ -1082,14 +1089,14 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
           <h2 className="text-lg font-medium" style={{ color: "#fffbeb" }}>
             NFT Collection
           </h2>
-          {filteredNFTs.length > 0 && (
-            <div className="text-sm font-medium text-brand-pink mt-1">
-              {activeView === "forSale" 
-                ? `${filteredNFTs.length} active listing${filteredNFTs.length !== 1 ? 's' : ''} found`
-                : `${filteredNFTs.length} NFT${filteredNFTs.length !== 1 ? 's' : ''} found`
-              }
+          <div className="mt-1">
+            <div className="text-xs font-medium" style={{ color: "#10b981" }}>
+              {activeCount} Active
             </div>
-          )}
+            <div className="text-xs font-medium" style={{ color: "#3b82f6" }}>
+              {soldCount} Sold
+            </div>
+          </div>
         </div>
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <div className="flex bg-neutral-800 rounded p-1">
@@ -1136,10 +1143,10 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
               </SelectTrigger>
               <SelectContent className="text-sm rounded">
                 <SelectItem value="default">Default</SelectItem>
-                <SelectItem value="rank-asc">Rank: Low to High</SelectItem>
-                <SelectItem value="rank-desc">Rank: High to Low</SelectItem>
                 <SelectItem value="price-asc">Price: Low to High</SelectItem>
                 <SelectItem value="price-desc">Price: High to Low</SelectItem>
+                <SelectItem value="rank-asc">Rank: Low to High</SelectItem>
+                <SelectItem value="rank-desc">Rank: High to Low</SelectItem>
                 <SelectItem value="ending-soonest">Ending Soonest</SelectItem>
               </SelectContent>
             </Select>

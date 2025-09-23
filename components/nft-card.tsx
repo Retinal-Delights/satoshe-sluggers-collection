@@ -141,12 +141,24 @@ export default function NFTCard({
 
     const amount = bidAmount || formatBidAmount(minimumBidAmount);
     
-    if (!amount || Number(amount) < minimumBidAmount) {
-      throw new Error(`Bid must be at least ${formatBidAmount(minimumBidAmount)} ETH`);
+    // Parse current bid amount from the currentBid prop (in ETH)
+    const currentBidEth = parseFloat(currentBid.replace(/[^\d.-]/g, '')) || 0;
+    
+    // Calculate minimum required bid
+    // If no current bid, use minimum bid amount, otherwise use current bid + 5% buffer
+    const bidBufferBps = 500; // 5% buffer (500 basis points)
+    const minRequiredBid = currentBidEth === 0 
+      ? minimumBidAmount 
+      : currentBidEth + (currentBidEth * bidBufferBps / 10000);
+    
+    if (!amount || Number(amount) < minRequiredBid) {
+      const requiredBid = formatBidAmount(minRequiredBid);
+      const currentBidText = currentBidEth === 0 ? 'minimum bid' : 'current highest bid';
+      throw new Error(`Bid must be at least ${requiredBid} ETH (${currentBidText} + 5% buffer)`);
     }
 
     // Check if bid is above buyout amount
-    if (typeof buyNowValue === 'number' && Number(amount) >= buyNowValue) {
+    if (typeof buyNowValue === 'number' && Number(amount) > buyNowValue) {
       throw new Error(`Bid amount is above the buyout amount of ${buyNowValue} ETH`);
     }
 
