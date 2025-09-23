@@ -75,7 +75,7 @@ export default function ContactPage() {
     <main className="min-h-screen bg-background text-foreground flex flex-col pt-24 sm:pt-28">
       <Navigation activePage="contact" />
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 flex-grow" role="main" aria-labelledby="contact-heading">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-12 sm:pb-20 flex-grow" role="main" aria-labelledby="contact-heading">
         <div className="text-center mb-6 sm:mb-8">
           <h1 id="contact-heading" className="text-2xl sm:text-3xl font-bold mb-3" style={{ color: "#fffbeb" }}>
             CONTACT US
@@ -86,13 +86,13 @@ export default function ContactPage() {
         </div>
 
         <div
-          className="bg-card rounded-lg p-6 border border-neutral-700 shadow-lg"
+          className="bg-card rounded p-6 border border-neutral-700 shadow-lg"
           role="region"
           aria-labelledby="contact-form-heading"
         >
           {submitted ? (
             <div className="text-center py-8" role="status" aria-live="polite">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-500/20 mb-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded bg-green-500/20 mb-4">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-8 w-8 text-green-500"
@@ -246,7 +246,7 @@ export default function ContactPage() {
                   required
                   aria-required="true"
                 />
-                <Label htmlFor="terms" className="cursor-pointer text-base" id="terms-desc" style={{ color: "#fffbeb" }}>
+                <Label htmlFor="terms" className="cursor-pointer text-base !font-normal" id="terms-desc" style={{ color: "#fffbeb" }}>
                   I accept the{" "}
                   <a
                     href="https://app.termly.io/policy-viewer/policy.html?policyUUID=3267dd16-a550-4879-8bf0-d03877fe1938"
