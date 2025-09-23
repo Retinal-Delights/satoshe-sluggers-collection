@@ -236,14 +236,13 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
               cachedData = getCachedDataFromStorage<[number, any][]>(cacheKey);
             }
             
-            // TEMPORARILY DISABLED - Force fresh load to debug Token ID 59
-            // if (cachedData) {
-            //   console.log('[fetchAuctionData] Using cached auction data');
-            //   const auctionDataMap = new Map(cachedData);
-            //   setAuctionMap(auctionDataMap);
-            //   setIsLoadingAuctions(false);
-            //   return;
-            // }
+            if (cachedData) {
+              console.log('[fetchAuctionData] Using cached auction data');
+              const auctionDataMap = new Map(cachedData);
+              setAuctionMap(auctionDataMap);
+              setIsLoadingAuctions(false);
+              return;
+            }
 
             
             // Fetch in larger batches to reduce API calls and respect rate limits
@@ -433,8 +432,8 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
   const { mutate: sendBid } = useSendTransaction();
   const { mutate: sendBuyout } = useSendTransaction();
 
-  // Listen for auction closed events to track sold NFTs
-  const { data: auctionClosedEvents } = useContractEvents({
+  // Listen for all auction events for real-time updates
+  const { data: auctionEvents } = useContractEvents({
     contract: marketplace,
     events: [auctionClosedEvent()],
   });
@@ -459,17 +458,39 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
     }
   }, [soldNFTs]);
 
-  // Handle auction closed events to track sold NFTs
+  // Real-time sync: Handle all auction events for live updates
   useEffect(() => {
-    if (auctionClosedEvents) {
-      auctionClosedEvents.forEach((event: any) => {
-        const tokenId = Number(event.args.tokenId);
-        if (tokenId !== undefined) {
-          setSoldNFTs(prev => new Set(prev).add(tokenId));
+    if (!auctionEvents || auctionEvents.length === 0) return;
+    
+    let updated = false;
+    const newAuctionMap = new Map(auctionMap);
+    const newSoldNFTs = new Set(soldNFTs);
+    
+    // Process each event for real-time updates
+    auctionEvents.forEach((event: any) => {
+      const tokenId = Number(event.args.tokenId);
+      if (tokenId === undefined) return;
+      
+      if (event.eventName === "AuctionClosed") {
+        // Mark NFT as sold
+        newSoldNFTs.add(tokenId);
+        if (newAuctionMap.has(tokenId)) {
+          const auction = newAuctionMap.get(tokenId);
+          newAuctionMap.set(tokenId, { ...auction, status: 0 }); // 0 = closed
         }
-      });
+        updated = true;
+        console.log(`[Real-time] NFT #${tokenId} sold`);
+      }
+      
+      
+    });
+    
+    // Update state only if there were changes
+    if (updated) {
+      setAuctionMap(newAuctionMap);
+      setSoldNFTs(newSoldNFTs);
     }
-  }, [auctionClosedEvents]);
+  }, [auctionEvents, auctionMap, soldNFTs]);
 
     useEffect(() => {
     // Load all static metadata and image URLs from local JSON files
