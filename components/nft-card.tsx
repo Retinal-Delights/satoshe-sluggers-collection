@@ -103,22 +103,13 @@ export default function NFTCard({
       const bidWei = ethers.parseEther(userInput);
       const auctionIdBigInt = typeof auctionId === "bigint" ? auctionId : BigInt(auctionId);
 
-      console.log("[DIRECT BID]", {
-        auctionId: auctionIdBigInt.toString(),
-        bidWei: bidWei.toString(),
-        userInput
-      });
-
       // Call contract directly - bypasses Thirdweb's buggy validation
       const tx = await contract.bidInAuction(auctionIdBigInt, bidWei, { 
         value: bidWei 
       });
       
-      console.log("Transaction sent:", tx.hash);
-      
       // Wait for confirmation
       const receipt = await tx.wait();
-      console.log("Transaction confirmed:", receipt);
       
       // Update UI
       setBidCount(prev => prev + 1);

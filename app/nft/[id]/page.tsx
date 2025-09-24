@@ -280,7 +280,6 @@ export default function NFTDetailPage() {
         //   cachedData = getCachedDataFromStorage<any>(cacheKey);
         // }
         // if (cachedData) {
-        //   console.log('[NFT Detail] Using cached auction data');
         //   setAuctionData(cachedData);
         //   setIsLoadingAuction(false);
         //   return;
@@ -400,7 +399,6 @@ export default function NFTDetailPage() {
             // Cache in localStorage
             setCachedDataToStorage(cacheKey, processedAuctionData, CACHE_TTL.AUCTION_DETAIL);
             
-            console.log('[NFT Detail] Cached auction data successfully');
           } catch (cacheError) {
             console.warn('[NFT Detail] Failed to cache auction data:', cacheError);
           }

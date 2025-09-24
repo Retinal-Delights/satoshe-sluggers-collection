@@ -82,7 +82,7 @@ import NFTCard from "@/components/NFTCardNew";
   startingPrice="0.1"
   buyNow="1.0"
   tokenId="1"
-  contractAddress="0xF0f26455b9869d4A788191f6AEdc78410731072C"
+  contractAddress="0xYourMarketplaceAddress"
   
   // Live props from wallet/auction state
   isFavorited={false}

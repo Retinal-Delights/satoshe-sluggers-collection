@@ -17,7 +17,6 @@ export function useMarketplaceEvents() {
 
   // DISABLED: All RPC calls disabled to prevent charges
   const fetchWinningBid = useCallback(async (auctionId: string) => {
-    console.log(`[DISABLED] Would fetch winning bid for auction ${auctionId} - RPC calls disabled to prevent charges`);
     return;
   }, []);
 
@@ -38,7 +37,6 @@ export function useMarketplaceEvents() {
 
   // DISABLED: Manually refresh bid for a specific auction (no RPC call)
   const refreshAuctionBid = useCallback((auctionId: string) => {
-    console.log(`[DISABLED] Would refresh auction bid for ${auctionId} - RPC calls disabled to prevent charges`);
     return;
   }, []);
 

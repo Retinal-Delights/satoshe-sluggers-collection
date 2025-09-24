@@ -128,7 +128,6 @@ export async function safeRpcCall<T>(
 
   // Execute with circuit breaker
   return rpcCircuitBreaker.execute(async () => {
-    console.log(`[RPC] Executing: ${operationName}`);
     return operation();
   });
 }

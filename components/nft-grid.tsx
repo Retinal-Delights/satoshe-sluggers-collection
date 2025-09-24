@@ -582,23 +582,6 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
           const tokenId = meta.token_id?.toString() || "";
           const auction = auctionMap.get(Number(tokenId));
           
-          if (tokenId === "59" || tokenId === "0") {
-            console.log("[NFTGrid DEBUG]", {
-              nftDisplayTokenId: tokenId,
-              auctionId: auction?.auctionId,
-              priceWei: auction?.buyoutAmount,
-              minimumBidWei: auction?.minimumBidAmount,
-              nftCardProps: {
-                buyNowWei: auction?.buyoutAmount
-                  ? auction.buyoutAmount.toString()
-                  : undefined,
-                minimumBidWei: auction?.minimumBidAmount
-                  ? auction.minimumBidAmount.toString()
-                  : undefined,
-                auctionId: auction?.auctionId,
-              },
-            });
-          }
           
           
           // Use image URL from nft_urls.json, fallback to placeholder

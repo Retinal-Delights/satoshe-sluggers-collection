@@ -2,7 +2,7 @@
 import { THIRDWEB_CLIENT_ID } from "./thirdweb";
 
 const INSIGHT_BASE_URL = "https://8453.insight.thirdweb.com/v1";
-const MARKETPLACE_CONTRACT = "0xF0f26455b9869d4A788191f6AEdc78410731072C";
+const MARKETPLACE_CONTRACT = process.env.NEXT_PUBLIC_MARKETPLACE_ADDRESS || "0xYourMarketplaceAddress";
 
 export interface InsightBidEvent {
   transactionHash: string;

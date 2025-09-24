@@ -19,7 +19,7 @@ export function NFTCardExample() {
     buyNow: "1.0",
     tokenId: "1",
     auctionEnd: Math.floor(Date.now() / 1000) + 86400, // 24 hours from now
-    contractAddress: "0xF0f26455b9869d4A788191f6AEdc78410731072C",
+    contractAddress: process.env.NEXT_PUBLIC_MARKETPLACE_ADDRESS || "0xYourMarketplaceAddress",
   };
 
   // Example live data (would come from wallet/auction state)

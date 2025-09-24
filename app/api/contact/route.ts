@@ -7,12 +7,6 @@ export async function POST(request: NextRequest) {
   try {
     const { name, email, subject, message } = await request.json();
 
-    // Debug environment variables
-    console.log('Environment variables check:', {
-      EMAIL_DOMAIN: process.env.EMAIL_DOMAIN,
-      CONTACT_EMAIL: process.env.CONTACT_EMAIL,
-      RESEND_API_KEY: process.env.RESEND_API_KEY ? 'Present' : 'Missing'
-    });
 
     // Validate required fields
     if (!name || !email || !subject || !message) {

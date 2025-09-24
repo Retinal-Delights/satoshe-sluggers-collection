@@ -66,7 +66,7 @@ console.log(auction.currentBidAmount); // Current highest bid
 Here’s what you need to do before creating your first webhook:
 
 a. Set Up a Webhook Endpoint on Your Server
-You need a backend route (e.g., https://satoshesluggers.com/api/webhook) that:
+You need a backend route (e.g., https://yourdomain.com/api/webhook) that:
 Accepts POST requests.
 Responds with a 200 OK status within 3 seconds.
 Optionally, verifies the webhook signature for security.
@@ -78,7 +78,7 @@ app.post("/api/webhook", (req, res) => {
 });
 
 b. Update Your Webhook URL
-When creating the webhook in the thirdweb dashboard or API, use the full endpoint (e.g., https://satoshesluggers.com/api/webhook), not just your homepage.
+When creating the webhook in the thirdweb dashboard or API, use the full endpoint (e.g., https://yourdomain.com/api/webhook), not just your homepage.
 
 c. Test Your Endpoint
 You can use tools like Postman or curl to send a test POST request to your endpoint and ensure it responds with 200 OK.

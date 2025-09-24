@@ -44,7 +44,7 @@ export default function ConnectWalletButton() {
             issued_at: issuedAt,
             expiration_time: expirationTime,
             invalid_before: invalidBefore,
-            domain: "satoshesluggers.com",
+            domain: "yourdomain.com",
             version: "1",
             nonce: Math.random().toString(36).substring(2, 15),
           };

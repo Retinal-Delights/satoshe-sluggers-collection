@@ -122,7 +122,6 @@ class EmergencyStopManager {
     // Notify listeners
     this.listeners.forEach(listener => listener(false));
     
-    console.log('[EMERGENCY STOP] Reset - RPC calls are now allowed');
   }
 
   private resetHourlyStats() {
