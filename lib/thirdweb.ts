@@ -9,7 +9,7 @@ const isDev = process.env.NODE_ENV === "development";
 
 export const THIRDWEB_CLIENT_ID =
   process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID ||
-  (isDev ? "0744c820c52c38d4c5017096246a1f60" : undefined);
+  (isDev ? "your-dev-client-id" : undefined);
 
 // 2) In prod, fail fast if they're missing
 if (!isDev && !THIRDWEB_CLIENT_ID) {
@@ -28,10 +28,10 @@ export const supportedChains = [base, ethereum];
 
 // 5) Your contract addresses (pulled from env or hard-coded fallbacks from README)
 export const NFT_CONTRACT_ADDRESS =
-  process.env.NEXT_PUBLIC_NFT_COLLECTION_ADDRESS || "0xf167ACb33384D998fa3A1C415B680eA7976B1d9C";
+  process.env.NEXT_PUBLIC_NFT_COLLECTION_ADDRESS || "0xYourNFTCollectionAddress";
 
 export const MARKETPLACE_CONTRACT_ADDRESS =
-  process.env.NEXT_PUBLIC_MARKETPLACE_ADDRESS || "0x97fe79A5DEDB4890795786e8B91f697f9825A358";
+  process.env.NEXT_PUBLIC_MARKETPLACE_ADDRESS || "0xYourMarketplaceAddress";
 
 if (!NFT_CONTRACT_ADDRESS || NFT_CONTRACT_ADDRESS === "0xYourDefaultNFTContractAddress") {
   throw new Error("❌ NFT_CONTRACT_ADDRESS is missing or invalid. Set NEXT_PUBLIC_NFT_COLLECTION_ADDRESS in your .env file.");
