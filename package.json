@@ -78,6 +78,17 @@
   "pnpm": {
     "overrides": {
       "thirdweb": "5.100.0"
+    },
+    "packageExtensions": {
+      "@vercel/speed-insights": {
+        "scripts": {}
+      },
+      "sharp": {
+        "scripts": {}
+      },
+      "unrs-resolver": {
+        "scripts": {}
+      }
     }
   }
 }
