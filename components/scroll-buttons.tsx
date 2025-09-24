@@ -5,7 +5,6 @@ import { ArrowUp, ArrowDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export default function ScrollButtons() {
-  const [showButton, setShowButton] = useState(false)
   const [isAtTop, setIsAtTop] = useState(true)
   const [isInitialized, setIsInitialized] = useState(false)
 
@@ -19,14 +18,8 @@ export default function ScrollButtons() {
       // Debounce the scroll handler to prevent rapid state changes
       timeoutId = setTimeout(() => {
         const scrollY = window.scrollY
-        const windowHeight = window.innerHeight
-        const documentHeight = document.documentElement.scrollHeight
         
-        // Show button when user has scrolled down a bit or when there's content below
-        const shouldShowButton = scrollY > 300 || (scrollY + windowHeight < documentHeight - 200)
-        setShowButton(shouldShowButton)
-        
-        // Determine if we're at the top (within 100px of top)
+        // Determine if we're at the top (with a small buffer)
         const atTop = scrollY < 100
         setIsAtTop(atTop)
       }, 50) // 50ms debounce
@@ -78,7 +71,7 @@ export default function ScrollButtons() {
     requestAnimationFrame(animateScroll)
   }
 
-  const handleScrollToggle = () => {
+  const handleScrollClick = () => {
     if (isAtTop) {
       // If at top, scroll to bottom
       const currentScrollY = window.scrollY
@@ -102,20 +95,18 @@ export default function ScrollButtons() {
 
   return (
     <div className="fixed bottom-6 right-6 z-50">
-      {showButton && (
-        <Button
-          onClick={handleScrollToggle}
-          size="icon"
-          className="rounded-full bg-brand-pink hover:bg-brand-pink-hover shadow-lg transition-all duration-300 hover:scale-105"
-          aria-label={isAtTop ? "Scroll to bottom" : "Scroll to top"}
-        >
-          {isAtTop ? (
-            <ArrowDown className="h-5 w-5 text-white" />
-          ) : (
-            <ArrowUp className="h-5 w-5 text-white" />
-          )}
-        </Button>
-      )}
+      <Button
+        onClick={handleScrollClick}
+        size="icon"
+        className="rounded-full bg-brand-pink hover:bg-brand-pink-hover shadow-lg transition-all duration-300 hover:scale-105"
+        aria-label={isAtTop ? "Scroll to bottom" : "Scroll to top"}
+      >
+        {isAtTop ? (
+          <ArrowDown className="h-7 w-7" style={{ color: "#fffbeb" }} strokeWidth={2.5} />
+        ) : (
+          <ArrowUp className="h-7 w-7" style={{ color: "#fffbeb" }} strokeWidth={2.5} />
+        )}
+      </Button>
     </div>
   )
 }

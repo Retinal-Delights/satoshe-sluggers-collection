@@ -25,6 +25,35 @@ export default function ConnectWalletButton() {
         termsOfServiceUrl:
           "https://retinaldelights.io/terms",
       }}
+      auth={{
+        async doLogin(params) {
+        },
+        
+        async doLogout() {
+        },
+        
+        async getLoginPayload(params) {
+          const now = new Date();
+          const issuedAt = now.toISOString();
+          const expirationTime = new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
+          const invalidBefore = now.toISOString();
+          
+          return {
+            address: params.address,
+            statement: `Welcome to Satoshe Sluggers Marketplace! Please sign this message to verify your wallet ownership.`,
+            issued_at: issuedAt,
+            expiration_time: expirationTime,
+            invalid_before: invalidBefore,
+            domain: "satoshesluggers.com",
+            version: "1",
+            nonce: Math.random().toString(36).substring(2, 15),
+          };
+        },
+        
+        async isLoggedIn() {
+          return true; // Thirdweb handles this automatically
+        },
+      }}
       theme={darkTheme({
         colors: {
           accentText: "hsl(324, 100%, 50%)",

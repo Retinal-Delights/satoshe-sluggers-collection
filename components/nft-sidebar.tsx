@@ -10,7 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 // Stub analytics function to prevent errors
 const track = (...args: any[]) => {
-  console.log('Analytics:', args);
 };
 
 // Create a context for filter reset functionality
@@ -124,12 +123,13 @@ function FilterCategory({ title, color, options, twoColumns = false, icon, selec
     <div className={`${isOpen ? 'pt-3 pb-3' : 'pt-1'}`}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between text-neutral-100 py-2 focus:outline-none ${isOpen ? `border-b-4 ${borderColorClasses[color]} pb-2` : ''}`}
+        className={`w-full flex items-center justify-between py-2 focus:outline-none ${isOpen ? `border-b-4 ${borderColorClasses[color]} pb-2` : ''}`}
+        style={{ color: "#fffbeb" }}
         aria-expanded={isOpen}
       >
         <div className="flex items-center gap-2">
           {icon && <span className={`${colorClasses[color]}`}>{icon}</span>}
-          <h3 className={`font-normal text-base ${isOpen ? colorClasses[color] : 'text-neutral-100'}`}>{title}</h3>
+          <h3 className={`font-normal text-base ${isOpen ? colorClasses[color] : ''}`} style={!isOpen ? { color: "#fffbeb" } : {}}>{title}</h3>
       </div>
         {isOpen ? (
           <ChevronDown className={`h-5 w-5 ${colorClasses[color]}`} />
@@ -272,12 +272,13 @@ function RarityTiersCategory({ title, color, icon, selected = [], onChange, trai
     <div className={`${isOpen ? 'pt-3 pb-3' : 'pt-1'}`}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between text-neutral-100 py-2 focus:outline-none ${isOpen ? `border-b-4 border-orange-500 pb-2` : ''}`}
+        className={`w-full flex items-center justify-between py-2 focus:outline-none ${isOpen ? `border-b-4 border-orange-500 pb-2` : ''}`}
+        style={{ color: "#fffbeb" }}
         aria-expanded={isOpen}
       >
         <div className="flex items-center gap-2">
           {icon && <span className={`${colorClasses[color]}`}>{icon}</span>}
-          <h3 className={`font-normal text-base ${isOpen ? colorClasses[color] : 'text-neutral-100'}`}>{title}</h3>
+          <h3 className={`font-normal text-base ${isOpen ? colorClasses[color] : ''}`} style={!isOpen ? { color: "#fffbeb" } : {}}>{title}</h3>
       </div>
         {isOpen ? (
           <ChevronDown className={`h-5 w-5 ${colorClasses[color]}`} />
@@ -292,7 +293,8 @@ function RarityTiersCategory({ title, color, icon, selected = [], onChange, trai
             <span className="text-sm text-neutral-400 block mb-1">Sort by:</span>
             <button
               onClick={toggleSortOrder}
-              className="flex items-center gap-1 text-sm px-3 py-1.5 rounded bg-neutral-800 hover:bg-neutral-700 text-neutral-100 border border-neutral-700 transition-colors w-full justify-between"
+              className="flex items-center gap-1 text-sm px-3 py-1.5 rounded bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 transition-colors w-full justify-between"
+              style={{ color: "#fffbeb" }}
             >
               <span className={colorClasses[color]}>
                 {sortOrder === "commonToRare" ? "Common to Rare" : "Rare to Common"}
@@ -423,12 +425,13 @@ function FilterCategoryWithSubcategories({ title, color, subcategories, twoColum
     <div className={`${isOpen ? 'pt-3 pb-3' : 'pt-1'}`}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between text-neutral-100 py-2 focus:outline-none ${isOpen ? `border-b-4 ${borderColorClasses[color]} pb-2` : ''}`}
+        className={`w-full flex items-center justify-between py-2 focus:outline-none ${isOpen ? `border-b-4 ${borderColorClasses[color]} pb-2` : ''}`}
+        style={{ color: "#fffbeb" }}
         aria-expanded={isOpen}
       >
         <div className="flex items-center gap-2">
           {icon && <span className={`${colorClasses[color]}`}>{icon}</span>}
-          <h3 className={`font-normal text-base ${isOpen ? colorClasses[color] : 'text-neutral-100'}`}>{title}</h3>
+          <h3 className={`font-normal text-base ${isOpen ? colorClasses[color] : ''}`} style={!isOpen ? { color: "#fffbeb" } : {}}>{title}</h3>
         </div>
         {isOpen ? (
           <ChevronDown className={`h-5 w-5 ${colorClasses[color]}`} />
@@ -527,12 +530,14 @@ function FilterCategoryWithSubcategories({ title, color, subcategories, twoColum
 interface NFTSidebarProps {
   searchTerm: string;
   setSearchTerm: (val: string) => void;
+  searchMode: "exact" | "contains";
+  setSearchMode: (mode: "exact" | "contains") => void;
   selectedFilters: any;
   setSelectedFilters: (val: any) => void;
   traitCounts?: Record<string, Record<string, number>>;
 }
 
-export default function NFTSidebar({ searchTerm, setSearchTerm, selectedFilters, setSelectedFilters, traitCounts = {} }: NFTSidebarProps) {
+export default function NFTSidebar({ searchTerm, setSearchTerm, searchMode, setSearchMode, selectedFilters, setSelectedFilters, traitCounts = {} }: NFTSidebarProps) {
   // Array to store reset functions
   const resetFunctions = useRef<(() => void)[]>([])
   // Array to store close functions
@@ -552,6 +557,8 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, selectedFilters,
   const clearAllFilters = () => {
     // Clear the search term
     setSearchTerm("")
+    // Reset search mode to "contains" to prevent "no NFTs found" when exact is enabled
+    setSearchMode("contains")
     // Call all registered reset functions
     resetFunctions.current.forEach((resetFn) => resetFn())
     // Close all dropdowns
@@ -591,17 +598,19 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, selectedFilters,
             <div className="flex gap-2">
               <button
                 onClick={() => window.open('https://basescan.org/address/0xF0f26455b9869d4A788191f6AEdc78410731072C', '_blank')}
-                className="flex-1 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-[11px] px-2 py-1.5 rounded transition-colors border border-neutral-600 flex items-center justify-center gap-1"
+                className="flex-1 bg-neutral-800 hover:bg-neutral-700 text-[11px] px-2 py-1.5 rounded transition-colors border border-neutral-600 flex items-center justify-center gap-1"
+                style={{ color: "#fffbeb" }}
               >
                 BaseScan
-                <ExternalLink className="h-3 w-3" />
+                <ExternalLink className="h-3 w-3" style={{ color: "#fffbeb" }} />
               </button>
               <button
                 onClick={() => window.open('https://base.blockscout.com/address/0xF0f26455b9869d4A788191f6AEdc78410731072C', '_blank')}
-                className="flex-1 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-[11px] px-2 py-1.5 rounded transition-colors border border-neutral-600 flex items-center justify-center gap-1"
+                className="flex-1 bg-neutral-800 hover:bg-neutral-700 text-[11px] px-2 py-1.5 rounded transition-colors border border-neutral-600 flex items-center justify-center gap-1"
+                style={{ color: "#fffbeb" }}
               >
                 Blockscout
-                <ExternalLink className="h-3 w-3" />
+                <ExternalLink className="h-3 w-3" style={{ color: "#fffbeb" }} />
               </button>
             </div>
           </div>
@@ -611,17 +620,19 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, selectedFilters,
             <div className="flex gap-2">
               <button
                 onClick={() => window.open('https://basescan.org/address/0xE3f1694adCe46ffcF82D15dd88859147c72f7C5a', '_blank')}
-                className="flex-1 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-[11px] px-2 py-1.5 rounded transition-colors border border-neutral-600 flex items-center justify-center gap-1"
+                className="flex-1 bg-neutral-800 hover:bg-neutral-700 text-[11px] px-2 py-1.5 rounded transition-colors border border-neutral-600 flex items-center justify-center gap-1"
+                style={{ color: "#fffbeb" }}
               >
                 BaseScan
-                <ExternalLink className="h-3 w-3" />
+                <ExternalLink className="h-3 w-3" style={{ color: "#fffbeb" }} />
               </button>
               <button
                 onClick={() => window.open('https://base.blockscout.com/address/0xE3f1694adCe46ffcF82D15dd88859147c72f7C5a', '_blank')}
-                className="flex-1 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-[11px] px-2 py-1.5 rounded transition-colors border border-neutral-600 flex items-center justify-center gap-1"
+                className="flex-1 bg-neutral-800 hover:bg-neutral-700 text-[11px] px-2 py-1.5 rounded transition-colors border border-neutral-600 flex items-center justify-center gap-1"
+                style={{ color: "#fffbeb" }}
               >
                 Blockscout
-                <ExternalLink className="h-3 w-3" />
+                <ExternalLink className="h-3 w-3" style={{ color: "#fffbeb" }} />
               </button>
             </div>
           </div>
@@ -631,7 +642,34 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, selectedFilters,
       <div className="border-b border-neutral-700 mb-4"></div>
 
       <div suppressHydrationWarning={true}>
-        <h3 className="font-normal mb-2 text-neutral-100 text-base">Search</h3>
+        <h3 className="font-normal mb-2 text-base" style={{ color: "#fffbeb" }}>Search</h3>
+        
+        {/* Search Mode Toggle */}
+        <div className="mb-3">
+          <div className="flex bg-neutral-700 rounded p-1">
+            <button
+              onClick={() => setSearchMode("contains")}
+              className={`flex-1 px-3 py-1.5 text-xs rounded transition-colors ${
+                searchMode === "contains"
+                  ? "bg-brand-pink text-white"
+                  : "text-neutral-400 hover:text-white"
+              }`}
+            >
+              Contains
+            </button>
+            <button
+              onClick={() => setSearchMode("exact")}
+              className={`flex-1 px-3 py-1.5 text-xs rounded transition-colors ${
+                searchMode === "exact"
+                  ? "bg-brand-pink text-white"
+                  : "text-neutral-400 hover:text-white"
+              }`}
+            >
+              Exact
+            </button>
+          </div>
+        </div>
+        
         <div className="relative mb-2" suppressHydrationWarning={true}>
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-500" />
           <Input
@@ -645,16 +683,19 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, selectedFilters,
               if (newValue.length > 2 || newValue.length === 0) {
                 track('NFT Search Used', {
                   searchTerm: newValue,
-                  searchLength: newValue.length
+                  searchLength: newValue.length,
+                  searchMode
                 });
               }
             }}
           />
         </div>
+        
         <Button
           variant="outline"
           size="sm"
           className="text-sm font-light flex items-center justify-center h-8 w-full mb-4 rounded border-neutral-600 focus:outline-none focus:ring-0 focus:border-neutral-500"
+          style={{ color: "#fffbeb" }}
           onClick={() => {
             // Search functionality can be implemented here if needed
             track('Search Button Clicked', {
@@ -677,7 +718,7 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, selectedFilters,
             hasSearchTerm: searchTerm.length > 0
           });
           clearAllFilters();
-        }} className="text-sm font-light flex items-center justify-center gap-1 h-9 w-full rounded border-neutral-600 focus:outline-none focus:ring-0 focus:border-neutral-500">
+        }} className="text-sm font-light flex items-center justify-center gap-1 h-9 w-full rounded border-neutral-600 focus:outline-none focus:ring-0 focus:border-neutral-500" style={{ color: "#fffbeb" }}>
           <X className="h-4 w-4" /> Clear All Filters
         </Button>
       </div>
@@ -725,7 +766,7 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, selectedFilters,
           color="amber"
           twoColumns={false}
           icon={
-            <Image src="/icons/skin-tone-yellow.svg" alt="Skin Tone" width={18} height={18} className="text-amber-400" />
+            <Image src="/icons/skin-tone-yellow.svg" alt="Skin Tone" width={18} height={18} className="text-amber-400" sizes="18px" />
           }
           options={traitCounts["skinTone"] ? Object.keys(traitCounts["skinTone"]).sort().map(value => ({ value, display: value })) : []}
           selected={selectedFilters.skinTone || []}
@@ -737,7 +778,7 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, selectedFilters,
           title="Shirt"
           color="red"
           twoColumns={false}
-          icon={<Image src="/icons/shirt-red.svg" alt="Shirt" width={18} height={18} className="text-red-400" />}
+          icon={<Image src="/icons/shirt-red.svg" alt="Shirt" width={18} height={18} className="text-red-400" sizes="18px" />}
           options={traitCounts["shirt"] ? Object.keys(traitCounts["shirt"]).sort().map(value => ({ value, display: value })) : []}
           selected={selectedFilters.shirt || []}
           onChange={arr => setSelectedFilters((f: any) => ({ ...f, shirt: arr }))}
@@ -748,7 +789,7 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, selectedFilters,
           title="Hair"
           color="green"
           twoColumns={false}
-          icon={<Image src="/icons/hair-green.svg" alt="Hair" width={18} height={18} className="text-green-400" />}
+          icon={<Image src="/icons/hair-green.svg" alt="Hair" width={18} height={18} className="text-green-400" sizes="18px" />}
           subcategories={[
             {
               name: "Banana Clip",
@@ -792,7 +833,7 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, selectedFilters,
           title="Eyewear"
           color="cyan"
           twoColumns={false}
-          icon={<Image src="/icons/eyewear-blue.svg" alt="Eyewear" width={18} height={18} className="text-cyan-400" />}
+          icon={<Image src="/icons/eyewear-blue.svg" alt="Eyewear" width={18} height={18} className="text-cyan-400" sizes="18px" />}
           options={[
             // Values match the cleaned combined_metadata.json (no "Eyewear" prefix)
             "Eyeglasses",
@@ -812,7 +853,7 @@ export default function NFTSidebar({ searchTerm, setSearchTerm, selectedFilters,
           color="purple"
           twoColumns={false}
           icon={
-            <Image src="/icons/headwear-purple.svg" alt="Headwear" width={18} height={18} className="text-purple-400" />
+            <Image src="/icons/headwear-purple.svg" alt="Headwear" width={18} height={18} className="text-purple-400" sizes="18px" />
           }
           subcategories={[
             {

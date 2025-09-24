@@ -2,9 +2,12 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useParams } from "next/navigation";
+import { safeRpcCall } from "@/lib/circuit-breaker";
+import { emergencySafeRpcCall } from "@/lib/emergency-stop";
+import { cacheManager, CACHE_KEYS, CACHE_TTL, getCachedDataFromStorage, setCachedDataToStorage } from "@/lib/cache-manager";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Heart } from "lucide-react";
+import { ArrowLeft, Heart, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -110,7 +113,6 @@ function getTierPricing(rarity: string) {
 function formatAuctionDate(endTimeSeconds: string | number | bigint) {
   if (!endTimeSeconds) return "N/A";
   const endDate = new Date(Number(endTimeSeconds) * 1000);
-  console.log(`[DEBUG] Auction end timestamp: ${endTimeSeconds}, converted date: ${endDate.toISOString()}`);
   return endDate.toLocaleDateString('en-US', {
     month: '2-digit',
     day: '2-digit',
@@ -122,7 +124,6 @@ function formatAuctionDate(endTimeSeconds: string | number | bigint) {
 function formatAuctionTime(endTimeSeconds: string | number | bigint) {
   if (!endTimeSeconds) return "N/A";
   const endDate = new Date(Number(endTimeSeconds) * 1000);
-  console.log(`[DEBUG] Auction end time: ${endDate.toISOString()}`);
   return endDate.toLocaleTimeString('en-US', {
     hour: 'numeric',
     minute: '2-digit',
@@ -148,7 +149,6 @@ function formatTimeRemaining(endTimeSeconds: string | number | bigint) {
   if (!endTimeSeconds) return "Auction ended";
   
   const timeLeft = Number(endTimeSeconds) - Math.floor(Date.now() / 1000);
-  console.log(`[DEBUG] Time remaining calculation: endTime=${endTimeSeconds}, now=${Math.floor(Date.now() / 1000)}, timeLeft=${timeLeft}`);
   
   if (timeLeft <= 0) return "Auction ended";
   
@@ -192,9 +192,22 @@ export default function NFTDetailPage() {
   const [timeRemaining, setTimeRemaining] = useState("");
   const [bidCount, setBidCount] = useState(0);
   const [currentBidAmount, setCurrentBidAmount] = useState<string>("0");
+  const [navigationTokens, setNavigationTokens] = useState<{prev: number | null, next: number | null}>({prev: null, next: null});
   
   // Use global marketplace events
   const { getCurrentBid, getBidCount, getAuctionStatus, refreshAuctionBid } = useMarketplaceEvents();
+
+  // Calculate navigation tokens (previous and next)
+  useEffect(() => {
+    const currentTokenId = parseInt(tokenId);
+    const prevToken = currentTokenId > 0 ? currentTokenId - 1 : null;
+    const nextToken = currentTokenId < 7776 ? currentTokenId + 1 : null; // 7777 total NFTs (0-7776)
+    
+    setNavigationTokens({
+      prev: prevToken,
+      next: nextToken
+    });
+  }, [tokenId]);
 
   // Bid counter management functions
   const incrementBidCount = () => {
@@ -223,7 +236,6 @@ export default function NFTDetailPage() {
   const [isLoadingAuction, setIsLoadingAuction] = useState(true);
 
   useEffect(() => {
-    console.log(`[NFT Detail] Loading data for token ID: ${tokenId}`);
     setIsLoading(true);
 
     Promise.all([
@@ -231,13 +243,11 @@ export default function NFTDetailPage() {
       fetch(NFT_URLS).then((r) => r.json()),
     ])
       .then(([metaDataArr, urlArr]) => {
-        console.log(`[NFT Detail] Loaded ${metaDataArr?.length || 0} metadata items and ${urlArr?.length || 0} URL items`);
 
         // Find metadata by token_id (which matches the URL parameter)
         const found = metaDataArr.find((item: any) =>
           item.token_id?.toString() === tokenId
         );
-        console.log(`[NFT Detail] Found metadata for token ${tokenId}:`, found ? 'Yes' : 'No');
 
         if (found) {
           setMetadata(found);
@@ -262,34 +272,47 @@ export default function NFTDetailPage() {
   const fetchAuctionData = async () => {
       try {
         setIsLoadingAuction(true);
-        console.log(`[NFT Detail] Fetching auction data for token ${tokenId}...`);
+
+        // DISABLED CACHE - Force fresh data for real-time updates
+        // const cacheKey = CACHE_KEYS.AUCTION_DETAIL(marketplace.address, tokenId);
+        // let cachedData = cacheManager.get<any>(cacheKey);
+        // if (!cachedData) {
+        //   cachedData = getCachedDataFromStorage<any>(cacheKey);
+        // }
+        // if (cachedData) {
+        //   console.log('[NFT Detail] Using cached auction data');
+        //   setAuctionData(cachedData);
+        //   setIsLoadingAuction(false);
+        //   return;
+        // }
 
         // Use direct contract call to get all auctions and find this token's auction
-        console.log(`[NFT Detail] Contract address:`, marketplace.address);
-        console.log(`[NFT Detail] Contract chain:`, marketplace.chain);
-        console.log(`[NFT Detail] Client ID:`, client.clientId);
 
-        // Use batching approach like in the grid to find this specific token's auction
-        const batchSize = 100;
-        const maxPossibleAuctions = 7777;
+        // Use larger batches to reduce API calls and respect rate limits
+        const batchSize = 1000; // Increased from 100 to reduce API calls
+        const maxPossibleAuctions = 7805;
         let tokenAuction = null;
         
         for (let startId = 0; startId < maxPossibleAuctions && !tokenAuction; startId += batchSize) {
           const endId = Math.min(startId + batchSize - 1, maxPossibleAuctions - 1);
-          console.log(`[NFT Detail] Checking batch ${startId}-${endId} for token ${tokenId}`);
           
           try {
-            const contractCallPromise = readContract({
-              contract: marketplace,
-              method: "function getAllValidAuctions(uint256 _startId, uint256 _endId) view returns ((uint256 auctionId, uint256 tokenId, uint256 quantity, uint256 minimumBidAmount, uint256 buyoutBidAmount, uint64 timeBufferInSeconds, uint64 bidBufferBps, uint64 startTimestamp, uint64 endTimestamp, address auctionCreator, address assetContract, address currency, uint8 tokenType, uint8 status)[] _validAuctions)",
-              params: [BigInt(startId), BigInt(endId)],
-            });
+            const batchData = await emergencySafeRpcCall(
+              async () => {
+                const contractCallPromise = readContract({
+                  contract: marketplace,
+                  method: "function getAllValidAuctions(uint256 _startId, uint256 _endId) view returns ((uint256 auctionId, uint256 tokenId, uint256 quantity, uint256 minimumBidAmount, uint256 buyoutBidAmount, uint64 timeBufferInSeconds, uint64 bidBufferBps, uint64 startTimestamp, uint64 endTimestamp, address auctionCreator, address assetContract, address currency, uint8 tokenType, uint8 status)[] _validAuctions)",
+                  params: [BigInt(startId), BigInt(endId)],
+                });
 
-            const timeoutPromise = new Promise((_, reject) =>
-              setTimeout(() => reject(new Error(`Batch ${startId}-${endId} timeout after 30 seconds`)), 30000)
+                const timeoutPromise = new Promise((_, reject) =>
+                  setTimeout(() => reject(new Error(`Batch ${startId}-${endId} timeout after 30 seconds`)), 30000)
+                );
+
+                return Promise.race([contractCallPromise, timeoutPromise]) as Promise<any[]>;
+              },
+              `NFT Detail batch ${startId}-${endId}`
             );
-
-            const batchData = await Promise.race([contractCallPromise, timeoutPromise]) as any[];
             
             if (batchData && Array.isArray(batchData)) {
               // Find auction for this specific token in this batch
@@ -298,29 +321,32 @@ export default function NFTDetailPage() {
               );
               
               if (tokenAuction) {
-                console.log(`[NFT Detail] Found auction for token ${tokenId} in batch ${startId}-${endId}`);
-                console.log(`[DEBUG] Raw auction data:`, tokenAuction);
                 break; // Found it, stop searching
               }
               
               // If we get an empty batch, we've likely reached the end
               if (batchData.length === 0) {
-                console.log(`[NFT Detail] Empty batch at ${startId}-${endId}, stopping search`);
                 break;
               }
             }
             
-            // Small delay between batches
-            await new Promise(resolve => setTimeout(resolve, 50));
+            // Longer delay between batches to respect rate limits
+            await new Promise(resolve => setTimeout(resolve, 500)); // Increased delay
             
-          } catch (batchError) {
+          } catch (batchError: any) {
             console.warn(`[NFT Detail] Batch ${startId}-${endId} failed:`, batchError);
-            // Continue with next batch
+            
+            // If circuit breaker is open, stop trying
+            if (batchError.message && batchError.message.includes('Circuit breaker is OPEN')) {
+              console.error('[NFT Detail] Circuit breaker is OPEN - stopping auction data fetch');
+              break;
+            }
+            
+            // Continue with next batch for other errors
           }
         }
 
         if (tokenAuction) {
-          console.log(`[NFT Detail] Found auction for token ${tokenId}:`, tokenAuction);
           const processedAuctionData = {
             id: tokenAuction.auctionId,
             tokenId: tokenAuction.tokenId,
@@ -330,7 +356,7 @@ export default function NFTDetailPage() {
             type: tokenAuction.tokenType,
             startingPrice: tokenAuction.minimumBidAmount,
             minimumBidAmount: tokenAuction.minimumBidAmount,
-            currentBidAmount: tokenAuction.minimumBidAmount,
+            currentBidAmount: tokenAuction.minimumBidAmount, // Will be updated with actual current bid
             buyoutAmount: tokenAuction.buyoutBidAmount,
             endTimeInSeconds: tokenAuction.endTimestamp,
             startTimeInSeconds: tokenAuction.startTimestamp,
@@ -338,10 +364,50 @@ export default function NFTDetailPage() {
           };
           setAuctionData(processedAuctionData);
           setBidCount(processedAuctionData.totalBids || 0);
+          
+          // Fetch the actual current winning bid for this auction
+          try {
+            const winningBid = await readContract({
+              contract: marketplace,
+              method: "function getWinningBid(uint256 _auctionId) view returns (address bidder, address currency, uint256 bidAmount, uint256 bidTime)",
+              params: [BigInt(processedAuctionData.auctionId)],
+            });
+            
+            if (winningBid && winningBid[2] && winningBid[2] !== 0n) {
+              const currentBidEth = Number(winningBid[2]) / 1e18;
+              setCurrentBidAmount(currentBidEth.toString());
+              console.log(`[NFT Detail] Current winning bid: ${currentBidEth} ETH`);
+            } else {
+              // No winning bid yet, use minimum bid
+              const minBidEth = Number(processedAuctionData.minimumBidAmount) / 1e18;
+              setCurrentBidAmount(minBidEth.toString());
+              console.log(`[NFT Detail] No winning bid, using minimum: ${minBidEth} ETH`);
+            }
+          } catch (bidError) {
+            console.warn('[NFT Detail] Failed to fetch winning bid:', bidError);
+            // Fallback to minimum bid
+            const minBidEth = Number(processedAuctionData.minimumBidAmount) / 1e18;
+            setCurrentBidAmount(minBidEth.toString());
+          }
+          
+          // Cache the auction data for future use (both in-memory and localStorage)
+          try {
+            const cacheKey = CACHE_KEYS.AUCTION_DETAIL(marketplace.address, tokenId);
+            
+            // Cache in memory
+            cacheManager.set(cacheKey, processedAuctionData, CACHE_TTL.AUCTION_DETAIL);
+            
+            // Cache in localStorage
+            setCachedDataToStorage(cacheKey, processedAuctionData, CACHE_TTL.AUCTION_DETAIL);
+            
+            console.log('[NFT Detail] Cached auction data successfully');
+          } catch (cacheError) {
+            console.warn('[NFT Detail] Failed to cache auction data:', cacheError);
+          }
+          
           // Fetch the current winning bid
           await refreshAuctionBid(processedAuctionData.auctionId.toString());
         } else {
-          console.log(`[NFT Detail] No auction found for token ${tokenId}`);
           setAuctionData(null);
         }
       } catch (error) {
@@ -380,11 +446,8 @@ export default function NFTDetailPage() {
 
         // Check for specific error types
         if (errorMessage.includes('AbiDecodingZeroDataError')) {
-          console.log(`[NFT Detail] AbiDecodingZeroDataError - no active auctions found for token ${tokenId}`);
         } else if (errorMessage.includes('Invalid currency token')) {
-          console.log(`[NFT Detail] Currency token error - using fallback for token ${tokenId}`);
         } else if (errorMessage.includes('fetch') || errorMessage.includes('timeout')) {
-          console.log(`[NFT Detail] Network/fetch/timeout error - check RPC connection for token ${tokenId}`);
         } else {
           console.error(`[NFT Detail] Unexpected error type:`, errorName, 'Message:', errorMessage);
         }
@@ -399,6 +462,17 @@ export default function NFTDetailPage() {
   useEffect(() => {
     fetchAuctionData();
   }, [tokenId]);
+
+  // Auto-refresh auction data every 30 seconds for real-time updates
+  useEffect(() => {
+    if (!auctionData?.auctionId) return;
+    
+    const interval = setInterval(() => {
+      fetchAuctionData();
+    }, 30000); // Refresh every 30 seconds
+    
+    return () => clearInterval(interval);
+  }, [auctionData?.auctionId]);
 
   // Update countdown every second (following Thirdweb AI recommendation)
   useEffect(() => {
@@ -471,7 +545,7 @@ export default function NFTDetailPage() {
     if (auctionStatus === 'closed') {
       fetchAuctionData();
     }
-  }, [auctionData?.auctionId, getCurrentBid, getBidCount, getAuctionStatus, currentBidAmount, bidCount, tierPricing.bid]);
+  }, [auctionData?.auctionId, getCurrentBid, getBidCount, getAuctionStatus, tierPricing.bid]);
 
   // Helper to format auction prices
   const formatAuctionPrice = (priceWei: string | number | bigint) => {
@@ -611,7 +685,9 @@ export default function NFTDetailPage() {
       <main className="min-h-screen bg-background text-foreground flex flex-col">
         <Navigation activePage="nfts" />
         <div className="flex-grow flex flex-col items-center justify-center pt-24 sm:pt-28">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2" style={{ borderTopColor: COLORS.background, borderBottomColor: COLORS.background }}></div>
+          <div className="text-center">
+            <p className="text-neutral-400">Loading...</p>
+          </div>
         </div>
         <Footer />
       </main>
@@ -637,13 +713,42 @@ export default function NFTDetailPage() {
     <main className="min-h-screen bg-background text-foreground flex flex-col">
       <Navigation activePage="nfts" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex-grow pt-24 sm:pt-28">
-        <Link
-          href="/nfts"
-          className="inline-flex items-center text-neutral-400 hover:text-[#ff0099] mb-4 sm:mb-6 text-sm transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to collection
-        </Link>
+        <div className="flex items-center justify-between mb-4 sm:mb-6 px-2 sm:px-4">
+          <Link
+            href="/nfts"
+            className="inline-flex items-center text-neutral-400 hover:text-[#ff0099] text-sm transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to collection
+          </Link>
+
+          {/* Navigation Arrows */}
+          <div className="flex items-center gap-3">
+            {navigationTokens.prev !== null && (
+              <Link
+                href={`/nft/${navigationTokens.prev}`}
+                className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-neutral-800 hover:bg-neutral-700 text-neutral-400 hover:text-[#ff0099] transition-colors border border-neutral-700 hover:border-[#ff0099]"
+                title={`Previous NFT #${navigationTokens.prev + 1}`}
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </Link>
+            )}
+            
+            <span className="text-sm text-neutral-500 px-2">
+              {parseInt(tokenId) + 1} of 7777
+            </span>
+            
+            {navigationTokens.next !== null && (
+              <Link
+                href={`/nft/${navigationTokens.next}`}
+                className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-neutral-800 hover:bg-neutral-700 text-neutral-400 hover:text-[#ff0099] transition-colors border border-neutral-700 hover:border-[#ff0099]"
+                title={`Next NFT #${navigationTokens.next + 1}`}
+              >
+                <ChevronRight className="h-5 w-5" />
+              </Link>
+            )}
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 xl:gap-12">
           {/* Left Column - Image, Attributes, and Rarity Chart */}
@@ -662,7 +767,7 @@ export default function NFTDetailPage() {
 
             {/* Attributes */}
             <div>
-              <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-neutral-100">Attributes</h2>
+              <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4" style={{ color: "#fffbeb" }}>Attributes</h2>
               <div className="grid grid-cols-2 gap-4">
                 {/* Left Column - First 3 Attributes */}
                 <div className="space-y-3">
@@ -680,7 +785,7 @@ export default function NFTDetailPage() {
                             {attr.name}
                           </p>
                         </div>
-                        <p className="font-semibold text-base text-neutral-100">{attr.value}</p>
+                        <p className="font-normal text-base" style={{ color: "#fffbeb" }}>{attr.value}</p>
                         <div className="text-sm text-neutral-400 mt-1">
                           <p>{attr.percentage}% have this trait</p>
                           {occurrence && <p>{occurrence} of 7777</p>}
@@ -707,7 +812,7 @@ export default function NFTDetailPage() {
                             {attr.name}
                           </p>
                         </div>
-                        <p className="font-semibold text-base text-neutral-100">{attr.value}</p>
+                        <p className="font-normal text-base" style={{ color: "#fffbeb" }}>{attr.value}</p>
                         <div className="text-sm text-neutral-400 mt-1">
                           <p>{attr.percentage}% have this trait</p>
                           {occurrence && <p>{occurrence} of 7777</p>}
@@ -731,10 +836,10 @@ export default function NFTDetailPage() {
           </div>
 
           {/* Right Column - NFT Details */}
-          <div className="space-y-6">
+          <div className="space-y-6 -mt-2">
             {/* NFT Name with Heart Icon */}
             <div className="flex items-start justify-between gap-4">
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-neutral-100 leading-tight">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold leading-tight" style={{ color: "#fffbeb" }}>
                 {metadata?.name || `Satoshe Slugger #${parseInt(tokenId) + 1}`}
               </h1>
               <button
@@ -757,22 +862,22 @@ export default function NFTDetailPage() {
             </div>
 
             {/* Price Information */}
-            <div className="grid grid-cols-3 gap-2 sm:gap-3">
+            <div className="grid grid-cols-3 gap-3 sm:gap-4">
               <div className="bg-neutral-800 p-3 sm:p-4 rounded border border-neutral-700">
                 <p className="text-neutral-400 text-xs sm:text-sm mb-1">Starting Price</p>
-                <p className="text-sm sm:text-base font-bold text-neutral-100">
+                <p className="text-sm sm:text-base font-semibold" style={{ color: "#fffbeb" }}>
                   {tierPricing.start} ETH
                 </p>
               </div>
               <div className="bg-neutral-800 p-3 sm:p-4 rounded border border-neutral-700">
                 <p className="text-neutral-400 text-xs sm:text-sm mb-1">Current Bid</p>
-                <p className="text-sm sm:text-base font-bold" style={{ color: COLORS.hair }}>
+                <p className="text-sm sm:text-base font-semibold" style={{ color: COLORS.hair }}>
                   {isLoadingAuction ? "Loading..." : `${currentBidPrice} ETH`}
                 </p>
               </div>
               <div className="bg-neutral-800 p-3 sm:p-4 rounded border border-neutral-700">
                 <p className="text-neutral-400 text-xs sm:text-sm mb-1">Buy Now Price</p>
-                <p className="text-sm sm:text-base font-bold" style={{ color: COLORS.background }}>
+                <p className="text-sm sm:text-base font-semibold" style={{ color: COLORS.background }}>
                   {isLoadingAuction ? "Loading..." : `${buyNowPrice} ETH`}
                 </p>
               </div>
@@ -780,45 +885,45 @@ export default function NFTDetailPage() {
 
             {/* Additional Details */}
             <div className="bg-neutral-800 p-4 rounded border border-neutral-700">
-              <h3 className="text-lg font-semibold text-neutral-100 mb-3">Details</h3>
+              <h3 className="text-lg font-semibold mb-4" style={{ color: "#fffbeb" }}>Details</h3>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="text-neutral-400 mb-1">NFT Number</p>
-                  <p className="text-neutral-100 font-medium">{metadata?.card_number ?? parseInt(tokenId) + 1}</p>
+                  <p className="font-normal" style={{ color: "#fffbeb" }}>{metadata?.card_number ?? parseInt(tokenId) + 1}</p>
                 </div>
                 <div>
                   <p className="text-neutral-400 mb-1">Token ID</p>
-                  <p className="text-neutral-100 font-medium">{metadata?.token_id ?? tokenId}</p>
+                  <p className="font-normal" style={{ color: "#fffbeb" }}>{metadata?.token_id ?? tokenId}</p>
                 </div>
                 <div>
                   <p className="text-neutral-400 mb-1">Collection</p>
-                  <p className="text-neutral-100 font-medium">
+                  <p className="font-normal" style={{ color: "#fffbeb" }}>
                     {metadata?.collection_number ?? "—"}
                   </p>
                 </div>
                 <div>
                   <p className="text-neutral-400 mb-1">Edition</p>
-                  <p className="text-neutral-100 font-medium">{metadata?.edition ?? "—"}</p>
+                  <p className="font-normal" style={{ color: "#fffbeb" }}>{metadata?.edition ?? "—"}</p>
                 </div>
                 <div>
                   <p className="text-neutral-400 mb-1">Series</p>
-                  <p className="text-neutral-100 font-medium">{metadata?.series ?? "—"}</p>
+                  <p className="font-normal" style={{ color: "#fffbeb" }}>{metadata?.series ?? "—"}</p>
                 </div>
                 <div>
                   <p className="text-neutral-400 mb-1">Rarity Tier</p>
-                  <p className="text-neutral-100 font-medium">{metadata?.rarity_tier ?? "Unknown"}</p>
+                  <p className="font-normal" style={{ color: "#fffbeb" }}>{metadata?.rarity_tier ?? "Unknown"}</p>
                 </div>
                 <div>
                   <p className="text-neutral-400 mb-1">Rarity Score</p>
-                  <p className="text-neutral-100 font-medium">{metadata?.rarity_score ?? "—"}</p>
+                  <p className="font-normal" style={{ color: "#fffbeb" }}>{metadata?.rarity_score ?? "—"}</p>
                 </div>
                 <div>
                   <p className="text-neutral-400 mb-1">Rank</p>
-                  <p className="text-neutral-100 font-medium">{metadata?.rank ?? "—"} of 7777</p>
+                  <p className="font-normal" style={{ color: "#fffbeb" }}>{metadata?.rank ?? "—"} of 7777</p>
                 </div>
                 <div>
                   <p className="text-neutral-400 mb-1">Rarity Percentage</p>
-                  <p className="text-neutral-100 font-medium">{metadata?.rarity_percent ?? "—"}%</p>
+                  <p className="font-normal" style={{ color: "#fffbeb" }}>{metadata?.rarity_percent ?? "—"}%</p>
                 </div>
               </div>
             </div>
@@ -829,36 +934,38 @@ export default function NFTDetailPage() {
                 <p className="text-neutral-400 text-sm mb-2">Artist</p>
                 <div className="flex items-center">
                   <Image
-                    src="/icons/artist-logo-kristen-woerdeman-20px.png"
+                    src="/icons/artist-logo-kristen-woerdeman-26px-off-white.svg"
                     alt="Kristen Woerdeman"
-                    width={20}
-                    height={20}
-                    className="w-5 h-5 mr-2"
+                    width={26}
+                    height={26}
+                    className="w-6 h-6 mr-2"
+                    sizes="26px"
                   />
-                  <p className="text-sm text-neutral-100">{metadata?.artist ?? "Kristen Woerdeman"}</p>
+                  <p className="text-sm" style={{ color: "#fffbeb" }}>{metadata?.artist ?? "Kristen Woerdeman"}</p>
                 </div>
               </div>
               <div className="bg-neutral-800 p-4 rounded border border-neutral-700">
                 <p className="text-neutral-400 text-sm mb-2">Platform</p>
                 <div className="flex items-center">
                   <Image
-                    src="/icons/platform-logo-retinal-delights-20px.png"
+                    src="/icons/platform-logo-retinal-delights-26px-off-white.svg"
                     alt="Retinal Delights"
-                    width={20}
-                    height={20}
-                    className="w-5 h-5 mr-2"
+                    width={26}
+                    height={26}
+                    className="w-6 h-6 mr-2"
+                    sizes="26px"
                   />
-                  <p className="text-sm text-neutral-100">{metadata?.platform ?? "Retinal Delights"}</p>
+                  <p className="text-sm" style={{ color: "#fffbeb" }}>{metadata?.platform ?? "Retinal Delights"}</p>
                 </div>
               </div>
             </div>
 
             {/* Auction End Time */}
-            <div className="text-sm bg-neutral-800 p-3 rounded border border-neutral-700">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="text-sm bg-neutral-800 p-4 rounded border border-neutral-700">
+              <div className="grid grid-cols-2 gap-6">
                 <div>
                   <span className="text-neutral-400">Auction Ends:</span>
-                  <p className="text-neutral-100 font-medium">
+                  <p className="font-semibold" style={{ color: "#fffbeb" }}>
                     {isLoadingAuction ? (
                       "Loading..."
                     ) : auctionData ? (
@@ -870,7 +977,7 @@ export default function NFTDetailPage() {
                 </div>
                 <div>
                   <span className="text-neutral-400">Time Remaining:</span>
-                  <p className={`font-medium ${getAuctionEndColor(auctionData?.endTimeInSeconds || 0)}`}>
+                  <p className="font-semibold" style={{ color: "#fffbeb" }}>
                     {isLoadingAuction ? "Loading..." : timeRemaining || "No active auction"}
                   </p>
                 </div>
@@ -878,18 +985,18 @@ export default function NFTDetailPage() {
             </div>
 
             {/* Bidding Section */}
-            <div className="space-y-4">
+            <div className="space-y-6">
               {/* Place Bid */}
               <div className="bg-neutral-800 p-4 rounded border border-neutral-700">
                 <div className="flex items-center justify-between mb-3">
                   <label htmlFor="bid-amount" className="text-sm font-medium" style={{ color: COLORS.hair }}>
                     Place Your Bid
                   </label>
-                  <div className="text-sm text-neutral-400">
+                  <div className="text-sm" style={{ color: "#fffbeb" }}>
                     {bidCount} bid{bidCount !== 1 ? 's' : ''} placed
                   </div>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex gap-4">
                   <div className="relative flex-1">
                     <Input
                       id="bid-amount"
@@ -902,11 +1009,12 @@ export default function NFTDetailPage() {
                           setBidAmount(validation.formattedValue);
                         }
                       }}
-                      className="pr-12 border-2 focus:ring-2 focus:ring-offset-2 text-base font-semibold placeholder:text-green-400"
+                      className="pr-12 border-2 focus:ring-2 focus:ring-offset-2 text-base font-semibold placeholder:text-green-400 h-10 rounded"
                       style={{
                         borderColor: COLORS.hair + '80',
-                        color: COLORS.hair,
-                        backgroundColor: 'transparent'
+                        color: '#10B981',
+                        backgroundColor: 'transparent',
+                        borderRadius: "4px"
                       }}
                       step="0.001"
                       min={tierPricing.start}
@@ -924,23 +1032,27 @@ export default function NFTDetailPage() {
                       if (auctionData?.auctionId) {
                         await refreshAuctionBid(auctionData.auctionId.toString());
                       }
+                      // Also refresh full auction data for complete real-time update
+                      await fetchAuctionData();
                       alert(`Bid of ${bidAmount} ETH placed successfully!`);
                     }}
                     onError={(error) => {
                       console.error("Bid failed:", error);
                       alert(error.message || "Failed to place bid. Please try again.");
                     }}
-                    className="w-32 px-6 py-2 font-semibold text-white transition-all duration-200 hover:scale-105 focus:ring-2 focus:ring-offset-2 hover:bg-emerald-600"
+                    className="w-32 px-6 h-10 font-bold transition-colors duration-300 ease-in-out focus:ring-2 focus:ring-offset-2 hover:bg-emerald-600 rounded"
                     style={{
+                      color: "#fffbeb",
                       backgroundColor: COLORS.hair,
-                      borderColor: COLORS.hair
+                      borderColor: COLORS.hair,
+                      borderRadius: "4px"
                     }}
                     aria-describedby="bid-help"
                   >
                     PLACE BID
                   </TransactionButton>
                 </div>
-                <p id="bid-help" className="text-sm text-neutral-400 mt-2">
+                <p id="bid-help" className="text-sm mt-2" style={{ color: "#fffbeb" }}>
                   Minimum bid: {tierPricing.start} ETH
                 </p>
               </div>
@@ -950,7 +1062,7 @@ export default function NFTDetailPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm mb-1" style={{ color: COLORS.background }}>Buy Now Price</p>
-                    <p className="text-xl font-bold" style={{ color: COLORS.background }}>
+                    <p className="text-sm sm:text-base font-semibold" style={{ color: COLORS.background }}>
                       {isLoadingAuction ? "Loading..." : `${buyNowPrice} ETH`}
                     </p>
                   </div>
@@ -965,10 +1077,12 @@ export default function NFTDetailPage() {
                       console.error("Buy now failed:", error);
                       alert(error.message || "Failed to buy NFT. Please try again.");
                     }}
-                    className="w-32 px-6 py-2 font-semibold text-white transition-all duration-200 hover:scale-105 focus:ring-2 focus:ring-offset-2 hover:bg-blue-600"
+                    className="w-32 px-6 h-10 font-bold transition-colors duration-300 ease-in-out focus:ring-2 focus:ring-offset-2 hover:bg-blue-600 rounded"
                     style={{
+                      color: "#fffbeb",
                       backgroundColor: COLORS.background,
-                      borderColor: COLORS.background
+                      borderColor: COLORS.background,
+                      borderRadius: "4px"
                     }}
                   >
                     BUY NOW
@@ -1095,8 +1209,8 @@ export default function NFTDetailPage() {
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="description" className="mt-4">
-                <div className="bg-neutral-800 p-4 rounded-lg border border-neutral-700">
-                  <p className="text-neutral-300 text-sm mb-4">
+                <div className="bg-neutral-800 p-4 rounded border border-neutral-700">
+                  <p className="text-sm mb-4" style={{ color: "#fffbeb" }}>
                     {metadata?.description || "Women's Baseball Card from the Satoshe Sluggers collection."}
                   </p>
 
@@ -1105,7 +1219,8 @@ export default function NFTDetailPage() {
                       <span className="text-neutral-400 text-sm">Contract Address</span>
                       <button
                         onClick={handleCopyAddress}
-                        className="text-sm font-mono text-neutral-100 hover:text-blue-400 transition-colors cursor-pointer"
+                        className="text-sm font-mono hover:text-blue-400 transition-colors cursor-pointer"
+                        style={{ color: "#fffbeb" }}
                         title="Click to copy full address to clipboard"
                       >
                         {nftCollection.address.slice(0, 6)}...{nftCollection.address.slice(-4)}
@@ -1113,30 +1228,30 @@ export default function NFTDetailPage() {
                     </div>
                     <div className="flex justify-between py-2 border-b border-neutral-700">
                       <span className="text-neutral-400 text-sm">Token ID</span>
-                      <span className="text-sm text-neutral-100">{metadata?.token_id ?? tokenId}</span>
+                      <span className="text-sm" style={{ color: "#fffbeb" }}>{metadata?.token_id ?? tokenId}</span>
                     </div>
                     <div className="flex justify-between py-2 border-b border-neutral-700">
                       <span className="text-neutral-400 text-sm">Token Standard</span>
-                      <span className="text-sm text-neutral-100">ERC-721</span>
+                      <span className="text-sm" style={{ color: "#fffbeb" }}>ERC-721</span>
                     </div>
                     <div className="flex justify-between py-2">
                       <span className="text-neutral-400 text-sm">Blockchain</span>
-                      <span className="text-sm text-neutral-100">Base</span>
+                      <span className="text-sm" style={{ color: "#fffbeb" }}>Base</span>
                     </div>
                   </div>
                 </div>
               </TabsContent>
               <TabsContent value="sales" className="mt-4">
-                <div className="bg-neutral-800 p-4 rounded-lg border border-neutral-700">
+                <div className="bg-neutral-800 p-4 rounded border border-neutral-700">
                   <div className="space-y-3">
                     {salesHistory.map((sale, index) => (
                       <div key={index} className="flex justify-between items-center py-3 border-b border-neutral-700 last:border-b-0">
                         <div>
-                          <p className="text-sm font-medium text-neutral-100">{sale.event}</p>
+                          <p className="text-sm font-medium" style={{ color: "#fffbeb" }}>{sale.event}</p>
                           <p className="text-xs text-neutral-400">{sale.price}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm text-neutral-100">{sale.from} → {sale.to}</p>
+                          <p className="text-sm" style={{ color: "#fffbeb" }}>{sale.from} → {sale.to}</p>
                           <p className="text-xs text-neutral-400">{sale.date}</p>
                         </div>
                       </div>

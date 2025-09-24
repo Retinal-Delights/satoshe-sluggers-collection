@@ -19,11 +19,13 @@ export default function Navigation({ activePage = "home" }: NavigationProps) {
       <div className="flex items-center">
         <Link href="/" className="flex items-center">
           <Image
-            src="/retinal-delights-nav-brand-white.svg"
+            src="/retinal_delights-horizontal-brand-offwhite.svg"
             alt="Retinal Delights"
             width={200}
             height={50}
-            className="w-auto h-10 sm:h-12"
+            className="w-auto h-10 sm:h-12 md:h-14 max-h-14"
+            priority
+            sizes="(max-width: 640px) 200px, (max-width: 768px) 240px, 280px"
           />
         </Link>
       </div>
@@ -31,63 +33,69 @@ export default function Navigation({ activePage = "home" }: NavigationProps) {
         <Link
           href="/"
           className={`text-base font-medium relative group ${
-            activePage === "home" ? "text-neutral-100" : "text-neutral-400 hover:text-neutral-100"
+            activePage === "home" ? "text-[#ff0099]" : "text-neutral-400 hover:text-[#fffbeb]"
           }`}
         >
           HOME
-          <span className={`absolute bottom-0 left-0 h-0.5 bg-neutral-100 transition-all duration-300 ease-out ${
+          <span className={`absolute bottom-0 left-0 h-0.5 transition-all duration-300 ease-out ${
             activePage === "home" ? "w-full" : "w-0 group-hover:w-full"
-          }`}></span>
+          }`} style={{ backgroundColor: activePage === "home" ? "#ff0099" : "#fffbeb" }}></span>
         </Link>
         <Link
           href="/about"
           className={`text-base font-medium relative group ${
-            activePage === "about" ? "text-neutral-100" : "text-neutral-400 hover:text-neutral-100"
+            activePage === "about" ? "text-[#ff0099]" : "text-neutral-400 hover:text-[#fffbeb]"
           }`}
         >
           ABOUT
-          <span className={`absolute bottom-0 left-0 h-0.5 bg-neutral-100 transition-all duration-300 ease-out ${
+          <span className={`absolute bottom-0 left-0 h-0.5 transition-all duration-300 ease-out ${
             activePage === "about" ? "w-full" : "w-0 group-hover:w-full"
-          }`}></span>
+          }`} style={{ backgroundColor: activePage === "about" ? "#ff0099" : "#fffbeb" }}></span>
         </Link>
         <Link
           href="/nfts"
           className={`text-base font-medium relative group ${
-            activePage === "nfts" ? "text-neutral-100" : "text-neutral-400 hover:text-neutral-100"
+            activePage === "nfts" ? "text-[#ff0099]" : "text-neutral-400 hover:text-[#fffbeb]"
           }`}
         >
           NFTS
-          <span className={`absolute bottom-0 left-0 h-0.5 bg-neutral-100 transition-all duration-300 ease-out ${
+          <span className={`absolute bottom-0 left-0 h-0.5 transition-all duration-300 ease-out ${
             activePage === "nfts" ? "w-full" : "w-0 group-hover:w-full"
-          }`}></span>
+          }`} style={{ backgroundColor: activePage === "nfts" ? "#ff0099" : "#fffbeb" }}></span>
         </Link>
         <Link
           href="/sell"
           className={`text-base font-medium relative group ${
-            activePage === "sell" ? "text-neutral-100" : "text-neutral-400 hover:text-neutral-100"
+            activePage === "sell" ? "text-[#ff0099]" : "text-neutral-400 hover:text-[#fffbeb]"
           }`}
         >
           SELL
-          <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-neutral-100 transition-all duration-300 ease-out group-hover:w-full"></span>
+          <span className={`absolute bottom-0 left-0 h-0.5 transition-all duration-300 ease-out ${
+            activePage === "sell" ? "w-full" : "w-0 group-hover:w-full"
+          }`} style={{ backgroundColor: activePage === "sell" ? "#ff0099" : "#fffbeb" }}></span>
         </Link>
         <Link
           href="/contact"
           className={`text-base font-medium relative group ${
-            activePage === "contact" ? "text-neutral-100" : "text-neutral-400 hover:text-neutral-100"
+            activePage === "contact" ? "text-[#ff0099]" : "text-neutral-400 hover:text-[#fffbeb]"
           }`}
         >
           CONTACT
-          <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-neutral-100 transition-all duration-300 ease-out group-hover:w-full"></span>
+          <span className={`absolute bottom-0 left-0 h-0.5 transition-all duration-300 ease-out ${
+            activePage === "contact" ? "w-full" : "w-0 group-hover:w-full"
+          }`} style={{ backgroundColor: activePage === "contact" ? "#ff0099" : "#fffbeb" }}></span>
         </Link>
         {account && (
           <Link
             href="/my-nfts"
             className={`text-base font-medium relative group ${
-              activePage === "my-nfts" ? "text-neutral-100" : "text-neutral-400 hover:text-neutral-100"
+              activePage === "my-nfts" ? "text-[#ff0099]" : "text-neutral-400 hover:text-[#fffbeb]"
             }`}
           >
             MY NFTS
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-neutral-100 transition-all duration-300 ease-out group-hover:w-full"></span>
+            <span className={`absolute bottom-0 left-0 h-0.5 transition-all duration-300 ease-out ${
+              activePage === "my-nfts" ? "w-full" : "w-0 group-hover:w-full"
+            }`} style={{ backgroundColor: activePage === "my-nfts" ? "#ff0099" : "#fffbeb" }}></span>
           </Link>
         )}
       </nav>

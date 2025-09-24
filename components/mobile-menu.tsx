@@ -41,7 +41,7 @@ export function MobileMenu({ isWalletConnected = false }: MobileMenuProps) {
           size="icon"
           className="lg:hidden p-2 hover:bg-accent rounded-full transition-colors border border-border"
         >
-          <Menu className="h-8 w-8" />
+          <Menu className="h-8 w-8" style={{ color: "#fffbeb" }} />
           <span className="sr-only">Toggle menu</span>
         </Button>
       </SheetTrigger>

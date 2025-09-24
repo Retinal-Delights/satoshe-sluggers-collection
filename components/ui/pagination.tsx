@@ -136,7 +136,7 @@ export default function NFTPagination({
             className="bg-neutral-800 border-neutral-700 hover:bg-neutral-700 h-8 w-8 p-0"
             style={{ borderRadius: "4px" }}
           >
-            <ChevronFirst className="h-4 w-4" />
+            <ChevronFirst className="h-4 w-4" style={{ color: "#fffbeb" }} />
           </Button>
           <Button
             variant="outline"
@@ -147,7 +147,7 @@ export default function NFTPagination({
             className="bg-neutral-800 border-neutral-700 hover:bg-neutral-700 h-8 w-8 p-0"
             style={{ borderRadius: "4px" }}
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-4 w-4" style={{ color: "#fffbeb" }} />
           </Button>
 
           <div className="hidden sm:flex items-center gap-1">
@@ -167,10 +167,10 @@ export default function NFTPagination({
                   size="sm"
                   className={
                     currentPage === page
-                      ? "bg-brand-pink hover:bg-brand-pink-hover text-white text-xs h-8 w-8 p-0"
-                      : "bg-neutral-800 border-neutral-700 hover:bg-neutral-700 text-white text-xs h-8 w-8 p-0"
+                      ? "bg-brand-pink hover:bg-brand-pink-hover text-xs h-8 w-8 p-0"
+                      : "bg-neutral-800 border-neutral-700 hover:bg-neutral-700 text-xs h-8 w-8 p-0"
                   }
-                  style={{ borderRadius: "4px" }}
+                  style={{ borderRadius: "4px", color: "#fffbeb" }}
                   onClick={() => onPageChange(page as number)}
                 >
                   {page}
@@ -188,7 +188,7 @@ export default function NFTPagination({
             className="bg-neutral-800 border-neutral-700 hover:bg-neutral-700 h-8 w-8 p-0"
             style={{ borderRadius: "4px" }}
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4" style={{ color: "#fffbeb" }} />
           </Button>
           <Button
             variant="outline"
@@ -199,7 +199,7 @@ export default function NFTPagination({
             className="bg-neutral-800 border-neutral-700 hover:bg-neutral-700 h-8 w-8 p-0"
             style={{ borderRadius: "4px" }}
           >
-            <ChevronLast className="h-4 w-4" />
+            <ChevronLast className="h-4 w-4" style={{ color: "#fffbeb" }} />
           </Button>
         </div>
 

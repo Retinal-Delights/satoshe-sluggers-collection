@@ -75,7 +75,7 @@ export default function AttributeRarityChart({ attributes, overallRarity }: Attr
   return (
     <Card className="flex flex-col bg-neutral-800 border-neutral-700 mb-8">
       <CardHeader className="items-center pb-3">
-        <CardTitle className="text-lg text-neutral-100">Attribute Rarity Distribution</CardTitle>
+        <CardTitle className="text-lg" style={{ color: "#fffbeb" }}>Attribute Rarity Distribution</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 pb-6">
         <ChartContainer
@@ -87,11 +87,12 @@ export default function AttributeRarityChart({ attributes, overallRarity }: Attr
               cursor={false}
               content={<ChartTooltipContent
                 hideLabel
-                className="bg-neutral-900 border-neutral-600 text-neutral-100"
+                className="bg-neutral-900 border-neutral-600"
+                style={{ color: "#fffbeb" }}
                 formatter={(value, name) => {
                   const item = chartData.find(d => d.name === name);
                   return [
-                    <span key={name} className="text-neutral-100 font-medium">
+                    <span key={name} className="font-medium" style={{ color: "#fffbeb" }}>
                       {name}, {item?.value}, {value}%
                     </span>,
                     ""
@@ -121,14 +122,16 @@ export default function AttributeRarityChart({ attributes, overallRarity }: Attr
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) - 8}
-                          className="fill-neutral-100 text-2xl font-bold"
+                          className="text-2xl font-bold"
+                          style={{ fill: "#fffbeb" }}
                         >
                           {overallRarity}%
                         </tspan>
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) + 18}
-                          className="fill-neutral-400 text-sm"
+                          className="text-sm"
+                          style={{ fill: "#fffbeb" }}
                         >
                           Rarity
                         </tspan>
@@ -149,7 +152,7 @@ export default function AttributeRarityChart({ attributes, overallRarity }: Attr
                 className="w-3 h-3 rounded-full flex-shrink-0"
                 style={{ backgroundColor: item.fill }}
               />
-              <span className="text-neutral-300 font-medium">
+              <span className="font-medium" style={{ color: "#fffbeb" }}>
                 {item.name}, {item.value}, {item.percentage}%
               </span>
             </div>

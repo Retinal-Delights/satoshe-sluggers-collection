@@ -4,24 +4,13 @@ import { Heart } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 
 const legalLinks = [
-  {
-    label: "TERMS OF SERVICE",
-    href: "https://app.termly.io/policy-viewer/policy.html?policyUUID=ea0f70ba-b648-4ebc-b19e-1951104cefa6",
-  },
-  {
-    label: "PRIVACY POLICY",
-    href: "https://app.termly.io/policy-viewer/policy.html?policyUUID=3267dd16-a550-4879-8bf0-d03877fe1938",
-  },
-  {
-    label: "COOKIES POLICY",
-    href: "https://app.termly.io/policy-viewer/policy.html?policyUUID=367cac94-e5d6-495a-a856-f39363a6d17e",
-  },
-  { label: "NFT LICENSE AGREEMENT", href: "https://www.retinaldelights.io/nft-license-agreement" },
-  { label: "DISCLAIMER", href: "https://www.retinaldelights.io/disclaimer" },
-  {
-    label: "ACCEPTABLE USE POLICY",
-    href: "https://app.termly.io/policy-viewer/policy.html?policyUUID=eebdec60-dcf1-4cdc-8e47-7977dbda5260",
-  },
+  { label: "TERMS", href: "https://retinaldelights.io/terms" },
+  { label: "PRIVACY", href: "https://retinaldelights.io/privacy" },
+  { label: "COOKIES", href: "https://retinaldelights.io/cookies" },
+  { label: "LICENSE AGREEMENT", href: "https://retinaldelights.io/nft-license-agreement" },
+  { label: "NFT LISTING", href: "https://retinaldelights.io/nft-listing-policy" },
+  { label: "ACCEPTABLE USE", href: "https://retinaldelights.io/acceptable-use-policy" },
+  { label: "DISCLAIMER", href: "https://retinaldelights.io/disclaimer" },
 ]
 
 export default function Footer() {
@@ -32,11 +21,12 @@ export default function Footer() {
         <div className="flex flex-col items-center justify-center gap-6">
           <div className="flex items-center justify-center py-2">
             <Image
-              src="/retinal-delights-nav-brand-white.svg"
+              src="/retinal_delights-horizontal-brand-offwhite.svg"
               alt="Retinal Delights"
-              width={220}
+              width={200}
               height={50}
-              className="h-12 w-auto"
+              className="w-auto h-10 sm:h-12 md:h-14 max-h-14"
+              sizes="(max-width: 640px) 200px, (max-width: 768px) 240px, 280px"
             />
           </div>
 

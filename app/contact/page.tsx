@@ -75,24 +75,24 @@ export default function ContactPage() {
     <main className="min-h-screen bg-background text-foreground flex flex-col pt-24 sm:pt-28">
       <Navigation activePage="contact" />
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 flex-grow" role="main" aria-labelledby="contact-heading">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-12 sm:pb-20 flex-grow" role="main" aria-labelledby="contact-heading">
         <div className="text-center mb-6 sm:mb-8">
-          <h1 id="contact-heading" className="text-2xl sm:text-3xl font-bold mb-3 text-neutral-100">
+          <h1 id="contact-heading" className="text-2xl sm:text-3xl font-bold mb-3" style={{ color: "#fffbeb" }}>
             CONTACT US
           </h1>
-          <p className="text-neutral-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed px-4">
+          <p className="text-base sm:text-lg max-w-2xl mx-auto leading-relaxed px-4" style={{ color: "#fffbeb" }}>
             Reach out with questions, feedback, or press inquiries.
           </p>
         </div>
 
         <div
-          className="bg-card rounded-lg p-6 border border-neutral-700 shadow-lg"
+          className="bg-card rounded p-6 border border-neutral-700 shadow-lg"
           role="region"
           aria-labelledby="contact-form-heading"
         >
           {submitted ? (
             <div className="text-center py-8" role="status" aria-live="polite">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-500/20 mb-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded bg-green-500/20 mb-4">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-8 w-8 text-green-500"
@@ -107,11 +107,12 @@ export default function ContactPage() {
               <h2 id="submission-status" className="text-xl font-bold mb-2">
                 Message Sent!
               </h2>
-              <p className="text-neutral-300 mb-6">Thank you for reaching out. We'll get back to you as soon as possible.</p>
+              <p className="mb-6" style={{ color: "#fffbeb" }}>Thank you for reaching out. We'll get back to you as soon as possible.</p>
               <Button
                 onClick={() => setSubmitted(false)}
-                className="text-white py-3 px-6 text-base font-medium focus:ring-4 transition-colors"
+                className="py-3 px-6 text-base font-medium focus:ring-4 transition-colors"
                 style={{
+                  color: "#fffbeb",
                   backgroundColor: "#FF0099",
                   borderColor: "#FF0099"
                 }}
@@ -128,7 +129,7 @@ export default function ContactPage() {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label htmlFor="name" className="block text-base font-medium text-neutral-200">
+                  <label htmlFor="name" className="block text-base font-medium" style={{ color: "#fffbeb" }}>
                     Name{" "}
                     <span style={{ color: "#FF0099" }} aria-hidden="true">
                       *
@@ -153,7 +154,7 @@ export default function ContactPage() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="email" className="block text-base font-medium text-neutral-200">
+                  <label htmlFor="email" className="block text-base font-medium" style={{ color: "#fffbeb" }}>
                     Email{" "}
                     <span style={{ color: "#FF0099" }} aria-hidden="true">
                       *
@@ -181,7 +182,7 @@ export default function ContactPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <label htmlFor="subject" className="block text-base font-medium text-neutral-200">
+                <label htmlFor="subject" className="block text-base font-medium" style={{ color: "#fffbeb" }}>
                   Subject{" "}
                   <span style={{ color: "#FF0099" }} aria-hidden="true">
                     *
@@ -206,7 +207,7 @@ export default function ContactPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <label htmlFor="message" className="block text-base font-medium text-neutral-200">
+                <label htmlFor="message" className="block text-base font-medium" style={{ color: "#fffbeb" }}>
                   Message{" "}
                   <span style={{ color: "#FF0099" }} aria-hidden="true">
                     *
@@ -245,7 +246,7 @@ export default function ContactPage() {
                   required
                   aria-required="true"
                 />
-                <Label htmlFor="terms" className="cursor-pointer text-base text-neutral-200" id="terms-desc">
+                <Label htmlFor="terms" className="cursor-pointer text-base !font-normal" id="terms-desc" style={{ color: "#fffbeb" }}>
                   I accept the{" "}
                   <a
                     href="https://app.termly.io/policy-viewer/policy.html?policyUUID=3267dd16-a550-4879-8bf0-d03877fe1938"
@@ -284,8 +285,9 @@ export default function ContactPage() {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="text-white py-3 px-8 text-lg font-medium focus:ring-4 transition-colors"
+                  className="py-3 px-8 text-lg font-medium focus:ring-4 transition-colors"
                   style={{
+                    color: "#fffbeb",
                     backgroundColor: "#FF0099",
                     borderColor: "#FF0099"
                   }}
@@ -293,34 +295,7 @@ export default function ContactPage() {
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#FF0099"}
                   aria-live="polite"
                 >
-                  {isSubmitting ? (
-                    <>
-                      <svg
-                        className="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                      </svg>
-                      <span>Sending...</span>
-                    </>
-                  ) : (
-                    "Send Message"
-                  )}
+                  {isSubmitting ? "Sending..." : "Send Message"}
                 </Button>
               </div>
             </form>

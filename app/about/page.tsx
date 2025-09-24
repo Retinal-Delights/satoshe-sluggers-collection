@@ -9,15 +9,16 @@ export default function AboutPage() {
     <main className="min-h-screen bg-background text-foreground flex flex-col pt-24 sm:pt-28">
       <Navigation activePage="about" />
 
-      <div className="flex-grow container mx-auto px-4 py-12 flex items-center justify-center">
-        <div className="max-w-3xl w-full bg-neutral-100 rounded-lg overflow-hidden shadow-xl p-4 sm:p-6 md:p-8 border border-neutral-300">
+      <div className="flex-grow container mx-auto px-4 py-12 pb-16 flex items-center justify-center">
+        <div className="max-w-3xl w-full">
           <Image
-            src="/about.svg"
+            src="/satoshe-sluggers-about-us-offwhite.svg"
             alt="About Satoshe Sluggers"
-            width={800}
-            height={1000}
-            className="w-full h-auto"
+            width={600}
+            height={1200}
+            className="w-full h-auto max-w-2xl"
             priority
+            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 80vw, 60vw"
           />
         </div>
       </div>
