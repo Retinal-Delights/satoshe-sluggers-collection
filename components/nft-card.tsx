@@ -10,7 +10,6 @@ import { bidInAuction, buyoutAuction, getAuction, getWinningBid } from "thirdweb
 import { toWei } from "thirdweb";
 import { marketplace } from "@/lib/contracts";
 import { ethers } from "ethers";
-import marketplaceAbi from "@/abi/nft_marketplace_abi.json";
 
 // Extend Window interface for ethereum
 declare global {
@@ -36,11 +35,15 @@ interface NFTCardProps {
   bidAmount: string;
   isProcessingBuyNow: boolean;
   isForSale: boolean;
-  currentBid?: string;
+  currentBid: string;
+  bidPrice: string;
+  auctionId?: string | number;
   
   // Purchase handlers (from parent/page)
   onBid: (bidAmount: string) => void;
   onBuyNow: () => void;
+  onBidAmountChange: (id: string, value: string) => void;
+  onPlaceBid: () => void;
   buyNowValue?: number;
   buyNowWei?: string;
   minimumBidWei?: string;
@@ -85,10 +88,13 @@ export default function NFTCard({
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       
-      // Create contract instance
+      // Create contract instance using the marketplace contract address
       const contract = new ethers.Contract(
-        "0xF0f26455b9869d4A788191f6AEdc78410731072C",
-        marketplaceAbi,
+        marketplace.address,
+        [
+          "function bidInAuction(uint256 auctionId, uint256 bidAmount) external payable",
+          "function buyoutAuction(uint256 auctionId) external payable"
+        ],
         signer
       );
 
@@ -119,7 +125,7 @@ export default function NFTCard({
       track('NFT Bid Placed', {
         tokenId,
         bidAmount: userInput,
-        currentBid: currentBid.replace(' ETH', ''),
+        currentBid: (currentBid || '0 ETH').replace(' ETH', ''),
         buyNow: buyNow.replace(' ETH', ''),
         rarity,
         rank: String(rank),
@@ -155,7 +161,7 @@ export default function NFTCard({
 
   // Min bid for UI display of default
   const minIncrement = 0.05; // 5%
-  const currentBidValue = Number(currentBid.replace(' ETH', ''));
+  const currentBidValue = Number((currentBid || '0 ETH').replace(' ETH', ''));
   const minimumBidDisplay = numBids > 0
     ? (currentBidValue * (1 + minIncrement))
     : currentBidValue;
@@ -245,11 +251,11 @@ export default function NFTCard({
                           const validation = validateNumericInput(e.target.value, tokenId);
                           if (validation.isValid) {
                             onBidAmountChange(tokenId, validation.formattedValue);
-                            if (validation.formattedValue !== currentBid.replace(' ETH', '')) {
+                            if (validation.formattedValue !== (currentBid || '0 ETH').replace(' ETH', '')) {
                               track('Bid Amount Modified', {
                                 tokenId,
                                 newBidAmount: validation.formattedValue,
-                                currentBid: currentBid.replace(' ETH', ''),
+                                currentBid: (currentBid || '0 ETH').replace(' ETH', ''),
                                 rarity
                               });
                             }
@@ -260,7 +266,7 @@ export default function NFTCard({
                         onFocus={e => e.currentTarget.style.borderColor = "#059669"}
                         onBlur={e => e.currentTarget.style.borderColor = "#10B981"}
                         step="0.00001"
-                        min={currentBid.replace(' ETH', '')}
+                        min={(currentBid || '0 ETH').replace(' ETH', '')}
                       />
                       <div className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 text-xs pointer-events-none">
                         ETH
@@ -306,7 +312,7 @@ export default function NFTCard({
                                 track('NFT Buy Now Clicked', {
                                   tokenId,
                                   buyNowPrice: buyNow.replace(' ETH', ''),
-                                  currentBid: currentBid.replace(' ETH', ''),
+                                  currentBid: (currentBid || '0 ETH').replace(' ETH', ''),
                                   rarity,
                                   rank: String(rank),
                                   numBids: String(numBids)

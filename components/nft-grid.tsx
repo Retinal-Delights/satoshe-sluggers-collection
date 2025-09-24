@@ -1293,6 +1293,7 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
                   rank={nft.rank}
                   rarity={nft.rarity}
                   rarityPercent={nft.rarityPercent}
+                  startingPrice={bidPriceFormatted}
                   bidPrice={bidPriceFormatted}
                   currentBid={currentBidFormatted}
                   buyNow={buyNowFormatted}
@@ -1304,9 +1305,10 @@ export default function NFTGrid({ searchTerm, searchMode, selectedFilters, onFil
                   isProcessingBuyNow={isProcessingBuyNow[nft.id]}
                   isForSale={nft.isForSale}
                   auctionId={nft.auctionId.toString()}
-                  onBidAmountChange={(id, value) => handleBidAmountChange(nft.id, value)}
+                  onBidAmountChange={(id: string, value: string) => handleBidAmountChange(nft.id, value)}
                   onPlaceBid={() => handlePlaceBid(nft)}
                   onBuyNow={() => handleBuyNow(nft)}
+                  onBid={(bidAmount: string) => handlePlaceBid(nft)}
                   buyNowValue={Number(nft.priceWei) / 1e18}
                   buyNowWei={nft.priceWei?.toString()}
                   minimumBidWei={nft.bidPriceWei?.toString()}
