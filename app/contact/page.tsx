@@ -249,7 +249,7 @@ export default function ContactPage() {
                 <Label htmlFor="terms" className="cursor-pointer text-base !font-normal" id="terms-desc" style={{ color: "#fffbeb" }}>
                   I accept the{" "}
                   <a
-                    href="https://app.termly.io/policy-viewer/policy.html?policyUUID=3267dd16-a550-4879-8bf0-d03877fe1938"
+                    href="https://retinaldelights.io/privacy"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="underline hover:opacity-80 focus:outline-2"
@@ -260,7 +260,7 @@ export default function ContactPage() {
                   </a>{" "}
                   and{" "}
                   <a
-                    href="https://app.termly.io/policy-viewer/policy.html?policyUUID=ea0f70ba-b648-4ebc-b19e-1951104cefa6"
+                    href="https://retinaldelights.io/terms"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="underline hover:opacity-80 focus:outline-2"
